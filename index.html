@@ -40,34 +40,67 @@ h1 { font-family: var(--serif); font-size: clamp(32px,5vw,56px); font-weight: 40
 .section-title { font-family: var(--serif); font-size: 26px; font-style: italic; color: var(--ink); }
 .section-rule { flex: 1; height: 1px; background: var(--border); }
 
-/* LIVE MARKET BANNER */
-.live-banner { background: var(--ink); border-radius: 12px; padding: 20px 24px; margin-bottom: 48px; display: flex; gap: 0; flex-wrap: wrap; overflow: hidden; }
-.live-item { flex: 1; min-width: 160px; padding: 0 20px; border-right: 1px solid rgba(255,255,255,0.08); }
+/* AI BRIEFING */
+.ai-section { background: linear-gradient(135deg, #1a1714 0%, #2a2420 100%); border-radius: 16px; padding: 32px; margin-bottom: 48px; position: relative; overflow: hidden; }
+.ai-section::after { content: '◈'; position: absolute; right: 30px; top: 24px; font-size: 60px; color: rgba(212,165,32,0.07); }
+.ai-head { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.ai-badge { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-light); background: rgba(212,165,32,0.12); border: 1px solid rgba(212,165,32,0.25); padding: 4px 10px; border-radius: 100px; }
+.ai-title { font-family: var(--serif); font-size: 22px; font-style: italic; color: #fff; }
+.ai-text { font-family: var(--mono); font-size: 12.5px; line-height: 1.85; color: rgba(255,255,255,0.78); margin-bottom: 22px; min-height: 40px; }
+.ai-text strong { color: var(--gold-light); font-weight: 500; }
+.ai-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.ai-btn { font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; padding: 10px 18px; border-radius: 8px; cursor: pointer; border: none; transition: all 0.15s; }
+.ai-btn.primary { background: var(--gold-light); color: var(--ink); font-weight: 500; }
+.ai-btn.primary:hover { background: #e0b430; }
+.ai-btn.ghost { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.12); }
+.ai-btn.ghost:hover { border-color: var(--gold-light); color: var(--gold-light); }
+.ai-btn:disabled { opacity: 0.4; cursor: default; }
+.ai-ask { flex: 1; min-width: 220px; display: flex; gap: 8px; }
+.ai-ask input { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 10px 14px; font-family: var(--mono); font-size: 11px; color: #fff; outline: none; }
+.ai-ask input::placeholder { color: rgba(255,255,255,0.3); }
+.ai-ask input:focus { border-color: var(--gold-light); }
+.speaking-wave { display: inline-flex; gap: 2px; align-items: center; height: 12px; }
+.speaking-wave span { width: 2px; background: var(--gold-light); border-radius: 1px; animation: wave 1s infinite ease-in-out; }
+.speaking-wave span:nth-child(2){animation-delay:.15s} .speaking-wave span:nth-child(3){animation-delay:.3s} .speaking-wave span:nth-child(4){animation-delay:.45s}
+@keyframes wave { 0%,100%{height:4px} 50%{height:12px} }
+
+/* LIVE MARKET */
+.live-banner { background: var(--ink); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; display: flex; gap: 0; flex-wrap: wrap; overflow: hidden; align-items: stretch; }
+.live-item { flex: 1; min-width: 150px; padding: 0 20px; border-right: 1px solid rgba(255,255,255,0.08); }
 .live-item:first-child { padding-left: 0; }
-.live-item:last-child { border-right: none; }
-.live-ticker { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 4px; }
+.live-ticker { font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 4px; }
 .live-price { font-family: var(--serif); font-size: 22px; font-style: italic; color: #fff; line-height: 1; }
-.live-change { font-family: var(--mono); font-size: 11px; margin-top: 3px; }
+.live-change { font-family: var(--mono); font-size: 10px; margin-top: 4px; }
 .live-change.up { color: var(--teal-light); }
 .live-change.down { color: #e07070; }
 .live-change.flat { color: rgba(255,255,255,0.35); }
-.live-status { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 9px; color: rgba(255,255,255,0.25); margin-top: 2px; }
-.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal-light); animation: pulse 2s infinite; }
+.live-status { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 8.5px; color: rgba(255,255,255,0.25); margin-top: 4px; }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal-light); animation: pulse 2s infinite; flex-shrink: 0; }
 .live-dot.stale { background: var(--amber); animation: none; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-.sparkline-wrap { display: flex; align-items: flex-end; padding: 0 20px; }
-#sparkCanvas { display: block; }
-.refresh-btn { margin-left: auto; background: none; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: rgba(255,255,255,0.45); font-family: var(--mono); font-size: 10px; padding: 6px 12px; cursor: pointer; align-self: center; transition: border-color 0.2s, color 0.2s; }
+.sparkline-wrap { display: flex; align-items: center; padding: 0 16px; border-right: 1px solid rgba(255,255,255,0.08); }
+.refresh-btn { margin-left: auto; background: none; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: rgba(255,255,255,0.45); font-family: var(--mono); font-size: 10px; padding: 6px 12px; cursor: pointer; align-self: center; transition: all 0.2s; white-space: nowrap; }
 .refresh-btn:hover { border-color: var(--gold-light); color: var(--gold-light); }
+.fund-return-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 24px; margin-bottom: 48px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.fund-return-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.fund-return-vals { display: flex; gap: 24px; flex: 1; flex-wrap: wrap; }
+.frv { }
+.frv-num { font-family: var(--serif); font-size: 22px; font-style: italic; line-height: 1; }
+.frv-lbl { font-family: var(--mono); font-size: 9px; color: var(--muted); margin-top: 3px; }
+.use-return-btn { background: var(--ink); color: #fff; border: none; border-radius: 8px; padding: 10px 16px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; cursor: pointer; transition: background 0.15s; }
+.use-return-btn:hover { background: #2d2925; }
+.use-return-btn:disabled { opacity: 0.4; cursor: default; }
 
 /* NEWS */
 .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-bottom: 48px; }
 .news-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; text-decoration: none; display: block; }
 .news-card:hover { border-color: var(--gold); box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
-.news-source { font-family: var(--mono); font-size: 8px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.news-source { font-family: var(--mono); font-size: 8px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
 .news-title { font-family: var(--display); font-size: 13px; font-weight: 700; color: var(--ink); line-height: 1.4; margin-bottom: 6px; }
+.news-desc { font-family: var(--mono); font-size: 10px; color: var(--muted); line-height: 1.5; margin-bottom: 8px; }
 .news-date { font-family: var(--mono); font-size: 9px; color: var(--muted); }
-.news-loading { font-family: var(--mono); font-size: 11px; color: var(--muted); padding: 20px 0; }
+.news-loading { font-family: var(--mono); font-size: 11px; color: var(--muted); padding: 20px 0; grid-column: 1 / -1; }
+.news-retry { color: var(--gold); cursor: pointer; text-decoration: underline; }
 
 /* SNAPSHOT */
 .snapshot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 12px; margin-bottom: 48px; }
@@ -104,8 +137,8 @@ h1 { font-family: var(--serif); font-size: clamp(32px,5vw,56px); font-weight: 40
 .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
 .chart-card-title { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
 .chart-card-inner { position: relative; height: 280px; display: flex; align-items: center; justify-content: center; }
-.donut-center { position: absolute; text-align: center; pointer-events: none; }
-.donut-center-val { font-family: var(--serif); font-size: 28px; font-style: italic; color: var(--ink); line-height: 1; }
+.donut-center { position: absolute; text-align: center; pointer-events: none; top: 42%; left: 0; right: 0; transform: translateY(-50%); }
+.donut-center-val { font-family: var(--serif); font-size: 26px; font-style: italic; color: var(--ink); line-height: 1; }
 .donut-center-label { font-family: var(--mono); font-size: 9px; color: var(--muted); margin-top: 2px; }
 .progress-section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 48px; }
 .progress-title { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
@@ -152,7 +185,6 @@ canvas { width: 100%; display: block; }
 .sc-at { font-family: var(--serif); font-size: 22px; font-style: italic; margin: 12px 0 4px; }
 .sc-sub { font-family: var(--mono); font-size: 10px; color: var(--muted); line-height: 1.6; }
 
-/* SCENARIO BAR */
 .scenario-bar-section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 48px; }
 .scenario-bar-title { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
 
@@ -209,6 +241,7 @@ canvas { width: 100%; display: block; }
 .ep-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 12px; }
 .ep-row label { font-family: var(--mono); font-size: 11px; color: var(--ink); flex: 1; }
 .ep-row input { width: 130px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; font-family: var(--mono); font-size: 12px; color: var(--ink); background: var(--surface2); text-align: right; outline: none; transition: border-color 0.15s; }
+.ep-row input[type=text] { text-align: left; }
 .ep-row input:focus { border-color: var(--gold); background: #fff; }
 .ep-actions { padding: 16px 24px 28px; border-top: 1px solid var(--border); flex-shrink: 0; display: flex; gap: 10px; }
 .ep-save { flex: 1; background: var(--ink); color: #fff; border: none; border-radius: 8px; padding: 13px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; cursor: pointer; transition: background 0.15s; }
@@ -230,7 +263,7 @@ canvas { width: 100%; display: block; }
   .edit-panel { width: 100vw; }
   .live-banner { flex-direction: column; gap: 12px; }
   .live-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 0 0 12px; }
-  .live-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .sparkline-wrap { border-right: none; padding: 0; }
 }
 </style>
 </head>
@@ -246,28 +279,50 @@ canvas { width: 100%; display: block; }
 
 <div class="main">
 
+  <!-- AI BRIEFING -->
+  <div class="ai-section">
+    <div class="ai-head">
+      <span class="ai-badge">◈ AI Assistant</span>
+      <span class="ai-title">Your Financial Briefing</span>
+    </div>
+    <div class="ai-text" id="aiText">Generating your personalised briefing…</div>
+    <div class="ai-controls">
+      <button class="ai-btn primary" id="aiSpeakBtn">🔊 Read Aloud</button>
+      <button class="ai-btn ghost" id="aiStopBtn" disabled>■ Stop</button>
+      <div class="ai-ask">
+        <input type="text" id="aiAsk" placeholder="Ask me… e.g. 'when do I hit a million?' or 'retire at 60'">
+        <button class="ai-btn ghost" id="aiAskBtn">Ask</button>
+      </div>
+    </div>
+  </div>
+
   <!-- LIVE MARKET DATA -->
   <div class="section-header">
-    <div class="section-num">00</div>
+    <div class="section-num">01</div>
     <div class="section-title">Live Market Data</div>
     <div class="section-rule"></div>
   </div>
   <div class="live-banner" id="liveBanner">
     <div class="live-item"><div class="live-ticker">Loading…</div><div class="live-price" style="color:rgba(255,255,255,0.3)">—</div></div>
-    <button class="refresh-btn" id="refreshBtn">↻ Refresh</button>
+  </div>
+  <div class="fund-return-bar" id="fundReturnBar" style="display:none;">
+    <div class="fund-return-label">VAFTGAG / VAFTA — Vanguard FTSE Global All Cap (Acc) · Tracked via VWRP.L proxy</div>
+    <div class="fund-return-vals" id="fundReturnVals"></div>
+    <button class="use-return-btn" id="useReturnBtn" disabled>↻ Use live return as base case</button>
   </div>
 
   <!-- ECONOMIC NEWS -->
   <div class="section-header">
-    <div class="section-num">01</div>
+    <div class="section-num">02</div>
     <div class="section-title">Economic &amp; Finance News</div>
     <div class="section-rule"></div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--muted);white-space:nowrap;" id="newsTimestamp"></div>
   </div>
-  <div id="newsGrid" class="news-grid"><div class="news-loading">Loading news…</div></div>
+  <div id="newsGrid" class="news-grid"><div class="news-loading">Fetching BBC Business &amp; Guardian headlines…</div></div>
 
   <!-- FINANCIAL PICTURE -->
   <div class="section-header">
-    <div class="section-num">02</div>
+    <div class="section-num">03</div>
     <div class="section-title">Your Complete Financial Picture Today</div>
     <div class="section-rule"></div>
   </div>
@@ -280,18 +335,14 @@ canvas { width: 100%; display: block; }
 
   <!-- VISUAL DASHBOARD -->
   <div class="section-header">
-    <div class="section-num">03</div>
+    <div class="section-num">04</div>
     <div class="section-title">Visual Dashboard</div>
     <div class="section-rule"></div>
   </div>
 
   <div class="progress-section">
     <div class="progress-title" id="progressTitle"></div>
-    <div class="progress-bar-wrap">
-      <div class="progress-bar-fill" id="progressFill">
-        <span class="progress-bar-pct" id="progressPct"></span>
-      </div>
-    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressFill"><span class="progress-bar-pct" id="progressPct"></span></div></div>
     <div class="progress-meta" id="progressMeta"></div>
   </div>
 
@@ -300,23 +351,18 @@ canvas { width: 100%; display: block; }
       <div class="chart-card-title">Asset Allocation — Portfolio Split</div>
       <div class="chart-card-inner">
         <canvas id="allocChart"></canvas>
-        <div class="donut-center">
-          <div class="donut-center-val" id="donutTotal"></div>
-          <div class="donut-center-label">Total Net Worth</div>
-        </div>
+        <div class="donut-center"><div class="donut-center-val" id="donutTotal"></div><div class="donut-center-label">Total Net Worth</div></div>
       </div>
     </div>
     <div class="chart-card">
       <div class="chart-card-title">Scenario Comparison at Retirement</div>
-      <div class="chart-card-inner" style="height:280px;">
-        <canvas id="scenarioBarChart"></canvas>
-      </div>
+      <div class="chart-card-inner"><canvas id="scenarioBarChart"></canvas></div>
     </div>
   </div>
 
   <!-- UK COMPARISON -->
   <div class="section-header">
-    <div class="section-num">04</div>
+    <div class="section-num">05</div>
     <div class="section-title" id="percTitle"></div>
     <div class="section-rule"></div>
   </div>
@@ -327,7 +373,7 @@ canvas { width: 100%; display: block; }
 
   <!-- PROJECTION CHART -->
   <div class="section-header">
-    <div class="section-num">05</div>
+    <div class="section-num">06</div>
     <div class="section-title" id="chartTitle"></div>
     <div class="section-rule"></div>
   </div>
@@ -342,10 +388,8 @@ canvas { width: 100%; display: block; }
     <div class="chart-note" id="chartNote"></div>
   </div>
 
-  <!-- SCENARIOS -->
   <div class="scenario-cards" id="scenarioCards"></div>
 
-  <!-- SCENARIO BAR CHART -->
   <div class="scenario-bar-section">
     <div class="scenario-bar-title" id="scenarioBarTitle"></div>
     <div style="height:160px;position:relative;"><canvas id="scenarioHBar"></canvas></div>
@@ -353,23 +397,20 @@ canvas { width: 100%; display: block; }
 
   <!-- MILESTONES -->
   <div class="section-header">
-    <div class="section-num">06</div>
+    <div class="section-num">07</div>
     <div class="section-title">Age-by-Age Milestones</div>
     <div class="section-rule"></div>
   </div>
   <table class="milestone-table">
-    <thead>
-      <tr><th>Age</th><th>Year</th><th id="th-bull"></th><th id="th-base"></th><th id="th-bear"></th><th>Key Milestone</th></tr>
-    </thead>
+    <thead><tr><th>Age</th><th>Year</th><th id="th-bull"></th><th id="th-base"></th><th id="th-bear"></th><th>Key Milestone</th></tr></thead>
     <tbody id="milestoneBody"></tbody>
   </table>
 
-  <!-- GAP -->
   <div class="gap-box" id="gapBox"></div>
 
   <!-- INSIGHTS -->
   <div class="section-header">
-    <div class="section-num">07</div>
+    <div class="section-num">08</div>
     <div class="section-title">What the Numbers Are Telling You</div>
     <div class="section-rule"></div>
   </div>
@@ -378,7 +419,7 @@ canvas { width: 100%; display: block; }
 </div>
 
 <div class="disclaimer">
-  ⚠ All projections are modelled estimates for illustrative purposes only. Live market data is sourced via public APIs and may be delayed or unavailable. Economic news is from BBC Business RSS. Vanguard fund performance shown is for VWRL (FTSE All-World ETF) as a proxy — your specific fund returns will differ. UK percentile comparisons are from ONS Wealth &amp; Assets Survey, PLSA, PensionBee, and MoneyHelper — these are estimates. This does not constitute regulated financial advice. Seek advice from an FCA-authorised IFA before making investment decisions.
+  ⚠ All projections are modelled estimates for illustrative purposes only. Live market data is sourced via public APIs (Yahoo Finance) through CORS proxies and may be delayed, throttled, or temporarily unavailable. Economic news is aggregated from BBC, Sky &amp; Reuters business RSS feeds. The Vanguard FTSE Global All Cap Index Fund is an OEIC priced once daily; live ticker data tracks the closest available quote and exchange-traded equivalent. UK percentile comparisons are from ONS Wealth &amp; Assets Survey, PLSA, PensionBee, and MoneyHelper — these are estimates. This does not constitute regulated financial advice. Voice features use your browser's built-in speech engine; no audio leaves your device. Seek advice from an FCA-authorised IFA before making investment decisions.
 </div>
 </div>
 
@@ -420,6 +461,10 @@ canvas { width: 100%; display: block; }
         <div class="ep-row"><label>Bear return (% real)</label><input type="number" id="f_bearRet" min="-5" max="10" step="0.5"></div>
       </div>
       <div class="ep-section">
+        <div class="ep-section-title">Live Fund Tracking</div>
+        <div class="ep-row"><label>Fund ticker (Yahoo symbol)</label><input type="text" id="f_fundSym" placeholder="VWRP.L"></div>
+      </div>
+      <div class="ep-section">
         <div class="ep-section-title">Market Context (manual override)</div>
         <div class="ep-row"><label>BoE Base Rate (%)</label><input type="number" id="f_boeRate" min="0" max="20" step="0.25"></div>
         <div class="ep-row"><label>CPI Inflation (%)</label><input type="number" id="f_cpiInflation" min="0" max="20" step="0.1"></div>
@@ -449,6 +494,8 @@ const DEFAULTS = {
   wpMonthly: 650, sippMonthly: 100, isaMonthly: 400,
   bullRet: 8, baseRet: 5, bearRet: 2,
   boeRate: 4.75, cpiInflation: 2.3, ftseYTD: 8.2, globalYTD: 12.4,
+  // VWRP.L = Vanguard FTSE All-World UCITS ETF Acc (closest Yahoo Finance proxy for VAFTGAG/VAFTA)
+  fundSym: 'VWRP.L',
   lastUpdated: null
 };
 
@@ -482,23 +529,27 @@ function calc(d) {
   let lo = -5, hi = 30;
   for (let i = 0; i < 60; i++) { const mid = (lo+hi)/2; if (project(totalInvested,monthlyTotal,years,mid)[years] < d.target) lo=mid; else hi=mid; }
   const minRet = (lo+hi)/2;
-  return { totalInvested, equity, totalNW, monthlyTotal, years, chartYears, bullVals, baseVals, bearVals, bullAt, baseAt, bearAt, totalContribs, growthNeeded, returnsNeeded, minRet };
+  // Year first crossing £1M in base case
+  let millionAge = null;
+  for (let i = 0; i < baseVals.length; i++) { if (baseVals[i] >= 1000000) { millionAge = d.age + i; break; } }
+  return { totalInvested, equity, totalNW, monthlyTotal, years, chartYears, bullVals, baseVals, bearVals, bullAt, baseAt, bearAt, totalContribs, growthNeeded, returnsNeeded, minRet, millionAge };
 }
 
-// ── FORMAT ────────────────────────────────────────────────────
 function fmtFull(n) { return '£' + Math.round(n).toLocaleString('en-GB'); }
 function fmtS(n) {
   if (n >= 1000000) return '£' + (n/1e6).toFixed(2) + 'M';
   if (n >= 1000) return '£' + Math.round(n/1000) + 'K';
   return '£' + Math.round(n).toLocaleString('en-GB');
 }
+function fmtSpoken(n) {
+  if (n >= 1000000) return (n/1e6).toFixed(2) + ' million pounds';
+  if (n >= 1000) return Math.round(n/1000) + ' thousand pounds';
+  return Math.round(n) + ' pounds';
+}
 function todayStr() { return new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'}); }
 function sgn(n) { return n >= 0 ? '+' : ''; }
 
-// ── CHART INSTANCES ───────────────────────────────────────────
-let allocChartInst = null;
-let scenarioBarInst = null;
-let scenarioHBarInst = null;
+let allocChartInst=null, scenarioBarInst=null, scenarioHBarInst=null;
 
 // ── RENDER ────────────────────────────────────────────────────
 function renderHeader(d, c) {
@@ -513,14 +564,10 @@ function renderHeader(d, c) {
     hs('Years to Target', c.years + ' yrs', 'Retiring at ' + d.retAge) +
     hs('Retirement Target', fmtS(d.target), 'Invested portfolio only');
 }
-function hs(l,v,s) { return '<div class="hstat"><div class="hstat-label">'+l+'</div><div class="hstat-val">'+v+'</div><div class="hstat-sub">'+s+'</div></div>'; }
+function hs(l,v,s){return '<div class="hstat"><div class="hstat-label">'+l+'</div><div class="hstat-val">'+v+'</div><div class="hstat-sub">'+s+'</div></div>';}
 
 function renderSnapshot(d, c) {
-  function sc(hl, lbl, val, sub, tagCls, tagTxt) {
-    const h = hl ? ' highlight' : '';
-    const tag = tagCls ? '<div class="snap-tag '+tagCls+'">'+tagTxt+'</div>' : '';
-    return '<div class="snap-card'+h+'"><div class="snap-label">'+lbl+'</div><div class="snap-val">'+val+'</div><div class="snap-sub">'+sub+'</div>'+tag+'</div>';
-  }
+  function sc(hl,lbl,val,sub,tagCls,tagTxt){const h=hl?' highlight':'';const tag=tagCls?'<div class="snap-tag '+tagCls+'">'+tagTxt+'</div>':'';return '<div class="snap-card'+h+'"><div class="snap-label">'+lbl+'</div><div class="snap-val">'+val+'</div><div class="snap-sub">'+sub+'</div>'+tag+'</div>';}
   document.getElementById('snapshotGrid').innerHTML =
     sc(true,'Total Net Worth',fmtFull(c.totalNW),'All assets minus mortgage','','') +
     sc(false,'Personal SIPP',fmtFull(d.sipp),'Vanguard FTSE Global All Cap','tag-pension','Pension') +
@@ -532,70 +579,35 @@ function renderSnapshot(d, c) {
 
 function renderContributions(d, c) {
   document.getElementById('contribTitle').textContent = 'Monthly Money in Motion — ' + fmtS(c.monthlyTotal) + '/mo into your future';
-  function fi(dest, amt, color, ann, total) {
-    const cls = total ? ' flow-total' : '';
-    const st = color ? ' style="color:'+color+'"' : '';
-    return '<div class="flow-item'+cls+'"><div class="flow-dest">'+dest+'</div><div class="flow-amount"'+st+'>'+amt+'</div><div class="flow-annual">'+ann+'</div></div>';
-  }
+  function fi(dest,amt,color,ann,total){const cls=total?' flow-total':'';const st=color?' style="color:'+color+'"':'';return '<div class="flow-item'+cls+'"><div class="flow-dest">'+dest+'</div><div class="flow-amount"'+st+'>'+amt+'</div><div class="flow-annual">'+ann+'</div></div>';}
   document.getElementById('contribFlows').innerHTML =
-    fi('Work Pension',fmtS(d.wpMonthly),'var(--teal)',fmtS(d.wpMonthly*12)+'/yr · Tax-relieved',false) +
-    '<div class="flow-arrow">+</div>' +
-    fi('Personal SIPP',fmtS(d.sippMonthly),'var(--teal)',fmtS(d.sippMonthly*12)+'/yr · +25% HMRC top-up',false) +
-    '<div class="flow-arrow">+</div>' +
-    fi('S&amp;S ISA (Bridge)',fmtS(d.isaMonthly),'var(--blue)',fmtS(d.isaMonthly*12)+'/yr · Age '+d.retAge+'–68 fund',false) +
-    '<div class="flow-arrow">=</div>' +
+    fi('Work Pension',fmtS(d.wpMonthly),'var(--teal)',fmtS(d.wpMonthly*12)+'/yr · Tax-relieved',false)+'<div class="flow-arrow">+</div>'+
+    fi('Personal SIPP',fmtS(d.sippMonthly),'var(--teal)',fmtS(d.sippMonthly*12)+'/yr · +25% HMRC top-up',false)+'<div class="flow-arrow">+</div>'+
+    fi('S&amp;S ISA (Bridge)',fmtS(d.isaMonthly),'var(--blue)',fmtS(d.isaMonthly*12)+'/yr · Age '+d.retAge+'–68 fund',false)+'<div class="flow-arrow">=</div>'+
     fi('Total Monthly',fmtS(c.monthlyTotal),null,fmtS(c.monthlyTotal*12)+'/yr · across all wrappers',true);
 }
 
 function renderProgress(d, c) {
-  const pct = Math.min(c.baseAt / d.target * 100, 100);
-  const pctDisplay = pct.toFixed(0) + '%';
+  const pct = Math.min(c.baseAt/d.target*100,100);
   document.getElementById('progressTitle').textContent = 'Base Case Progress to ' + fmtS(d.target) + ' Target';
-  document.getElementById('progressFill').style.width = pctDisplay;
-  document.getElementById('progressPct').textContent = pctDisplay;
-  document.getElementById('progressMeta').innerHTML =
-    '<span>Today: ' + fmtS(c.totalInvested) + '</span>' +
-    '<span>At ' + d.retAge + ' (base): ' + fmtS(c.baseAt) + '</span>' +
-    '<span>Target: ' + fmtS(d.target) + '</span>';
+  document.getElementById('progressFill').style.width = pct.toFixed(0)+'%';
+  document.getElementById('progressPct').textContent = pct.toFixed(0)+'%';
+  document.getElementById('progressMeta').innerHTML = '<span>Today: '+fmtS(c.totalInvested)+'</span><span>At '+d.retAge+' (base): '+fmtS(c.baseAt)+'</span><span>Target: '+fmtS(d.target)+'</span>';
 }
 
 function renderAllocChart(d, c) {
   const ctx = document.getElementById('allocChart').getContext('2d');
-  const data = {
-    labels: ['Personal SIPP', 'Work Pension', 'ISA', 'Property Equity', 'Cash'],
-    datasets: [{
-      data: [d.sipp, d.workPension, d.isa, c.equity, d.cash],
-      backgroundColor: ['rgba(42,122,111,0.85)','rgba(42,122,111,0.5)','rgba(44,95,138,0.75)','rgba(184,134,11,0.75)','rgba(138,130,120,0.6)'],
-      borderColor: ['#ffffff'],
-      borderWidth: 2,
-      hoverOffset: 8
-    }]
-  };
   if (allocChartInst) allocChartInst.destroy();
   allocChartInst = new Chart(ctx, {
-    type: 'doughnut',
-    data,
-    options: {
-      cutout: '68%',
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: { font: { family: 'IBM Plex Mono', size: 10 }, color: '#8a8278', boxWidth: 10, padding: 12 }
-        },
-        tooltip: {
-          callbacks: {
-            label: function(item) {
-              const v = item.raw;
-              const pct = (v / c.totalNW * 100).toFixed(1);
-              return ' ' + fmtFull(v) + ' (' + pct + '%)';
-            }
-          },
-          titleFont: { family: 'IBM Plex Mono' },
-          bodyFont: { family: 'IBM Plex Mono' }
-        }
-      },
-      animation: { animateRotate: true, duration: 700 }
-    }
+    type:'doughnut',
+    data:{ labels:['Personal SIPP','Work Pension','ISA','Property Equity','Cash'],
+      datasets:[{ data:[d.sipp,d.workPension,d.isa,Math.max(0,c.equity),d.cash],
+        backgroundColor:['rgba(42,122,111,0.85)','rgba(42,122,111,0.5)','rgba(44,95,138,0.75)','rgba(184,134,11,0.75)','rgba(138,130,120,0.6)'],
+        borderColor:'#fff', borderWidth:2, hoverOffset:8 }] },
+    options:{ cutout:'68%', plugins:{
+      legend:{ position:'bottom', labels:{ font:{family:'IBM Plex Mono',size:10}, color:'#8a8278', boxWidth:10, padding:12 } },
+      tooltip:{ callbacks:{ label:function(i){ return ' '+fmtFull(i.raw)+' ('+(i.raw/c.totalNW*100).toFixed(1)+'%)'; } }, titleFont:{family:'IBM Plex Mono'}, bodyFont:{family:'IBM Plex Mono'} }
+    }, animation:{ animateRotate:true, duration:700 } }
   });
   document.getElementById('donutTotal').textContent = fmtS(c.totalNW);
 }
@@ -603,54 +615,25 @@ function renderAllocChart(d, c) {
 function renderScenarioBar(d, c) {
   const ctx2 = document.getElementById('scenarioBarChart').getContext('2d');
   const ctx3 = document.getElementById('scenarioHBar').getContext('2d');
-  const labels = ['Bull (' + d.bullRet + '%)', 'Base (' + d.baseRet + '%)', 'Bear (' + d.bearRet + '%)'];
+  const labels = ['Bull ('+d.bullRet+'%)','Base ('+d.baseRet+'%)','Bear ('+d.bearRet+'%)'];
   const values = [c.bullAt, c.baseAt, c.bearAt];
   const colors = ['rgba(42,122,111,0.8)','rgba(184,134,11,0.8)','rgba(192,57,43,0.8)'];
-  const opts = {
-    responsive: true, maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: { label: function(i) { return ' ' + fmtFull(i.raw); } },
-        titleFont: { family: 'IBM Plex Mono' }, bodyFont: { family: 'IBM Plex Mono' }
-      }
-    },
-    scales: {
-      x: { ticks: { font: { family: 'IBM Plex Mono', size: 10 }, color: '#8a8278' }, grid: { color: '#e2ddd5' } },
-      y: {
-        ticks: {
-          font: { family: 'IBM Plex Mono', size: 10 }, color: '#8a8278',
-          callback: function(v) { return v >= 1e6 ? '£'+(v/1e6).toFixed(1)+'M' : '£'+(v/1000)+'K'; }
-        },
-        grid: { color: '#e2ddd5' }
-      }
-    }
-  };
+  const yTick = { font:{family:'IBM Plex Mono',size:10}, color:'#8a8278', callback:function(v){return v>=1e6?'£'+(v/1e6).toFixed(1)+'M':'£'+(v/1000)+'K';} };
   if (scenarioBarInst) scenarioBarInst.destroy();
   scenarioBarInst = new Chart(ctx2, {
-    type: 'bar', data: { labels, datasets: [{ data: values, backgroundColor: colors, borderRadius: 6, borderSkipped: false }] },
-    options: { ...opts, plugins: { ...opts.plugins, annotation: {} } }
+    type:'bar', data:{ labels, datasets:[{ data:values, backgroundColor:colors, borderRadius:6, borderSkipped:false }] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:function(i){return ' '+fmtFull(i.raw);} }, titleFont:{family:'IBM Plex Mono'}, bodyFont:{family:'IBM Plex Mono'} } },
+      scales:{ x:{ ticks:{font:{family:'IBM Plex Mono',size:10},color:'#8a8278'}, grid:{color:'#e2ddd5'} }, y:{ ticks:yTick, grid:{color:'#e2ddd5'} } } }
   });
-
-  // Horizontal comparison bar (simpler, using Chart.js horizontal)
   if (scenarioHBarInst) scenarioHBarInst.destroy();
   scenarioHBarInst = new Chart(ctx3, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        { data: values, backgroundColor: colors, borderRadius: 4 },
-        { data: [d.target, d.target, d.target], backgroundColor: 'rgba(26,23,20,0.12)', borderRadius: 4, label: 'Target' }
-      ]
-    },
-    options: {
-      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(i) { return (i.datasetIndex===0?' Portfolio: ':' Target: ') + fmtFull(i.raw); } }, titleFont:{family:'IBM Plex Mono'}, bodyFont:{family:'IBM Plex Mono'} } },
-      scales: {
-        x: { ticks: { font:{family:'IBM Plex Mono',size:9}, color:'#8a8278', callback: function(v){return v>=1e6?'£'+(v/1e6).toFixed(1)+'M':'£'+(v/1000)+'K';} }, grid:{color:'#e2ddd5'}, stacked:false },
-        y: { ticks: { font:{family:'IBM Plex Mono',size:10}, color:'#8a8278' }, grid:{display:false} }
-      }
-    }
+    type:'bar', data:{ labels, datasets:[
+      { label:'Portfolio', data:values, backgroundColor:colors, borderRadius:4 },
+      { label:'Target', data:[d.target,d.target,d.target], backgroundColor:'rgba(26,23,20,0.12)', borderRadius:4 } ] },
+    options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:function(i){return (i.datasetIndex===0?' Portfolio: ':' Target: ')+fmtFull(i.raw);} }, titleFont:{family:'IBM Plex Mono'}, bodyFont:{family:'IBM Plex Mono'} } },
+      scales:{ x:{ ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8a8278',callback:function(v){return v>=1e6?'£'+(v/1e6).toFixed(1)+'M':'£'+(v/1000)+'K';}}, grid:{color:'#e2ddd5'} }, y:{ ticks:{font:{family:'IBM Plex Mono',size:10},color:'#8a8278'}, grid:{display:false} } } }
   });
 }
 
@@ -658,157 +641,90 @@ function renderPercentiles(d, c) {
   const tp = d.sipp + d.workPension;
   document.getElementById('percTitle').textContent = 'How You Compare — UK Peers at Age ' + d.age;
   document.getElementById('percIntro').innerHTML = 'Based on ONS Wealth &amp; Assets Survey data and PensionBee/PLSA research for 25–34 year olds. The median UK '+d.age+'-year-old has a pension pot of approximately <strong style="color:var(--ink)">£8,000–£12,000</strong> and total net worth (excl. property) of around <strong style="color:var(--ink)">£18,000–£25,000</strong>.';
-  function rank(pot) {
-    if (pot>150000) return '~Top 1–2% nationally';
-    if (pot>80000) return '~Top 3–5% nationally';
-    if (pot>50000) return '~Top 5–8% nationally';
-    if (pot>25000) return '~Top 10–15% nationally';
-    return '~Top 25–35%';
-  }
-  function pct(v,max) { return Math.min(v/max*100,100).toFixed(0)+'%'; }
-  function pi(label, bw, bg, ml, yours, rnk, note) {
-    const mkr = ml ? '<div class="perc-bar-marker" style="left:'+ml+';"></div>' : '';
-    return '<div class="perc-item"><div class="perc-label">'+label+'</div><div class="perc-bar-track"><div class="perc-bar-fill" style="width:'+bw+';background:'+bg+';"></div>'+mkr+'</div><div class="perc-values"><span class="perc-yours">'+yours+'</span><span class="perc-rank">'+rnk+'</span></div><div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px;">'+note+'</div></div>';
-  }
+  function rank(p){if(p>150000)return '~Top 1–2% nationally';if(p>80000)return '~Top 3–5% nationally';if(p>50000)return '~Top 5–8% nationally';if(p>25000)return '~Top 10–15% nationally';return '~Top 25–35%';}
+  function pct(v,max){return Math.min(v/max*100,100).toFixed(0)+'%';}
+  function pi(label,bw,bg,ml,yours,rnk,note){const mkr=ml?'<div class="perc-bar-marker" style="left:'+ml+';"></div>':'';return '<div class="perc-item"><div class="perc-label">'+label+'</div><div class="perc-bar-track"><div class="perc-bar-fill" style="width:'+bw+';background:'+bg+';"></div>'+mkr+'</div><div class="perc-values"><span class="perc-yours">'+yours+'</span><span class="perc-rank">'+rnk+'</span></div><div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px;">'+note+'</div></div>';}
   const onTrack = c.baseAt >= d.target;
   document.getElementById('percGrid').innerHTML =
-    pi('Total Pension (SIPP + Work)',pct(tp,200000),'linear-gradient(90deg,var(--teal-light),var(--teal))','50%','Your pot: '+fmtFull(tp),rank(tp),'UK median age '+d.age+': £8–12K · You are '+Math.round(tp/10000)+'x ahead') +
-    pi('Monthly pension contributions',pct(d.wpMonthly+d.sippMonthly,1200),'linear-gradient(90deg,var(--teal-light),var(--teal))','50%','Contrib: '+fmtS(d.wpMonthly+d.sippMonthly)+'/mo','~Top 8–10% nationally','UK median: £150–200/mo at this age') +
-    pi('Net worth excl. property',pct(c.totalInvested+d.cash,260000),'linear-gradient(90deg,var(--teal-light),var(--teal))','50%','NW ex-property: '+fmtFull(c.totalInvested+d.cash),rank(c.totalInvested+d.cash),'UK median '+d.age+'-year-old ex-property NW: ~£18–28K') +
-    pi('Homeownership + equity at '+d.age,'78%','linear-gradient(90deg,var(--gold-light),var(--gold))','30%',fmtFull(c.equity)+' equity · Homeowner','Top ~25% by age','Only ~35–38% of under-35s own. Average FTB age is now 33–34.') +
+    pi('Total Pension (SIPP + Work)',pct(tp,200000),'linear-gradient(90deg,var(--teal-light),var(--teal))','50%','Your pot: '+fmtFull(tp),rank(tp),'UK median age '+d.age+': £8–12K · You are '+Math.round(tp/10000)+'x ahead')+
+    pi('Monthly pension contributions',pct(d.wpMonthly+d.sippMonthly,1200),'linear-gradient(90deg,var(--teal-light),var(--teal))','50%','Contrib: '+fmtS(d.wpMonthly+d.sippMonthly)+'/mo','~Top 8–10% nationally','UK median: £150–200/mo at this age')+
+    pi('Net worth excl. property',pct(c.totalInvested+d.cash,260000),'linear-gradient(90deg,var(--teal-light),var(--teal))','50%','NW ex-property: '+fmtFull(c.totalInvested+d.cash),rank(c.totalInvested+d.cash),'UK median '+d.age+'-year-old ex-property NW: ~£18–28K')+
+    pi('Homeownership + equity at '+d.age,'78%','linear-gradient(90deg,var(--gold-light),var(--gold))','30%',fmtFull(c.equity)+' equity · Homeowner','Top ~25% by age','Only ~35–38% of under-35s own. Average FTB age is now 33–34.')+
     pi('Retirement readiness vs '+fmtS(d.target),Math.min(c.baseAt/d.target*100,100).toFixed(0)+'%','linear-gradient(90deg,var(--gold-light),var(--teal))',null,onTrack?'On track (base case)':'Gap to close',onTrack?'✓ Target reachable':'⚠ See gap analysis',fmtS(d.target)+' by '+d.retAge+' is '+(onTrack?'achievable':'challenging')+' in base scenario');
 }
 
 function renderChart(d, c) {
-  document.getElementById('leg-bull').textContent = 'Bull ('+d.bullRet+'% real)';
-  document.getElementById('leg-base').textContent = 'Base ('+d.baseRet+'% real)';
-  document.getElementById('leg-bear').textContent = 'Bear ('+d.bearRet+'% real)';
-  document.getElementById('chartTitle').textContent = 'Invested Portfolio Projection — Age '+d.age+' to '+(d.age+c.chartYears);
-  document.getElementById('th-bull').textContent = 'Bull ('+d.bullRet+'%)';
-  document.getElementById('th-base').textContent = 'Base ('+d.baseRet+'%)';
-  document.getElementById('th-bear').textContent = 'Bear ('+d.bearRet+'%)';
-  document.getElementById('chartNote').textContent = 'Invested assets only. Contributions: '+fmtS(d.wpMonthly)+' work pension + '+fmtS(d.sippMonthly)+' SIPP + '+fmtS(d.isaMonthly)+' ISA = '+fmtS(c.monthlyTotal)+'/mo. Starting balance: '+fmtFull(c.totalInvested)+'. State Pension not included. Property excluded.';
+  document.getElementById('leg-bull').textContent='Bull ('+d.bullRet+'% real)';
+  document.getElementById('leg-base').textContent='Base ('+d.baseRet+'% real)';
+  document.getElementById('leg-bear').textContent='Bear ('+d.bearRet+'% real)';
+  document.getElementById('chartTitle').textContent='Invested Portfolio Projection — Age '+d.age+' to '+(d.age+c.chartYears);
+  document.getElementById('th-bull').textContent='Bull ('+d.bullRet+'%)';
+  document.getElementById('th-base').textContent='Base ('+d.baseRet+'%)';
+  document.getElementById('th-bear').textContent='Bear ('+d.bearRet+'%)';
+  document.getElementById('chartNote').textContent='Invested assets only. Contributions: '+fmtS(d.wpMonthly)+' work pension + '+fmtS(d.sippMonthly)+' SIPP + '+fmtS(d.isaMonthly)+' ISA = '+fmtS(c.monthlyTotal)+'/mo. Starting balance: '+fmtFull(c.totalInvested)+'. State Pension not included. Property excluded.';
   drawCanvas(d, c);
 }
 
 function drawCanvas(d, c) {
-  const canvas = document.getElementById('projChart');
-  if (!canvas) return;
+  const canvas = document.getElementById('projChart'); if (!canvas) return;
   const dpr = window.devicePixelRatio || 2;
-  const W = Math.max(canvas.parentElement.clientWidth - 56, 200);
-  const H = 360;
-  canvas.width = W * dpr; canvas.height = H * dpr;
-  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-  const bull = c.bullVals, base = c.baseVals, bear = c.bearVals;
-  const totalYears = c.chartYears, retY = c.years;
-  const padL=72, padR=52, padT=20, padB=48;
-  const cW=W-padL-padR, cH=H-padT-padB;
-  const maxV = bull[bull.length-1];
-  function xp(i){return padL+(i/totalYears)*cW;}
-  function yp(v){return padT+cH-Math.min(v/maxV,1.05)*cH;}
-  const mag = Math.pow(10, Math.floor(Math.log10(maxV))-1);
-  const step = Math.ceil(maxV/(mag*40))*mag*10;
+  const W = Math.max(canvas.parentElement.clientWidth - 56, 200), H = 360;
+  canvas.width = W*dpr; canvas.height = H*dpr; canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  const ctx = canvas.getContext('2d'); ctx.scale(dpr, dpr);
+  const bull=c.bullVals, base=c.baseVals, bear=c.bearVals;
+  const totalYears=c.chartYears, retY=c.years;
+  const padL=72,padR=52,padT=20,padB=48, cW=W-padL-padR, cH=H-padT-padB;
+  const maxV=bull[bull.length-1];
+  function xp(i){return padL+(i/totalYears)*cW;} function yp(v){return padT+cH-Math.min(v/maxV,1.05)*cH;}
+  const mag=Math.pow(10,Math.floor(Math.log10(maxV))-1), step=Math.ceil(maxV/(mag*40))*mag*10;
   ctx.font='10px IBM Plex Mono,monospace'; ctx.fillStyle='#8a8278'; ctx.textAlign='right';
-  for (let g=0; g<=maxV*1.1; g+=step) {
-    const y=yp(g); if(y<padT-10||y>padT+cH+5) continue;
-    ctx.strokeStyle='#e2ddd5'; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(padL+cW,y); ctx.stroke();
-    ctx.fillText(g>=1e6?'£'+(g/1e6).toFixed(1)+'M':'£'+(g/1000).toFixed(0)+'K', padL-8, y+4);
-  }
-  ctx.textAlign='center'; ctx.fillStyle='#8a8278';
-  for (let i=0; i<=totalYears; i+=3) ctx.fillText(d.age+i, xp(i), H-padB+18);
-  if (d.target <= maxV*1.1) {
-    const ty=yp(d.target);
-    ctx.strokeStyle='#1a1714'; ctx.lineWidth=1.5; ctx.setLineDash([6,4]);
-    ctx.beginPath(); ctx.moveTo(padL,ty); ctx.lineTo(padL+cW,ty); ctx.stroke();
-    ctx.setLineDash([]); ctx.fillStyle='#1a1714'; ctx.textAlign='left'; ctx.font='bold 9px IBM Plex Mono,monospace';
-    ctx.fillText(fmtS(d.target)+' TARGET', padL+8, ty-5);
-  }
-  ctx.strokeStyle='#b8860b'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
-  ctx.beginPath(); ctx.moveTo(xp(retY),padT); ctx.lineTo(xp(retY),padT+cH); ctx.stroke();
-  ctx.setLineDash([]); ctx.fillStyle='#b8860b'; ctx.textAlign='center'; ctx.font='9px IBM Plex Mono,monospace';
-  ctx.fillText('AGE '+d.retAge, xp(retY), padT+10);
+  for(let g=0;g<=maxV*1.1;g+=step){const y=yp(g);if(y<padT-10||y>padT+cH+5)continue;ctx.strokeStyle='#e2ddd5';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(padL+cW,y);ctx.stroke();ctx.fillText(g>=1e6?'£'+(g/1e6).toFixed(1)+'M':'£'+(g/1000).toFixed(0)+'K',padL-8,y+4);}
+  ctx.textAlign='center';ctx.fillStyle='#8a8278';for(let i=0;i<=totalYears;i+=3)ctx.fillText(d.age+i,xp(i),H-padB+18);
+  if(d.target<=maxV*1.1){const ty=yp(d.target);ctx.strokeStyle='#1a1714';ctx.lineWidth=1.5;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(padL,ty);ctx.lineTo(padL+cW,ty);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#1a1714';ctx.textAlign='left';ctx.font='bold 9px IBM Plex Mono,monospace';ctx.fillText(fmtS(d.target)+' TARGET',padL+8,ty-5);}
+  ctx.strokeStyle='#b8860b';ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(xp(retY),padT);ctx.lineTo(xp(retY),padT+cH);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#b8860b';ctx.textAlign='center';ctx.font='9px IBM Plex Mono,monospace';ctx.fillText('AGE '+d.retAge,xp(retY),padT+10);
   function fill(data,color){ctx.beginPath();ctx.moveTo(xp(0),yp(data[0]));for(let i=1;i<data.length;i++)ctx.lineTo(xp(i),yp(data[i]));ctx.lineTo(xp(data.length-1),padT+cH);ctx.lineTo(xp(0),padT+cH);ctx.closePath();ctx.fillStyle=color;ctx.fill();}
-  fill(bull,'rgba(42,122,111,0.06)'); fill(base,'rgba(184,134,11,0.06)'); fill(bear,'rgba(192,57,43,0.06)');
+  fill(bull,'rgba(42,122,111,0.06)');fill(base,'rgba(184,134,11,0.06)');fill(bear,'rgba(192,57,43,0.06)');
   function line(data,color,lw){ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.setLineDash([]);for(let i=0;i<data.length;i++){if(i===0)ctx.moveTo(xp(i),yp(data[i]));else ctx.lineTo(xp(i),yp(data[i]));}ctx.stroke();}
-  line(bull,'#2a7a6f',3); line(base,'#b8860b',2.5); line(bear,'#c0392b',2);
+  line(bull,'#2a7a6f',3);line(base,'#b8860b',2.5);line(bear,'#c0392b',2);
   [[bull,'#2a7a6f'],[base,'#b8860b'],[bear,'#c0392b']].forEach(function(p){ctx.fillStyle=p[1];ctx.font='bold 10px IBM Plex Mono,monospace';ctx.textAlign='left';ctx.fillText(fmtS(p[0][totalYears]),xp(totalYears)+4,yp(p[0][totalYears])+4);});
   [[bull,'#2a7a6f'],[base,'#b8860b'],[bear,'#c0392b']].forEach(function(p){const v=p[0][retY];ctx.beginPath();ctx.arc(xp(retY),yp(v),5,0,Math.PI*2);ctx.fillStyle=p[1];ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();});
   ctx.strokeStyle='#e2ddd5';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(padL,padT+cH);ctx.lineTo(padL+cW,padT+cH);ctx.stroke();
 }
 
 function renderScenarios(d, c) {
-  function sc(cls, name, ret, val, diff, prob, note) {
-    const sign = diff>=0?'+':''; const abs = Math.abs(diff);
-    const dt = diff>=0?'Exceeds target by <strong style="color:var(--'+cls+')">'+fmtS(abs)+'</strong>.':'Falls short by <strong style="color:var(--'+cls+')">'+fmtS(abs)+'</strong>.';
-    return '<div class="sc-card '+cls+'"><div class="sc-header"><div><div class="sc-name">'+name+'</div><div class="sc-return">'+ret+'%</div><div class="sc-label">real annual return</div></div><div style="font-family:var(--mono);font-size:9px;color:var(--'+cls+');text-align:right;">'+note+'</div></div><div class="sc-at" style="color:var(--'+cls+')">'+fmtS(val)+'</div><div class="sc-label">Invested portfolio at age '+d.retAge+'</div><div class="sc-sub" style="margin-top:10px;">'+dt+'<br><br><strong>Probability: ~'+prob+'</strong></div></div>';
-  }
+  function sc(cls,name,ret,val,diff,prob,note){const abs=Math.abs(diff);const dt=diff>=0?'Exceeds target by <strong style="color:var(--'+cls+')">'+fmtS(abs)+'</strong>.':'Falls short by <strong style="color:var(--'+cls+')">'+fmtS(abs)+'</strong>.';return '<div class="sc-card '+cls+'"><div class="sc-header"><div><div class="sc-name">'+name+'</div><div class="sc-return">'+ret+'%</div><div class="sc-label">real annual return</div></div><div style="font-family:var(--mono);font-size:9px;color:var(--'+cls+');text-align:right;">'+note+'</div></div><div class="sc-at" style="color:var(--'+cls+')">'+fmtS(val)+'</div><div class="sc-label">Invested portfolio at age '+d.retAge+'</div><div class="sc-sub" style="margin-top:10px;">'+dt+'<br><br><strong>Probability: ~'+prob+'</strong></div></div>';}
   document.getElementById('scenarioCards').innerHTML =
-    sc('teal','Bull Scenario',d.bullRet,c.bullAt,c.bullAt-d.target,'25–30%','≈ Strong decade<br>above avg. growth') +
-    sc('gold','Base Scenario',d.baseRet,c.baseAt,c.baseAt-d.target,'45–50% (most likely)','≈ Long-run global<br>equity average') +
+    sc('teal','Bull Scenario',d.bullRet,c.bullAt,c.bullAt-d.target,'25–30%','≈ Strong decade<br>above avg. growth')+
+    sc('gold','Base Scenario',d.baseRet,c.baseAt,c.baseAt-d.target,'45–50% (most likely)','≈ Long-run global<br>equity average')+
     sc('red','Bear Scenario',d.bearRet,c.bearAt,c.bearAt-d.target,'20–25%','≈ Persistent low<br>growth / inflation');
-  document.getElementById('scenarioBarTitle').textContent = 'Portfolio at Age ' + d.retAge + ' — Scenario Comparison vs Target (' + fmtS(d.target) + ')';
+  document.getElementById('scenarioBarTitle').textContent='Portfolio at Age '+d.retAge+' — Scenario Comparison vs Target ('+fmtS(d.target)+')';
 }
 
 function renderMilestones(d, c) {
-  const tbody = document.getElementById('milestoneBody');
-  const cy = new Date().getFullYear();
-  const every = Math.max(2, Math.floor(c.chartYears / 11));
-  const shown = new Set([d.age]);
-  for (let a = d.age+every; a < d.age+c.chartYears; a+=every) shown.add(Math.round(a/every)*every);
-  shown.add(d.retAge);
-  if (d.retAge+3 <= d.age+c.chartYears) shown.add(d.retAge+3);
-  if (d.retAge+5 <= d.age+c.chartYears) shown.add(d.retAge+5);
-  const ages = Array.from(shown).sort((a,b)=>a-b);
-  function mt(age) {
-    if (age===d.age) return 'Starting point · Today';
-    if (age===d.retAge) return 'Retirement target date';
-    if (age===d.retAge-5) return 'Final 5-year planning phase';
-    if (age===d.retAge-10) return 'Mid-journey review point';
-    if (age>d.retAge) return 'Post-retirement buffer zone';
-    const y=age-d.age; if(y<=4) return 'Early compounding phase'; if(y<=10) return 'Building momentum'; return 'Compounding accelerates';
-  }
+  const tbody=document.getElementById('milestoneBody'), cy=new Date().getFullYear();
+  const every=Math.max(2,Math.floor(c.chartYears/11));
+  const shown=new Set([d.age]);
+  for(let a=d.age+every;a<d.age+c.chartYears;a+=every)shown.add(Math.round(a/every)*every);
+  shown.add(d.retAge); if(d.retAge+3<=d.age+c.chartYears)shown.add(d.retAge+3); if(d.retAge+5<=d.age+c.chartYears)shown.add(d.retAge+5);
+  const ages=Array.from(shown).sort((a,b)=>a-b);
+  function mt(age){if(age===d.age)return 'Starting point · Today';if(age===d.retAge)return 'Retirement target date';if(age===d.retAge-5)return 'Final 5-year planning phase';if(age===d.retAge-10)return 'Mid-journey review point';if(age>d.retAge)return 'Post-retirement buffer zone';const y=age-d.age;if(y<=4)return 'Early compounding phase';if(y<=10)return 'Building momentum';return 'Compounding accelerates';}
   let html='';
-  ages.forEach(function(age){
-    const i=age-d.age; if(i<0||i>c.chartYears) return;
-    const isRet=age===d.retAge, isHL=isRet||(i>0&&i%(every*2)===0);
-    let badge='';
-    if(isRet) badge='<span class="mbadge" style="background:var(--teal)">TARGET</span>';
-    else if(age===d.retAge-5) badge='<span class="mbadge">KEY</span>';
-    else if(i===every) badge='<span class="mbadge">MILESTONE</span>';
-    html+='<tr'+(isHL?' class="highlight-row"':'')+'>'+
-      '<td class="age-col">'+age+'</td><td>'+(cy+i)+'</td>'+
-      '<td class="bull">'+(i<c.bullVals.length?fmtS(c.bullVals[i]):'—')+'</td>'+
-      '<td class="base">'+(i<c.baseVals.length?fmtS(c.baseVals[i]):'—')+'</td>'+
-      '<td class="bear">'+(i<c.bearVals.length?fmtS(c.bearVals[i]):'—')+'</td>'+
-      '<td style="font-family:var(--mono);font-size:10px;color:var(--muted)">'+mt(age)+badge+'</td></tr>';
-  });
-  tbody.innerHTML = html;
+  ages.forEach(function(age){const i=age-d.age;if(i<0||i>c.chartYears)return;const isRet=age===d.retAge,isHL=isRet||(i>0&&i%(every*2)===0);let badge='';if(isRet)badge='<span class="mbadge" style="background:var(--teal)">TARGET</span>';else if(age===d.retAge-5)badge='<span class="mbadge">KEY</span>';else if(i===every)badge='<span class="mbadge">MILESTONE</span>';html+='<tr'+(isHL?' class="highlight-row"':'')+'><td class="age-col">'+age+'</td><td>'+(cy+i)+'</td><td class="bull">'+(i<c.bullVals.length?fmtS(c.bullVals[i]):'—')+'</td><td class="base">'+(i<c.baseVals.length?fmtS(c.baseVals[i]):'—')+'</td><td class="bear">'+(i<c.bearVals.length?fmtS(c.bearVals[i]):'—')+'</td><td style="font-family:var(--mono);font-size:10px;color:var(--muted)">'+mt(age)+badge+'</td></tr>';});
+  tbody.innerHTML=html;
 }
 
 function renderGap(d, c) {
-  const mult = (d.target/c.totalInvested).toFixed(1);
-  const onT = c.baseAt>=d.target;
-  function gs(v,l) { return '<div><div class="gap-stat-val">'+v+'</div><div class="gap-stat-label">'+l+'</div></div>'; }
+  const mult=(d.target/c.totalInvested).toFixed(1), onT=c.baseAt>=d.target;
+  function gs(v,l){return '<div><div class="gap-stat-val">'+v+'</div><div class="gap-stat-label">'+l+'</div></div>';}
   document.getElementById('gapBox').innerHTML =
     '<div><h3>The Gap to '+fmtS(d.target)+'</h3><p>You need your invested portfolio to grow from <strong>'+fmtFull(c.totalInvested)+' to '+fmtFull(d.target)+'</strong> in '+c.years+' years — a <strong>'+mult+'x increase</strong>. With '+fmtS(c.monthlyTotal)+'/mo at '+d.baseRet+'% real, '+(onT?'you get there.':'you fall short — consider increasing contributions.')+'</p></div>'+
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">'+
-    gs(fmtS(c.growthNeeded),'Growth needed from today')+
-    gs(fmtS(c.totalContribs),'Total new contributions ('+c.years+' yrs)')+
-    gs(fmtS(c.returnsNeeded),'Must come from investment returns')+
-    gs(c.minRet.toFixed(1)+'%','Minimum real return required')+'</div>';
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">'+gs(fmtS(c.growthNeeded),'Growth needed from today')+gs(fmtS(c.totalContribs),'Total new contributions ('+c.years+' yrs)')+gs(fmtS(c.returnsNeeded),'Must come from investment returns')+gs(c.minRet.toFixed(1)+'%','Minimum real return required')+'</div>';
 }
 
 function renderInsights(d, c) {
-  const tp = d.sipp+d.workPension;
-  const e100 = project(0,100,c.years,d.baseRet)[c.years];
-  const e350 = project(0,350,c.years,d.baseRet)[c.years];
-  const bridge = 4000*12*(68-d.retAge);
-  const isaR = project(d.isa,d.isaMonthly,c.years,d.baseRet)[c.years];
-  const propR = Math.round(d.propVal*Math.pow(1.02,c.years)/50000)*50000;
-  function ins(type,icon,title,body) { return '<div class="insight '+type+'"><div class="insight-icon">'+icon+'</div><div class="insight-title">'+title+'</div><div class="insight-body">'+body+'</div></div>'; }
+  const tp=d.sipp+d.workPension, e100=project(0,100,c.years,d.baseRet)[c.years], e350=project(0,350,c.years,d.baseRet)[c.years];
+  const bridge=4000*12*(68-d.retAge), isaR=project(d.isa,d.isaMonthly,c.years,d.baseRet)[c.years], propR=Math.round(d.propVal*Math.pow(1.02,c.years)/50000)*50000;
+  function ins(type,icon,title,body){return '<div class="insight '+type+'"><div class="insight-icon">'+icon+'</div><div class="insight-title">'+title+'</div><div class="insight-body">'+body+'</div></div>';}
   document.getElementById('insightsGrid').innerHTML =
     ins('positive','🚀','You Are Extraordinary for Your Age','At '+d.age+', <strong>'+fmtFull(tp)+' in pensions</strong> puts you in the top 5–8% of UK savers. Average '+d.age+'-year-old: £8–12K. You are roughly <strong>'+Math.round(tp/10000)+'x ahead</strong> of the median. With a '+c.years+'-year runway, your current pot will roughly 4x on its own at '+d.baseRet+'% real before you add another penny.')+
     ins('positive','🏠','Property Is a Hidden Asset','Owning at '+d.age+' with <strong>'+fmtFull(c.equity)+' equity</strong>. By retirement at '+d.retAge+' at 2% real house price growth, your home could be worth <strong>~'+fmtS(propR)+'</strong> — a backstop the projection doesn\'t count.')+
@@ -819,159 +735,342 @@ function renderInsights(d, c) {
 }
 
 function renderAll() {
-  const d = getData(), c = calc(d);
+  const d=getData(), c=calc(d);
   renderHeader(d,c); renderSnapshot(d,c); renderContributions(d,c);
   renderProgress(d,c); renderAllocChart(d,c); renderScenarioBar(d,c);
   renderPercentiles(d,c); renderChart(d,c); renderScenarios(d,c);
   renderMilestones(d,c); renderGap(d,c); renderInsights(d,c);
+  buildBriefing(d,c);
 }
 
-// ── LIVE DATA ────────────────────────────────────────────────
-const PROXY = 'https://corsproxy.io/?';
-let liveDataLoaded = false;
-
-async function fetchLiveData() {
-  document.getElementById('liveBanner').innerHTML = '<div class="live-item"><div class="live-ticker" style="color:rgba(255,255,255,0.4)">Fetching live data…</div><div class="live-price" style="color:rgba(255,255,255,0.25)">—</div></div><button class="refresh-btn" id="refreshBtn">↻ Refresh</button>';
-  document.getElementById('refreshBtn').addEventListener('click', fetchLiveData);
-
-  const tickers = [
-    { sym:'VWRL.L', label:'VWRL · All-World', sub:'Vanguard All-World ETF (proxy for FTSE Global All Cap)' },
-    { sym:'^FTSE',  label:'FTSE 100', sub:'UK large-cap index' },
-    { sym:'^FTAS',  label:'FTSE All-Share', sub:'UK broad market' },
-    { sym:'VGOV.L', label:'VGOV · UK Gilts', sub:'Vanguard UK Gov Bond ETF' }
+// ── AI BRIEFING + VOICE ───────────────────────────────────────
+let briefingText = '';
+function buildBriefing(d, c) {
+  const tp = d.sipp + d.workPension;
+  const onTrack = c.baseAt >= d.target;
+  const millionMsg = c.millionAge ? ('In the base case your invested portfolio passes one million pounds around age ' + c.millionAge + '. ') : '';
+  const sentences = [
+    'Good ' + dayPart() + '. Here is your wealth briefing.',
+    'Your total net worth today is ' + fmtSpoken(c.totalNW) + ', of which ' + fmtSpoken(c.totalInvested) + ' is invested across pensions and your ISA.',
+    'You are contributing ' + fmtSpoken(c.monthlyTotal) + ' every month, with ' + c.years + ' years until your target retirement age of ' + d.retAge + '.',
+    'At ' + tp.toLocaleString('en-GB') + ' pounds in pensions, you are roughly ' + Math.round(tp/10000) + ' times ahead of the typical ' + d.age + ' year old in the UK.',
+    'In the base case, at a ' + d.baseRet + ' percent real return, your portfolio reaches ' + fmtSpoken(c.baseAt) + ' by age ' + d.retAge + '. ' + millionMsg,
+    onTrack
+      ? 'That puts you on track to hit your target of ' + fmtSpoken(d.target) + '. Your minimum required real return is just ' + c.minRet.toFixed(1) + ' percent, which is below the long run average for global equities.'
+      : 'That leaves you short of your ' + fmtSpoken(d.target) + ' target by ' + fmtSpoken(d.target - c.baseAt) + '. You would need a real return of ' + c.minRet.toFixed(1) + ' percent, or higher monthly contributions, to close the gap.',
+    'My suggestion: keep an eye on the ISA bridge, since that funds the years between ' + d.retAge + ' and the state pension. Otherwise, stay invested and let compounding do the heavy lifting.'
   ];
+  briefingText = sentences.join(' ');
+  // HTML version with emphasis
+  const html = [
+    '<strong>Good ' + dayPart() + '.</strong> Your total net worth is <strong>' + fmtFull(c.totalNW) + '</strong>, with <strong>' + fmtFull(c.totalInvested) + '</strong> invested. You add <strong>' + fmtS(c.monthlyTotal) + '/mo</strong> with <strong>' + c.years + ' years</strong> to go.',
+    'At <strong>' + tp.toLocaleString('en-GB') + '</strong> in pensions you are about <strong>' + Math.round(tp/10000) + '× ahead</strong> of a typical ' + d.age + '-year-old. Base case reaches <strong>' + fmtS(c.baseAt) + '</strong> by age ' + d.retAge + (c.millionAge ? ', passing <strong>£1M around age ' + c.millionAge + '</strong>.' : '.'),
+    onTrack
+      ? '✓ <strong>On track</strong> for your ' + fmtS(d.target) + ' target — minimum return needed is only <strong>' + c.minRet.toFixed(1) + '%</strong> real.'
+      : '⚠ Currently <strong>' + fmtS(d.target - c.baseAt) + ' short</strong> of target — you need <strong>' + c.minRet.toFixed(1) + '%</strong> real or more contributions.'
+  ].join('<br><br>');
+  document.getElementById('aiText').innerHTML = html;
+}
+function dayPart() { const h=new Date().getHours(); return h<12?'morning':h<18?'afternoon':'evening'; }
 
-  const results = await Promise.allSettled(tickers.map(t => fetchTicker(t.sym)));
+function speak(text) {
+  if (!('speechSynthesis' in window)) { showToast('Voice not supported in this browser'); return; }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-GB'; u.rate = 1.0; u.pitch = 1.0;
+  const voices = window.speechSynthesis.getVoices();
+  const gb = voices.find(v => /en-GB/i.test(v.lang) && /female|libby|sonia|hazel|google uk/i.test(v.name)) || voices.find(v => /en-GB/i.test(v.lang)) || voices.find(v => /en/i.test(v.lang));
+  if (gb) u.voice = gb;
+  u.onstart = function(){ document.getElementById('aiSpeakBtn').disabled = true; document.getElementById('aiStopBtn').disabled = false; };
+  u.onend = function(){ document.getElementById('aiSpeakBtn').disabled = false; document.getElementById('aiStopBtn').disabled = true; };
+  window.speechSynthesis.speak(u);
+}
+function stopSpeak() { window.speechSynthesis.cancel(); document.getElementById('aiSpeakBtn').disabled=false; document.getElementById('aiStopBtn').disabled=true; }
 
-  let html = '';
-  results.forEach(function(res, i) {
-    const t = tickers[i];
-    if (res.status === 'fulfilled' && res.value) {
-      const v = res.value;
-      const pctCls = v.dayPct > 0 ? 'up' : v.dayPct < 0 ? 'down' : 'flat';
-      const yrCls  = v.yrPct  > 0 ? 'up' : v.yrPct  < 0 ? 'down' : 'flat';
-      html += '<div class="live-item"><div class="live-ticker">'+t.label+'</div><div class="live-price">'+v.price+'</div><div class="live-change '+pctCls+'">'+sgn(v.dayPct)+v.dayPct.toFixed(2)+'% today &nbsp;·&nbsp; 1yr: '+sgn(v.yrPct)+v.yrPct.toFixed(1)+'%</div><div class="live-status"><span class="live-dot"></span>'+t.sub+'</div></div>';
-    } else {
-      html += '<div class="live-item"><div class="live-ticker">'+t.label+'</div><div class="live-price" style="color:rgba(255,255,255,0.3)">—</div><div class="live-change flat">Data unavailable</div><div class="live-status"><span class="live-dot stale"></span>'+t.sub+'</div></div>';
-    }
-  });
-
-  // Sparkline
-  const vwrlResult = results[0];
-  if (vwrlResult.status === 'fulfilled' && vwrlResult.value && vwrlResult.value.closes) {
-    html += '<div class="sparkline-wrap"><canvas id="sparkCanvas" width="120" height="48"></canvas></div>';
+function answerQuestion(q) {
+  const d = getData(), c = calc(d);
+  const ql = q.toLowerCase();
+  let ans = '';
+  const retMatch = ql.match(/retire\s*(?:at|by)?\s*(\d{2})/);
+  const millionMatch = /million|1m|£1m|1,000,000|1000000/.test(ql);
+  const extraMatch = ql.match(/(?:extra|add|more)\s*£?\s*(\d+)/);
+  if (retMatch) {
+    const newAge = parseInt(retMatch[1]);
+    const yrs = Math.max(1, newAge - d.age);
+    const v = project(c.totalInvested, c.monthlyTotal, yrs, d.baseRet)[yrs];
+    ans = 'If you retire at ' + newAge + ', that is ' + yrs + ' years of growth. In the base case your portfolio would reach about ' + fmtFull(v) + '. ' + (v >= d.target ? 'That meets your ' + fmtFull(d.target) + ' target.' : 'That is ' + fmtFull(d.target - v) + ' short of your ' + fmtFull(d.target) + ' target.');
+  } else if (millionMatch) {
+    ans = c.millionAge ? ('In the base case at ' + d.baseRet + '% real, your invested portfolio passes £1,000,000 around age ' + c.millionAge + ' (' + (c.millionAge - d.age) + ' years from now).') : ('At your current ' + d.baseRet + '% base case, the portfolio does not reach £1M within the projection window. Try increasing contributions or the return assumption.');
+  } else if (extraMatch) {
+    const extra = parseInt(extraMatch[1]);
+    const v = project(c.totalInvested, c.monthlyTotal + extra, c.years, d.baseRet)[c.years];
+    const diff = v - c.baseAt;
+    ans = 'Adding £' + extra + '/month would lift your base-case portfolio at age ' + d.retAge + ' to about ' + fmtFull(v) + ' — that is ' + fmtFull(diff) + ' more than your current plan.';
+  } else if (/property|house|home|equity/.test(ql)) {
+    ans = 'Your property is worth ' + fmtFull(d.propVal) + ' with a ' + fmtFull(d.mortgage) + ' mortgage, giving ' + fmtFull(c.equity) + ' of equity. At 2% real growth it could be worth around ' + fmtS(Math.round(d.propVal*Math.pow(1.02,c.years)/50000)*50000) + ' by age ' + d.retAge + '.';
+  } else if (/isa|bridge/.test(ql)) {
+    const isaR = project(d.isa, d.isaMonthly, c.years, d.baseRet)[c.years];
+    ans = 'Your ISA is ' + fmtFull(d.isa) + ' growing at ' + fmtS(d.isaMonthly) + '/month. By age ' + d.retAge + ' it should reach about ' + fmtFull(isaR) + ', which funds your bridge years before the state pension.';
+  } else if (/target|on track|enough|will i/.test(ql)) {
+    ans = c.baseAt >= d.target ? ('Yes — in the base case you reach ' + fmtFull(c.baseAt) + ' by age ' + d.retAge + ', meeting your ' + fmtFull(d.target) + ' target. Minimum return needed is ' + c.minRet.toFixed(1) + '% real.') : ('In the base case you reach ' + fmtFull(c.baseAt) + ', which is ' + fmtFull(d.target - c.baseAt) + ' short of ' + fmtFull(d.target) + '. You need ' + c.minRet.toFixed(1) + '% real return or more contributions.');
+  } else {
+    ans = briefingText;
   }
-  html += '<button class="refresh-btn" id="refreshBtn">↻ Refresh</button>';
-  document.getElementById('liveBanner').innerHTML = html;
-  document.getElementById('refreshBtn').addEventListener('click', fetchLiveData);
-
-  // Draw sparkline
-  if (vwrlResult.status === 'fulfilled' && vwrlResult.value && vwrlResult.value.closes) {
-    drawSparkline(vwrlResult.value.closes);
-  }
-
-  liveDataLoaded = true;
+  document.getElementById('aiText').textContent = ans;
+  speak(ans);
 }
 
-async function fetchTicker(sym) {
-  const url = PROXY + encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + sym + '?interval=1d&range=1y&includePrePost=false');
-  const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
-  const json = await res.json();
-  const result = json.chart.result[0];
-  const meta = result.meta;
-  const closes = result.indicators.quote[0].close.filter(Boolean);
-  const current = meta.regularMarketPrice;
-  const prev = meta.chartPreviousClose || closes[closes.length-2] || current;
-  const yearAgo = closes[0] || current;
-  const dayPct = ((current - prev) / prev) * 100;
-  const yrPct  = ((current - yearAgo) / yearAgo) * 100;
-  const currency = meta.currency || '';
-  const price = currency === 'GBp' ? '£' + (current/100).toFixed(2) : (currency==='GBP'?'£':'')+current.toFixed(2);
-  return { price, dayPct, yrPct, closes, current };
-}
+// ── LIVE MARKET DATA ─────────────────────────────────────────
+const PROXIES = [
+  function(u){ return 'https://corsproxy.io/?url=' + encodeURIComponent(u); },
+  function(u){ return 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u); },
+  function(u){ return 'https://thingproxy.freeboard.io/fetch/' + u; }
+];
 
-function drawSparkline(closes) {
-  const c = document.getElementById('sparkCanvas');
-  if (!c) return;
-  const ctx = c.getContext('2d');
-  const W=120, H=48, pad=4;
-  const min = Math.min(...closes), max = Math.max(...closes);
-  const range = max - min || 1;
-  ctx.clearRect(0,0,W,H);
-  const startColor = closes[closes.length-1] > closes[0] ? '#3d9e91' : '#e07070';
-  ctx.beginPath();
-  ctx.strokeStyle = startColor;
-  ctx.lineWidth = 1.5;
-  closes.forEach(function(v,i){
-    const x = pad + (i/(closes.length-1))*(W-pad*2);
-    const y = H-pad - ((v-min)/range)*(H-pad*2);
-    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-  });
-  ctx.stroke();
-  const lastX = W-pad, lastY = H-pad-((closes[closes.length-1]-min)/range)*(H-pad*2);
-  ctx.beginPath(); ctx.arc(lastX,lastY,3,0,Math.PI*2); ctx.fillStyle=startColor; ctx.fill();
-}
-
-async function fetchNews() {
-  const feeds = [
-    'https://feeds.bbci.co.uk/news/business/rss.xml',
-    'https://feeds.skynews.com/feeds/rss/business.xml'
-  ];
-  for (const feed of feeds) {
+async function tryFetchJSON(targetUrl) {
+  for (const proxy of PROXIES) {
     try {
-      const url = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feed) + '&count=6';
-      const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
-      const data = await res.json();
-      if (data.status === 'ok' && data.items && data.items.length > 0) return data.items;
+      const res = await fetch(proxy(targetUrl), { signal: AbortSignal.timeout(8000) });
+      if (!res.ok) continue;
+      const text = await res.text();
+      try { return JSON.parse(text); } catch(e) { continue; }
     } catch(e) { continue; }
   }
   return null;
 }
 
+async function fetchTicker(sym) {
+  const url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + sym + '?interval=1d&range=1y';
+  const json = await tryFetchJSON(url);
+  if (!json || !json.chart || !json.chart.result || !json.chart.result[0]) return null;
+  const r = json.chart.result[0], meta = r.meta;
+  const closes = (r.indicators.quote[0].close || []).filter(function(x){ return x != null; });
+  if (closes.length < 2) return null;
+  const current = meta.regularMarketPrice || closes[closes.length-1];
+  const prev = meta.chartPreviousClose || closes[closes.length-2];
+  const yearAgo = closes[0];
+  const dayPct = ((current-prev)/prev)*100;
+  const yrPct = ((current-yearAgo)/yearAgo)*100;
+  const cur = meta.currency || '';
+  const price = cur==='GBp' ? '£'+(current/100).toFixed(2) : (cur==='GBP'||cur==='USD'?(cur==='GBP'?'£':'$'):'')+current.toFixed(2);
+  return { price, dayPct, yrPct, closes, current };
+}
+
+async function fetchLiveData() {
+  const banner = document.getElementById('liveBanner');
+  banner.innerHTML = '<div class="live-item"><div class="live-ticker" style="color:rgba(255,255,255,0.4)">Fetching live data…</div><div class="live-price" style="color:rgba(255,255,255,0.25)">—</div></div>';
+  const d = getData();
+  const tickers = [
+    { sym: d.fundSym || 'VWRP.L', label:'VAFTGAG / All Cap Acc', sub:'VWRP proxy · Vanguard FTSE All-World Acc', fund:true },
+    { sym:'^FTSE',  label:'FTSE 100', sub:'UK large-cap index' },
+    { sym:'VGOV.L', label:'VGOV · UK Gilts', sub:'Vanguard UK Gov Bond ETF' },
+    { sym:'IGLT.L', label:'IGLT · UK Gilts', sub:'iShares Core UK Gilts ETF' }
+  ];
+  const results = await Promise.allSettled(tickers.map(function(t){ return fetchTicker(t.sym); }));
+  let html = '', fundData = null, sparkCloses = null;
+  results.forEach(function(res, i) {
+    const t = tickers[i];
+    if (res.status === 'fulfilled' && res.value) {
+      const v = res.value;
+      if (t.fund) { fundData = v; sparkCloses = v.closes; }
+      if (!sparkCloses) sparkCloses = v.closes;
+      const pc = v.dayPct>0?'up':v.dayPct<0?'down':'flat';
+      html += '<div class="live-item"><div class="live-ticker">'+t.label+'</div><div class="live-price">'+v.price+'</div><div class="live-change '+pc+'">'+sgn(v.dayPct)+v.dayPct.toFixed(2)+'% today · 1yr '+sgn(v.yrPct)+v.yrPct.toFixed(1)+'%</div><div class="live-status"><span class="live-dot"></span>'+t.sub+'</div></div>';
+    } else {
+      html += '<div class="live-item"><div class="live-ticker">'+t.label+'</div><div class="live-price" style="color:rgba(255,255,255,0.3)">—</div><div class="live-change flat">Data unavailable</div><div class="live-status"><span class="live-dot stale"></span>'+t.sub+'</div></div>';
+    }
+  });
+  if (sparkCloses) html += '<div class="sparkline-wrap"><canvas id="sparkCanvas" width="120" height="48"></canvas></div>';
+  html += '<button class="refresh-btn" id="refreshBtn">↻ Refresh</button>';
+  banner.innerHTML = html;
+  document.getElementById('refreshBtn').addEventListener('click', fetchLiveData);
+  if (sparkCloses) drawSparkline(sparkCloses);
+  renderFundReturn(fundData, results);
+}
+
+function renderFundReturn(fundData, results) {
+  const bar = document.getElementById('fundReturnBar');
+  // Use fund data; fall back to first available result
+  let fd = fundData;
+  if (!fd) { for (const r of results) { if (r.status==='fulfilled' && r.value) { fd = r.value; break; } } }
+  if (!fd) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  const closes = fd.closes;
+  // Annualised over the period we have (~1yr)
+  const oneYr = fd.yrPct;
+  // Compute max-window CAGR from available closes
+  const periods = closes.length;
+  const totalRet = (closes[periods-1]/closes[0]-1)*100;
+  document.getElementById('fundReturnVals').innerHTML =
+    '<div class="frv"><div class="frv-num" style="color:'+(oneYr>=0?'var(--teal)':'var(--red)')+'">'+sgn(oneYr)+oneYr.toFixed(1)+'%</div><div class="frv-lbl">1-year return</div></div>'+
+    '<div class="frv"><div class="frv-num" style="color:'+(totalRet>=0?'var(--teal)':'var(--red)')+'">'+sgn(totalRet)+totalRet.toFixed(1)+'%</div><div class="frv-lbl">Period return</div></div>'+
+    '<div class="frv"><div class="frv-num">'+Math.max(0,(oneYr-getData().cpiInflation)).toFixed(1)+'%</div><div class="frv-lbl">Est. real (after CPI)</div></div>';
+  const btn = document.getElementById('useReturnBtn');
+  btn.disabled = false;
+  btn.onclick = function() {
+    const d = getData();
+    const realRet = Math.max(0, Math.min(15, oneYr - d.cpiInflation));
+    d.baseRet = Math.round(realRet*2)/2;
+    d.lastUpdated = todayStr();
+    saveData(d);
+    renderAll();
+    showToast('Base case set to ' + d.baseRet + '% (live 1yr real)');
+  };
+}
+
+function drawSparkline(closes) {
+  const c = document.getElementById('sparkCanvas'); if (!c) return;
+  const ctx=c.getContext('2d'), W=120,H=48,pad=4;
+  const min=Math.min.apply(null,closes), max=Math.max.apply(null,closes), range=max-min||1;
+  ctx.clearRect(0,0,W,H);
+  const col = closes[closes.length-1]>closes[0]?'#3d9e91':'#e07070';
+  ctx.beginPath(); ctx.strokeStyle=col; ctx.lineWidth=1.5;
+  closes.forEach(function(v,i){const x=pad+(i/(closes.length-1))*(W-pad*2),y=H-pad-((v-min)/range)*(H-pad*2);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});
+  ctx.stroke();
+  const lx=W-pad, ly=H-pad-((closes[closes.length-1]-min)/range)*(H-pad*2);
+  ctx.beginPath();ctx.arc(lx,ly,3,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();
+}
+
+// ── NEWS (robust multi-source) ───────────────────────────────
+const FEEDS = [
+  { url:'https://feeds.bbci.co.uk/news/business/rss.xml', name:'BBC Business', direct:true },
+  { url:'https://feeds.skynews.com/feeds/rss/business.xml', name:'Sky News', direct:false },
+  { url:'https://www.theguardian.com/uk/business/rss', name:'The Guardian', direct:true },
+  { url:'https://www.ft.com/rss/home/uk', name:'Financial Times', direct:false }
+];
+
+function parseRSS(xmlText, sourceName) {
+  try {
+    const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
+    if (doc.querySelector('parsererror')) return null;
+    const items = Array.from(doc.querySelectorAll('item, entry')).slice(0, 5);
+    if (!items.length) return null;
+    return items.map(function(it) {
+      const get = function(sel){ const el = it.querySelector(sel); return el ? el.textContent.trim() : ''; };
+      let link = get('link');
+      if (!link) { const la = it.querySelector('link'); if (la) link = la.getAttribute('href') || la.textContent.trim() || ''; }
+      let desc = get('description') || get('summary') || '';
+      desc = desc.replace(/<!\[CDATA\[|\]\]>/g,'').replace(/<[^>]+>/g,'').replace(/&[a-z#0-9]+;/gi,' ').replace(/\s+/g,' ').trim().slice(0,130);
+      return { title: get('title').replace(/<!\[CDATA\[|\]\]>/g,'').trim(), link, pubDate: get('pubDate') || get('published') || get('updated'), description: desc, source: sourceName };
+    }).filter(function(i){ return i.title && i.title.length > 3; });
+  } catch(e) { return null; }
+}
+
+async function fetchNews() {
+  const allItems = [];
+  const seen = new Set();
+
+  function addItems(parsed) {
+    if (!parsed) return;
+    for (const item of parsed) {
+      const key = item.title.slice(0,40);
+      if (!seen.has(key) && item.title) { seen.add(key); allItems.push(item); }
+    }
+  }
+
+  // Strategy 1: Direct fetch — BBC and Guardian set Access-Control-Allow-Origin: *
+  for (const feed of FEEDS) {
+    if (!feed.direct) continue;
+    try {
+      const res = await fetch(feed.url, { signal: AbortSignal.timeout(5000) });
+      if (res.ok) { const xml = await res.text(); addItems(parseRSS(xml, feed.name)); }
+    } catch(e) {}
+  }
+  if (allItems.length >= 4) return allItems.slice(0, 6);
+
+  // Strategy 2: allorigins.win returns JSON wrapper { contents: "<xml>..." }
+  for (const feed of FEEDS) {
+    if (allItems.find(function(i){ return i.source === feed.name; })) continue;
+    try {
+      const aoUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(feed.url);
+      const res = await fetch(aoUrl, { signal: AbortSignal.timeout(7000) });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.contents) addItems(parseRSS(data.contents, feed.name));
+      }
+    } catch(e) {}
+    if (allItems.length >= 6) break;
+  }
+  if (allItems.length >= 3) return allItems.slice(0, 6);
+
+  // Strategy 3: corsproxy.io raw fetch
+  for (const feed of FEEDS) {
+    if (allItems.find(function(i){ return i.source === feed.name; })) continue;
+    try {
+      const pUrl = 'https://corsproxy.io/?url=' + encodeURIComponent(feed.url);
+      const res = await fetch(pUrl, { signal: AbortSignal.timeout(7000) });
+      if (res.ok) { const xml = await res.text(); addItems(parseRSS(xml, feed.name)); }
+    } catch(e) {}
+    if (allItems.length >= 6) break;
+  }
+  if (allItems.length >= 2) return allItems.slice(0, 6);
+
+  // Strategy 4: rss2json as last resort (rate-limited but sometimes works)
+  for (const feed of FEEDS) {
+    if (allItems.find(function(i){ return i.source === feed.name; })) continue;
+    try {
+      const url = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feed.url) + '&count=3';
+      const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.status === 'ok' && data.items && data.items.length) {
+          addItems(data.items.map(function(i){ return { title:i.title, link:i.link, pubDate:i.pubDate, description:(i.description||'').replace(/<[^>]+>/g,'').slice(0,130), source:feed.name }; }));
+        }
+      }
+    } catch(e) {}
+    if (allItems.length >= 6) break;
+  }
+
+  return allItems.length ? allItems.slice(0, 6) : null;
+}
+
 function renderNews(items) {
   const grid = document.getElementById('newsGrid');
-  if (!items || items.length === 0) {
-    grid.innerHTML = '<div class="news-loading">News feed unavailable. Check back later or ensure you\'re online.</div>';
+  const ts = document.getElementById('newsTimestamp');
+  if (!items || !items.length) {
+    grid.innerHTML = '<div class="news-loading">Headlines couldn\'t load right now — proxy may be busy. <span class="news-retry" id="newsRetry">Retry ↻</span></div>';
+    if (ts) ts.textContent = 'Failed · ' + new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    const r = document.getElementById('newsRetry');
+    if (r) r.addEventListener('click', function(){
+      grid.innerHTML='<div class="news-loading">Fetching BBC Business &amp; Guardian headlines…</div>';
+      if (ts) ts.textContent = '';
+      fetchNews().then(renderNews);
+    });
     return;
   }
+  if (ts) ts.textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  const clean = function(s){ return (s||'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#0?39;|&apos;/g,"'").replace(/&quot;/g,'"').replace(/<!\[CDATA\[|\]\]>/g,''); };
   grid.innerHTML = items.slice(0,6).map(function(item) {
-    const d = new Date(item.pubDate);
-    const dateStr = isNaN(d) ? '' : d.toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
-    const clean = (item.title||'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#039;/g,"'").replace(/&quot;/g,'"');
-    return '<a class="news-card" href="'+item.link+'" target="_blank" rel="noopener"><div class="news-source">BBC Business</div><div class="news-title">'+clean+'</div><div class="news-date">'+dateStr+'</div></a>';
+    const dt = new Date(item.pubDate);
+    const dateStr = isNaN(dt.getTime()) ? '' : dt.toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    const desc = item.description ? '<div class="news-desc">'+clean(item.description)+'</div>' : '';
+    return '<a class="news-card" href="'+(item.link||'#')+'" target="_blank" rel="noopener"><div class="news-source">'+(item.source||'Business')+'</div><div class="news-title">'+clean(item.title)+'</div>'+desc+'<div class="news-date">'+dateStr+'</div></a>';
   }).join('');
 }
 
 // ── EDIT PANEL ────────────────────────────────────────────────
 function openEdit() {
-  const d = getData();
-  const m = { f_age:d.age,f_retAge:d.retAge,f_target:d.target,f_sipp:d.sipp,f_workPension:d.workPension,f_isa:d.isa,f_propVal:d.propVal,f_mortgage:d.mortgage,f_cash:d.cash,f_wpMonthly:d.wpMonthly,f_sippMonthly:d.sippMonthly,f_isaMonthly:d.isaMonthly,f_bullRet:d.bullRet,f_baseRet:d.baseRet,f_bearRet:d.bearRet,f_boeRate:d.boeRate,f_cpiInflation:d.cpiInflation,f_ftseYTD:d.ftseYTD,f_globalYTD:d.globalYTD };
-  Object.keys(m).forEach(function(id){ const el=document.getElementById(id); if(el) el.value=m[id]; });
-  document.getElementById('editOverlay').classList.add('open');
-  document.body.style.overflow='hidden';
+  const d=getData();
+  const m={f_age:d.age,f_retAge:d.retAge,f_target:d.target,f_sipp:d.sipp,f_workPension:d.workPension,f_isa:d.isa,f_propVal:d.propVal,f_mortgage:d.mortgage,f_cash:d.cash,f_wpMonthly:d.wpMonthly,f_sippMonthly:d.sippMonthly,f_isaMonthly:d.isaMonthly,f_bullRet:d.bullRet,f_baseRet:d.baseRet,f_bearRet:d.bearRet,f_fundSym:d.fundSym,f_boeRate:d.boeRate,f_cpiInflation:d.cpiInflation,f_ftseYTD:d.ftseYTD,f_globalYTD:d.globalYTD};
+  Object.keys(m).forEach(function(id){const el=document.getElementById(id);if(el)el.value=m[id];});
+  document.getElementById('editOverlay').classList.add('open'); document.body.style.overflow='hidden';
 }
-function closeEdit() { document.getElementById('editOverlay').classList.remove('open'); document.body.style.overflow=''; }
+function closeEdit(){ document.getElementById('editOverlay').classList.remove('open'); document.body.style.overflow=''; }
 function saveFromPanel() {
   const d=getData();
   function n(id){return parseFloat(document.getElementById(id).value)||0;}
-  d.age=Math.round(n('f_age')); d.retAge=Math.round(n('f_retAge')); d.target=n('f_target');
-  d.sipp=n('f_sipp'); d.workPension=n('f_workPension'); d.isa=n('f_isa');
-  d.propVal=n('f_propVal'); d.mortgage=n('f_mortgage'); d.cash=n('f_cash');
-  d.wpMonthly=n('f_wpMonthly'); d.sippMonthly=n('f_sippMonthly'); d.isaMonthly=n('f_isaMonthly');
-  d.bullRet=n('f_bullRet'); d.baseRet=n('f_baseRet'); d.bearRet=n('f_bearRet');
-  d.boeRate=n('f_boeRate'); d.cpiInflation=n('f_cpiInflation'); d.ftseYTD=n('f_ftseYTD'); d.globalYTD=n('f_globalYTD');
+  d.age=Math.round(n('f_age'));d.retAge=Math.round(n('f_retAge'));d.target=n('f_target');
+  d.sipp=n('f_sipp');d.workPension=n('f_workPension');d.isa=n('f_isa');
+  d.propVal=n('f_propVal');d.mortgage=n('f_mortgage');d.cash=n('f_cash');
+  d.wpMonthly=n('f_wpMonthly');d.sippMonthly=n('f_sippMonthly');d.isaMonthly=n('f_isaMonthly');
+  d.bullRet=n('f_bullRet');d.baseRet=n('f_baseRet');d.bearRet=n('f_bearRet');
+  const sym=(document.getElementById('f_fundSym').value||'').trim(); if(sym)d.fundSym=sym;
+  d.boeRate=n('f_boeRate');d.cpiInflation=n('f_cpiInflation');d.ftseYTD=n('f_ftseYTD');d.globalYTD=n('f_globalYTD');
   d.lastUpdated=todayStr();
-  saveData(d); renderAll(); closeEdit(); showToast('Saved & recalculated ✓');
+  saveData(d); renderAll(); closeEdit(); showToast('Saved & recalculated ✓'); fetchLiveData();
 }
-function resetToDefaults() {
-  if(!confirm('Reset all values to defaults?')) return;
-  try{localStorage.removeItem(SK);}catch(e){}
-  renderAll(); openEdit(); showToast('Reset to defaults');
-}
-function showToast(msg) {
-  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
-  setTimeout(function(){t.classList.remove('show');},2800);
-}
+function resetToDefaults(){ if(!confirm('Reset all values to defaults?'))return; try{localStorage.removeItem(SK);}catch(e){} renderAll(); openEdit(); showToast('Reset to defaults'); }
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},2800); }
 
 // ── WIRING ────────────────────────────────────────────────────
 document.getElementById('fabBtn').addEventListener('click', openEdit);
@@ -981,11 +1080,19 @@ document.getElementById('epReset').addEventListener('click', resetToDefaults);
 document.getElementById('editOverlay').addEventListener('click', function(e){ if(e.target===this) closeEdit(); });
 document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeEdit(); });
 window.addEventListener('resize', function(){ const d=getData(),c=calc(d); drawCanvas(d,c); });
+document.getElementById('aiSpeakBtn').addEventListener('click', function(){ speak(briefingText); });
+document.getElementById('aiStopBtn').addEventListener('click', stopSpeak);
+document.getElementById('aiAskBtn').addEventListener('click', function(){ const q=document.getElementById('aiAsk').value.trim(); if(q) answerQuestion(q); });
+document.getElementById('aiAsk').addEventListener('keydown', function(e){ if(e.key==='Enter'){ const q=this.value.trim(); if(q) answerQuestion(q); } });
+if ('speechSynthesis' in window) { window.speechSynthesis.onvoiceschanged = function(){}; window.speechSynthesis.getVoices(); }
 
 // ── BOOT ──────────────────────────────────────────────────────
 renderAll();
 fetchLiveData();
 fetchNews().then(renderNews);
+// Auto-refresh news every 30 minutes and market data every 5 minutes
+setInterval(function(){ fetchNews().then(renderNews); }, 30 * 60 * 1000);
+setInterval(function(){ fetchLiveData(); }, 5 * 60 * 1000);
 
 })();
 </script>
