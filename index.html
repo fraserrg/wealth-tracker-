@@ -10,6 +10,7 @@
 <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Wealth+Tracker%22%2C%22short_name%22%3A%22Wealth%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23050810%22%2C%22theme_color%22%3A%22%23050810%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg+xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27+viewBox%3D%270+0+192+192%27%253E%253Crect+width%3D%27192%27+height%3D%27192%27+fill%3D%27%23050810%27%2F%253E%253Ctext+y%3D%27140%27+x%3D%2796%27+font-size%3D%27120%27+text-anchor%3D%27middle%27+fill%3D%27%23d4a520%27%253E%25C2%25A3%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
 :root {
   --bg: #f5f2ec; --surface: #ffffff; --surface2: #f0ece4;
@@ -344,7 +345,153 @@ canvas { width: 100%; display: block; }
 .toast { position: fixed; bottom: 100px; right: 32px; z-index: 500; background: var(--teal); color: #fff; font-family: var(--mono); font-size: 12px; padding: 10px 18px; border-radius: 8px; opacity: 0; transform: translateY(8px); transition: opacity 0.25s, transform 0.25s; pointer-events: none; }
 .toast.show { opacity: 1; transform: translateY(0); }
 
-@media (max-width: 900px) { .visual-grid { grid-template-columns: 1fr; } }
+/* ONBOARDING */
+.ob-overlay { position: fixed; inset: 0; background: rgba(5,8,16,0.92); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(8px); }
+.ob-overlay.hidden { display: none; }
+.ob-box { background: var(--surface); border-radius: 20px; width: 100%; max-width: 540px; overflow: hidden; box-shadow: 0 24px 80px rgba(0,0,0,0.5); }
+.ob-header { background: #050810; padding: 32px 36px 24px; position: relative; }
+.ob-steps { display: flex; gap: 6px; margin-bottom: 20px; }
+.ob-step-dot { flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.12); transition: background 0.3s; }
+.ob-step-dot.done { background: var(--cyan); }
+.ob-step-dot.active { background: var(--gold-light); }
+.ob-step-title { font-family: var(--serif); font-size: 24px; font-style: italic; color: #fff; margin-bottom: 4px; }
+.ob-step-sub { font-family: var(--mono); font-size: 11px; color: rgba(255,255,255,0.4); }
+.ob-body { padding: 28px 36px; }
+.ob-field { margin-bottom: 18px; }
+.ob-field label { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+.ob-field input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--mono); font-size: 14px; color: var(--ink); background: var(--surface2); outline: none; transition: border-color 0.2s; }
+.ob-field input:focus { border-color: var(--gold); background: var(--surface); }
+.ob-hint { font-family: var(--mono); font-size: 9px; color: var(--muted); margin-top: 5px; }
+.ob-footer { display: flex; gap: 10px; padding: 0 36px 28px; }
+.ob-next { flex: 1; background: var(--ink); color: #fff; border: none; border-radius: 10px; padding: 13px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; cursor: pointer; transition: background 0.15s; }
+.ob-next:hover { background: #050810; }
+.ob-skip { background: none; border: 1px solid var(--border); border-radius: 10px; padding: 13px 18px; font-family: var(--mono); font-size: 11px; color: var(--muted); cursor: pointer; }
+.ob-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+/* AI SETTINGS */
+.ai-settings-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 800; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+.ai-settings-overlay.hidden { display: none; }
+.ai-settings-box { background: var(--surface); border-radius: 16px; width: 100%; max-width: 480px; overflow: hidden; box-shadow: 0 16px 60px rgba(0,0,0,0.4); }
+.ais-header { background: #050810; padding: 24px 28px; }
+.ais-title { font-family: var(--serif); font-size: 20px; font-style: italic; color: var(--gold-light); margin-bottom: 4px; }
+.ais-sub { font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.35); }
+.ais-body { padding: 24px 28px; }
+.ais-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.ais-input { width: 100%; padding: 11px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--mono); font-size: 13px; color: var(--ink); background: var(--surface2); outline: none; letter-spacing: 0.05em; }
+.ais-input:focus { border-color: var(--gold); }
+.ais-note { font-family: var(--mono); font-size: 9px; color: var(--muted); line-height: 1.65; margin-top: 10px; }
+.ais-note a { color: var(--cyan); }
+.ais-status { font-family: var(--mono); font-size: 10px; padding: 8px 12px; border-radius: 6px; margin-top: 12px; }
+.ais-status.ok { background: rgba(42,122,111,0.1); color: var(--teal); border: 1px solid rgba(42,122,111,0.2); }
+.ais-status.none { background: rgba(212,165,32,0.08); color: var(--gold); border: 1px solid rgba(212,165,32,0.2); }
+.ais-footer { display: flex; gap: 10px; padding: 0 28px 24px; }
+.ais-save { flex: 1; background: var(--ink); color: #fff; border: none; border-radius: 8px; padding: 12px; font-family: var(--mono); font-size: 11px; cursor: pointer; }
+.ais-close-btn { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; font-family: var(--mono); font-size: 11px; color: var(--muted); cursor: pointer; }
+
+/* AI CONVERSATION */
+.ai-conv-history { max-height: 280px; overflow-y: auto; margin-bottom: 16px; display: flex; flex-direction: column; gap: 10px; }
+.ai-conv-history:empty { display: none; }
+.conv-msg { font-family: var(--mono); font-size: 11.5px; line-height: 1.7; padding: 12px 14px; border-radius: 10px; }
+.conv-msg.user { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.65); align-self: flex-end; max-width: 85%; border-bottom-right-radius: 3px; }
+.conv-msg.assistant { background: rgba(212,165,32,0.08); color: rgba(255,255,255,0.82); border: 1px solid rgba(212,165,32,0.12); border-bottom-left-radius: 3px; white-space: pre-wrap; }
+.conv-msg.assistant strong { color: var(--gold-light); }
+.conv-msg.typing { color: rgba(255,255,255,0.3); animation: pulse2 1.2s infinite; }
+@keyframes pulse2 { 0%,100%{opacity:0.3} 50%{opacity:0.8} }
+.ai-api-indicator { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 9px; }
+.ai-api-dot { width: 6px; height: 6px; border-radius: 50%; }
+.ai-api-dot.active { background: var(--teal-light); box-shadow: 0 0 6px var(--teal-light); }
+.ai-api-dot.inactive { background: var(--amber); }
+.ai-deep-btn { background: linear-gradient(135deg, rgba(0,180,216,0.15), rgba(212,165,32,0.1)); border: 1px solid rgba(0,180,216,0.25); color: var(--cyan); }
+.ai-deep-btn:hover { background: linear-gradient(135deg, rgba(0,180,216,0.25), rgba(212,165,32,0.15)); border-color: var(--cyan); }
+.ai-clear-btn { font-size: 9px; padding: 6px 10px; }
+
+/* DEBT TRACKER */
+.debt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 12px; margin-bottom: 16px; }
+.debt-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; position: relative; }
+.debt-card-name { font-family: var(--display); font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+.debt-card-type { font-family: var(--mono); font-size: 8px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.debt-card-balance { font-family: var(--serif); font-size: 24px; font-style: italic; color: var(--red); line-height: 1; margin-bottom: 4px; }
+.debt-card-meta { font-family: var(--mono); font-size: 9px; color: var(--muted); line-height: 1.7; }
+.debt-card-del { position: absolute; top: 12px; right: 12px; background: none; border: none; color: var(--muted); font-size: 14px; cursor: pointer; padding: 2px 6px; border-radius: 4px; }
+.debt-card-del:hover { color: var(--red); background: rgba(192,57,43,0.08); }
+.debt-add-form { background: var(--surface2); border: 1px dashed var(--border); border-radius: 10px; padding: 20px; margin-bottom: 24px; }
+.debt-add-form .debt-form-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.debt-add-form input, .debt-add-form select { padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-family: var(--mono); font-size: 11px; background: var(--surface); color: var(--ink); outline: none; width: 100%; }
+.debt-add-form input:focus { border-color: var(--gold); }
+.debt-summary { background: var(--ink); color: #fff; border-radius: 10px; padding: 16px 20px; display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 24px; }
+.debt-sum-item { }
+.debt-sum-val { font-family: var(--serif); font-size: 20px; font-style: italic; color: var(--gold-light); }
+.debt-sum-label { font-family: var(--mono); font-size: 9px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 2px; }
+
+/* BUDGET TRACKER */
+.budget-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 12px; margin-bottom: 24px; }
+.budget-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+.budget-cat { font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; display: flex; justify-content: space-between; }
+.budget-inputs { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+.budget-inputs input { flex: 1; padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; font-family: var(--mono); font-size: 12px; color: var(--ink); background: var(--surface2); text-align: right; outline: none; }
+.budget-inputs input:focus { border-color: var(--gold); }
+.budget-vs { font-family: var(--mono); font-size: 9px; color: var(--muted); }
+.budget-bar-wrap { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.budget-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s; }
+.budget-summary-row { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; padding: 12px 0; border-top: 1px solid var(--border); margin-top: 4px; }
+
+/* SCENARIOS */
+.scenario-save-row { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
+.scenario-save-row input { flex: 1; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--mono); font-size: 12px; color: var(--ink); background: var(--surface2); outline: none; }
+.scenario-save-row input:focus { border-color: var(--gold); }
+.scenario-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 12px; margin-bottom: 24px; }
+.scenario-saved-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; }
+.sscard-name { font-family: var(--display); font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.sscard-date { font-family: var(--mono); font-size: 9px; color: var(--muted); margin-bottom: 12px; }
+.sscard-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.sscard-stat-val { font-family: var(--serif); font-size: 16px; font-style: italic; color: var(--teal); }
+.sscard-stat-lbl { font-family: var(--mono); font-size: 8px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.sscard-actions { display: flex; gap: 8px; }
+.sscard-btn { flex: 1; padding: 7px; font-family: var(--mono); font-size: 10px; border-radius: 6px; cursor: pointer; text-align: center; }
+.sscard-load { background: var(--ink); color: #fff; border: none; }
+.sscard-del { background: none; border: 1px solid var(--border); color: var(--muted); }
+.sscard-del:hover { border-color: var(--red); color: var(--red); }
+
+/* STATE PENSION */
+.sp-card { background: linear-gradient(135deg, rgba(42,122,111,0.06), rgba(44,95,138,0.06)); border: 1px solid rgba(42,122,111,0.2); border-radius: 12px; padding: 28px; margin-bottom: 24px; }
+.sp-row { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
+.sp-inputs { flex: 1; min-width: 200px; }
+.sp-result { flex: 2; min-width: 280px; }
+.sp-niyears-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.sp-niyears-input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--mono); font-size: 16px; color: var(--ink); background: var(--surface); outline: none; text-align: center; }
+.sp-niyears-input:focus { border-color: var(--teal); }
+.sp-calc-btn { width: 100%; margin-top: 10px; background: var(--teal); color: #fff; border: none; border-radius: 8px; padding: 11px; font-family: var(--mono); font-size: 11px; cursor: pointer; }
+.sp-result-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+.sp-res-val { font-family: var(--serif); font-size: 22px; font-style: italic; color: var(--teal); line-height: 1; }
+.sp-res-lbl { font-family: var(--mono); font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 3px; }
+.sp-progress-wrap { margin-top: 14px; }
+.sp-progress-track { height: 6px; background: var(--border); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+.sp-progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--teal), var(--teal-light)); transition: width 0.8s ease; }
+.sp-note { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 14px; line-height: 1.65; }
+
+/* DATA PORTABILITY */
+.portability-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 48px; }
+.port-btn { display: flex; align-items: center; gap: 10px; padding: 14px 22px; border-radius: 10px; font-family: var(--mono); font-size: 11px; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border); background: var(--surface); color: var(--ink); }
+.port-btn:hover { border-color: var(--gold); }
+.port-btn-icon { font-size: 18px; }
+.port-btn-text { }
+.port-btn-sub { font-size: 9px; color: var(--muted); display: block; margin-top: 1px; }
+.port-btn.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+.port-btn.primary:hover { background: #050810; }
+.port-btn.danger:hover { border-color: var(--red); color: var(--red); }
+
+/* PRINT */
+@media print {
+  .dark-toggle, .edit-fab, .pwa-banner, .milestone-toast, .ai-controls, #liveBanner, .fund-return-bar, #newsGrid, .section-header .section-num { display: none !important; }
+  .header { background: #fff !important; color: #000 !important; }
+  .header-canvas { display: none !important; }
+  .header-glow, .header-glow2 { display: none !important; }
+  .hstat-val { color: #1a1714 !important; }
+  body { background: #fff; }
+  .main { padding: 20px; }
+}
+
+@media (max-width: 900px) { .visual-grid { grid-template-columns: 1fr; } .calc-grid { grid-template-columns: 1fr; } }
 @media (max-width: 700px) {
   .header, .main { padding: 28px 20px; }
   .disclaimer { padding: 20px; }
@@ -381,13 +528,20 @@ canvas { width: 100%; display: block; }
     <div class="ai-head">
       <span class="ai-badge">◈ AI Assistant</span>
       <span class="ai-title">Your Financial Briefing</span>
+      <span class="ai-api-indicator" style="margin-left:auto;color:rgba(255,255,255,0.4)">
+        <span class="ai-api-dot inactive" id="aiApiDot"></span><span id="aiApiLabel">Offline mode</span>
+      </span>
     </div>
+    <div class="ai-conv-history" id="aiConvHistory"></div>
     <div class="ai-text" id="aiText">Generating your personalised briefing…</div>
     <div class="ai-controls">
       <button class="ai-btn primary" id="aiSpeakBtn">🔊 Read Aloud</button>
       <button class="ai-btn ghost" id="aiStopBtn" disabled>■ Stop</button>
+      <button class="ai-btn ai-deep-btn" id="aiDeepBtn">✦ Deep Analysis</button>
+      <button class="ai-btn ghost" id="aiSettingsBtn">⚙ AI Settings</button>
+      <button class="ai-btn ghost ai-clear-btn" id="aiClearBtn">Clear chat</button>
       <div class="ai-ask">
-        <input type="text" id="aiAsk" placeholder="Ask me… e.g. 'when do I hit a million?' or 'retire at 60'">
+        <input type="text" id="aiAsk" placeholder="Ask me anything… 'when do I hit a million?', 'how's the economy?', 'should I overpay my mortgage?'">
         <button class="ai-btn ghost" id="aiAskBtn">Ask</button>
       </div>
     </div>
@@ -601,9 +755,140 @@ canvas { width: 100%; display: block; }
   </div>
   <div class="wrapper-grid" id="wrapperGrid"></div>
 
+  <!-- STATE PENSION -->
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div class="section-title">State Pension Estimator</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="sp-card">
+    <div class="sp-row">
+      <div class="sp-inputs">
+        <div class="sp-niyears-label">Qualifying NI years so far</div>
+        <input type="number" class="sp-niyears-input" id="spNiYears" min="0" max="50" step="1" value="10">
+        <button class="sp-calc-btn" id="spCalcBtn">Estimate Entitlement</button>
+        <div class="sp-note">The full new State Pension needs <strong>35 qualifying years</strong>; you need at least 10 to get anything. Check your real record at gov.uk/check-state-pension.</div>
+      </div>
+      <div class="sp-result">
+        <div class="sp-result-grid" id="spResultGrid"></div>
+        <div class="sp-progress-wrap">
+          <div class="sp-niyears-label" id="spProgressLabel">Progress to full entitlement</div>
+          <div class="sp-progress-track"><div class="sp-progress-fill" id="spProgressFill" style="width:0"></div></div>
+        </div>
+        <div class="sp-note" id="spDetail"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEBT DASHBOARD -->
+  <div class="section-header">
+    <div class="section-num">13</div>
+    <div class="section-title">Debt &amp; Liability Tracker</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="debt-summary" id="debtSummary" style="display:none;"></div>
+  <div class="debt-add-form">
+    <div class="debt-form-row">
+      <input type="text" id="debtName" placeholder="Name (e.g. Barclaycard)">
+      <select id="debtType">
+        <option value="Credit Card">Credit Card</option>
+        <option value="Personal Loan">Personal Loan</option>
+        <option value="Car Finance">Car Finance</option>
+        <option value="Student Loan">Student Loan</option>
+        <option value="Overdraft">Overdraft</option>
+        <option value="Other">Other</option>
+      </select>
+      <input type="number" id="debtBalance" placeholder="Balance £" min="0" step="100">
+    </div>
+    <div class="debt-form-row">
+      <input type="number" id="debtRate" placeholder="APR %" min="0" max="100" step="0.1">
+      <input type="number" id="debtPayment" placeholder="Monthly payment £" min="0" step="10">
+      <button class="calc-btn" id="debtAddBtn" style="margin-top:0;">+ Add Debt</button>
+    </div>
+  </div>
+  <div class="debt-grid" id="debtGrid"></div>
+
+  <!-- BUDGET TRACKER -->
+  <div class="section-header">
+    <div class="section-num">14</div>
+    <div class="section-title">Monthly Budget — Plan vs Actual</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="budget-grid" id="budgetGrid"></div>
+  <div class="budget-summary-row" id="budgetSummary"></div>
+
+  <!-- SCENARIOS -->
+  <div class="section-header">
+    <div class="section-num">15</div>
+    <div class="section-title">Saved Scenarios</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="scenario-save-row">
+    <input type="text" id="scenarioName" placeholder="Name this scenario… e.g. 'Retire at 50', 'Go part-time at 45'">
+    <button class="calc-btn" id="scenarioSaveBtn" style="margin-top:0;width:auto;padding:9px 18px;">💾 Save current plan</button>
+  </div>
+  <div class="scenario-list" id="scenarioList"></div>
+  <div id="scenarioEmpty" class="history-empty" style="display:none;">No saved scenarios yet. Adjust your figures, then save a snapshot to compare different futures side by side.</div>
+
+  <!-- DATA PORTABILITY & EXPORT -->
+  <div class="section-header">
+    <div class="section-num">16</div>
+    <div class="section-title">Reports &amp; Your Data</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="portability-row">
+    <button class="port-btn primary" id="exportPdfBtn"><span class="port-btn-icon">📄</span><span class="port-btn-text">Download PDF Report<span class="port-btn-sub">Professional wealth summary</span></span></button>
+    <button class="port-btn" id="exportDataBtn"><span class="port-btn-icon">⬇</span><span class="port-btn-text">Export Data (JSON)<span class="port-btn-sub">Back up / move to another device</span></span></button>
+    <button class="port-btn" id="importDataBtn"><span class="port-btn-icon">⬆</span><span class="port-btn-text">Import Data<span class="port-btn-sub">Restore from a backup file</span></span></button>
+    <button class="port-btn" id="printBtn"><span class="port-btn-icon">🖨</span><span class="port-btn-text">Print Dashboard<span class="port-btn-sub">Browser print / save as PDF</span></span></button>
+    <button class="port-btn danger" id="wipeBtn"><span class="port-btn-icon">🗑</span><span class="port-btn-text">Reset Everything<span class="port-btn-sub">Clear all saved data</span></span></button>
+    <input type="file" id="importFile" accept="application/json,.json" style="display:none;">
+  </div>
+
   <!-- ANNUAL REVIEW -->
   <div id="reviewBanner" class="review-banner" style="display:none;"></div>
 
+</div>
+
+<!-- ONBOARDING WIZARD -->
+<div class="ob-overlay hidden" id="obOverlay">
+  <div class="ob-box">
+    <div class="ob-header">
+      <div class="ob-steps" id="obSteps"></div>
+      <div class="ob-step-title" id="obTitle"></div>
+      <div class="ob-step-sub" id="obSub"></div>
+    </div>
+    <div class="ob-body" id="obBody"></div>
+    <div class="ob-footer">
+      <button class="ob-skip" id="obSkip">Skip setup</button>
+      <button class="ob-next" id="obNext">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI SETTINGS MODAL -->
+<div class="ai-settings-overlay hidden" id="aiSettingsOverlay">
+  <div class="ai-settings-box">
+    <div class="ais-header">
+      <div class="ais-title">AI Settings</div>
+      <div class="ais-sub">Connect Claude for genuine, conversational answers</div>
+    </div>
+    <div class="ais-body">
+      <div class="ais-label">Anthropic API Key</div>
+      <input type="password" class="ais-input" id="aisKeyInput" placeholder="sk-ant-…" autocomplete="off">
+      <div class="ais-status" id="aisStatus"></div>
+      <div class="ais-note">
+        Without a key, the assistant uses a built-in offline knowledge engine (still answers most questions). With a Claude API key, you get genuine conversational AI that understands context and follow-ups.<br><br>
+        🔒 Your key is stored only in this browser (localStorage) and is sent directly to Anthropic — never to any other server. Get one at <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>.<br><br>
+        Your financial figures are only shared with Anthropic when you actually ask the AI a question.
+      </div>
+    </div>
+    <div class="ais-footer">
+      <button class="ais-save" id="aisSaveBtn">Save Key</button>
+      <button class="ais-close-btn" id="aisClearKeyBtn">Remove Key</button>
+      <button class="ais-close-btn" id="aisCloseBtn">Close</button>
+    </div>
+  </div>
 </div>
 
 <div class="disclaimer">
@@ -697,6 +982,22 @@ const DEFAULTS = {
   lastUpdated: null
 };
 const HSK = 'wealth_history_v1';
+const SCK = 'wealth_scenarios_v1';
+const DBK = 'wealth_debts_v1';
+const BGK = 'wealth_budget_v1';
+const KEYK = 'wealth_claude_key';
+const OBK = 'wealth_onboarded_v1';
+
+const BUDGET_DEFAULTS = [
+  { cat:'Housing / Mortgage', plan:1400 },
+  { cat:'Pension & Investments', plan:1150 },
+  { cat:'Food & Groceries', plan:450 },
+  { cat:'Utilities & Bills', plan:300 },
+  { cat:'Transport', plan:250 },
+  { cat:'Leisure & Dining', plan:300 },
+  { cat:'Insurance', plan:120 },
+  { cat:'Other / Misc', plan:200 }
+];
 
 function getData() {
   try { const r = localStorage.getItem(SK); if (r) return Object.assign({}, DEFAULTS, JSON.parse(r)); }
@@ -1196,6 +1497,513 @@ function initPWA() {
   }
 }
 
+// ── STATE PENSION ─────────────────────────────────────────────
+const FULL_STATE_PENSION = 11502; // £/yr 2024/25 new State Pension
+const SP_MAX_YEARS = 35, SP_MIN_YEARS = 10, SP_AGE = 68;
+function renderStatePension() {
+  let years = 10;
+  try { const s = localStorage.getItem('wealth_ni_years'); if (s) years = parseInt(s) || 10; } catch(e){}
+  const inp = document.getElementById('spNiYears');
+  if (inp) inp.value = years;
+  calcStatePension();
+}
+function calcStatePension() {
+  const inp = document.getElementById('spNiYears');
+  if (!inp) return;
+  const years = Math.max(0, Math.min(50, parseInt(inp.value) || 0));
+  try { localStorage.setItem('wealth_ni_years', String(years)); } catch(e){}
+  const d = getData();
+  const eligible = years >= SP_MIN_YEARS;
+  const annual = eligible ? Math.round(FULL_STATE_PENSION * Math.min(years, SP_MAX_YEARS) / SP_MAX_YEARS) : 0;
+  const monthly = Math.round(annual / 12);
+  const yearsToGo = Math.max(0, SP_AGE - d.age);
+  const projYears = Math.min(SP_MAX_YEARS, years + yearsToGo);
+  const projAnnual = Math.round(FULL_STATE_PENSION * projYears / SP_MAX_YEARS);
+  const grid = document.getElementById('spResultGrid');
+  if (grid) grid.innerHTML =
+    '<div><div class="sp-res-val">'+(eligible?fmtFull(annual):'£0')+'</div><div class="sp-res-lbl">Entitlement now ('+years+' yrs)</div></div>'+
+    '<div><div class="sp-res-val">'+fmtFull(projAnnual)+'</div><div class="sp-res-lbl">Projected at 68 ('+projYears+' yrs)</div></div>'+
+    '<div><div class="sp-res-val">'+fmtFull(Math.round(projAnnual/12))+'</div><div class="sp-res-lbl">Per month at 68</div></div>';
+  const pct = Math.min(years / SP_MAX_YEARS * 100, 100);
+  const fill = document.getElementById('spProgressFill');
+  if (fill) fill.style.width = pct.toFixed(0)+'%';
+  const lbl = document.getElementById('spProgressLabel');
+  if (lbl) lbl.textContent = years + ' of ' + SP_MAX_YEARS + ' qualifying years (' + pct.toFixed(0) + '%)';
+  const detail = document.getElementById('spDetail');
+  if (detail) {
+    const gap = SP_MAX_YEARS - years;
+    detail.innerHTML = eligible
+      ? (gap > 0
+          ? 'With '+yearsToGo+' more years of work before age '+SP_AGE+', you should reach <strong>'+projYears+' qualifying years</strong>'+(projYears>=SP_MAX_YEARS?' — the full State Pension.':'. You\'d need '+(SP_MAX_YEARS-projYears)+' more to max out (voluntary NI contributions can fill gaps).')
+          : '✓ You already qualify for the <strong>full State Pension</strong> of '+fmtFull(FULL_STATE_PENSION)+'/yr.')
+      : 'You need at least <strong>'+SP_MIN_YEARS+' qualifying years</strong> to receive any State Pension — you currently have '+years+'.';
+  }
+  // also store estimate for AI context
+  window._spEstimate = { annual: projAnnual, monthly: Math.round(projAnnual/12), age: SP_AGE };
+}
+
+// ── DEBT TRACKER ──────────────────────────────────────────────
+function getDebts() { try { return JSON.parse(localStorage.getItem(DBK) || '[]'); } catch(e){ return []; } }
+function saveDebts(arr) { try { localStorage.setItem(DBK, JSON.stringify(arr)); } catch(e){} }
+function addDebt() {
+  const name = (document.getElementById('debtName').value||'').trim();
+  const type = document.getElementById('debtType').value;
+  const balance = parseFloat(document.getElementById('debtBalance').value) || 0;
+  const rate = parseFloat(document.getElementById('debtRate').value) || 0;
+  const payment = parseFloat(document.getElementById('debtPayment').value) || 0;
+  if (!name || balance <= 0) { showToast('Enter a name and balance'); return; }
+  const debts = getDebts();
+  debts.push({ id: Date.now(), name, type, balance, rate, payment });
+  saveDebts(debts);
+  ['debtName','debtBalance','debtRate','debtPayment'].forEach(function(id){ document.getElementById(id).value=''; });
+  renderDebtDashboard();
+  showToast('Debt added');
+}
+function removeDebt(id) {
+  saveDebts(getDebts().filter(function(x){ return x.id !== id; }));
+  renderDebtDashboard();
+}
+function payoffMonths(balance, rate, payment) {
+  if (payment <= 0) return Infinity;
+  const r = rate / 100 / 12;
+  if (r <= 0) return Math.ceil(balance / payment);
+  if (payment <= balance * r) return Infinity; // never pays off
+  return Math.ceil(-Math.log(1 - (balance * r) / payment) / Math.log(1 + r));
+}
+function renderDebtDashboard() {
+  const grid = document.getElementById('debtGrid');
+  const summary = document.getElementById('debtSummary');
+  if (!grid) return;
+  const debts = getDebts();
+  if (!debts.length) {
+    grid.innerHTML = '<div class="history-empty">No debts tracked. Add credit cards, loans or car finance above to see payoff timelines — or celebrate being debt-free! 🎉</div>';
+    if (summary) summary.style.display = 'none';
+    return;
+  }
+  const totalBal = debts.reduce(function(s,x){ return s + x.balance; }, 0);
+  const totalPay = debts.reduce(function(s,x){ return s + x.payment; }, 0);
+  const totalInterestYr = debts.reduce(function(s,x){ return s + x.balance * x.rate/100; }, 0);
+  if (summary) {
+    summary.style.display = 'flex';
+    summary.innerHTML =
+      '<div class="debt-sum-item"><div class="debt-sum-val">'+fmtFull(totalBal)+'</div><div class="debt-sum-label">Total owed</div></div>'+
+      '<div class="debt-sum-item"><div class="debt-sum-val">'+fmtFull(Math.round(totalPay))+'</div><div class="debt-sum-label">Monthly payments</div></div>'+
+      '<div class="debt-sum-item"><div class="debt-sum-val">'+fmtFull(Math.round(totalInterestYr))+'</div><div class="debt-sum-label">Interest cost / yr</div></div>';
+  }
+  grid.innerHTML = debts.map(function(x){
+    const m = payoffMonths(x.balance, x.rate, x.payment);
+    const payoffTxt = m === Infinity ? 'Payment too low to clear' : (m < 12 ? m + ' months' : (Math.floor(m/12)+'y '+(m%12)+'m'));
+    const totalCost = m === Infinity ? null : Math.round(x.payment * m);
+    const interest = totalCost ? totalCost - x.balance : null;
+    return '<div class="debt-card"><button class="debt-card-del" data-id="'+x.id+'">✕</button>'+
+      '<div class="debt-card-name">'+x.name+'</div><div class="debt-card-type">'+x.type+'</div>'+
+      '<div class="debt-card-balance">'+fmtFull(x.balance)+'</div>'+
+      '<div class="debt-card-meta">'+x.rate+'% APR · '+fmtFull(x.payment)+'/mo<br>Clear in: <strong style="color:var(--ink)">'+payoffTxt+'</strong>'+
+      (interest!=null?'<br>Total interest: '+fmtFull(interest):'')+'</div></div>';
+  }).join('');
+  grid.querySelectorAll('.debt-card-del').forEach(function(b){
+    b.addEventListener('click', function(){ removeDebt(parseInt(this.dataset.id)); });
+  });
+}
+
+// ── BUDGET TRACKER ────────────────────────────────────────────
+function getBudget() {
+  try { const s = localStorage.getItem(BGK); if (s) return JSON.parse(s); } catch(e){}
+  return BUDGET_DEFAULTS.map(function(b){ return { cat:b.cat, plan:b.plan, actual:b.plan }; });
+}
+function saveBudget(arr) { try { localStorage.setItem(BGK, JSON.stringify(arr)); } catch(e){} }
+function renderBudgetTracker() {
+  const grid = document.getElementById('budgetGrid');
+  if (!grid) return;
+  const budget = getBudget();
+  grid.innerHTML = budget.map(function(b, i){
+    const pct = b.plan > 0 ? Math.min(b.actual / b.plan * 100, 150) : 0;
+    const over = b.actual > b.plan;
+    const col = over ? 'var(--red)' : pct > 90 ? 'var(--amber)' : 'var(--teal)';
+    return '<div class="budget-item"><div class="budget-cat"><span>'+b.cat+'</span><span style="color:'+col+'">'+(over?'+'+fmtS(b.actual-b.plan):'✓')+'</span></div>'+
+      '<div class="budget-inputs"><input type="number" data-i="'+i+'" data-f="plan" value="'+b.plan+'" title="Planned"><span style="color:var(--muted);font-family:var(--mono);font-size:11px;">vs</span><input type="number" data-i="'+i+'" data-f="actual" value="'+b.actual+'" title="Actual"></div>'+
+      '<div class="budget-vs">Plan '+fmtS(b.plan)+' · Actual '+fmtS(b.actual)+'</div>'+
+      '<div class="budget-bar-wrap"><div class="budget-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div></div>';
+  }).join('');
+  grid.querySelectorAll('input').forEach(function(inp){
+    inp.addEventListener('change', function(){
+      const arr = getBudget();
+      arr[parseInt(this.dataset.i)][this.dataset.f] = parseFloat(this.value) || 0;
+      saveBudget(arr);
+      renderBudgetTracker();
+    });
+  });
+  const totPlan = budget.reduce(function(s,b){ return s+b.plan; },0);
+  const totAct = budget.reduce(function(s,b){ return s+b.actual; },0);
+  const d = getData();
+  const income = d.monthlyIncome || 4000;
+  const sumEl = document.getElementById('budgetSummary');
+  if (sumEl) {
+    const surplus = income - totAct;
+    sumEl.innerHTML = '<span>Income: <strong>'+fmtFull(income)+'</strong> · Planned out: <strong>'+fmtFull(totPlan)+'</strong> · Actual out: <strong>'+fmtFull(totAct)+'</strong></span>'+
+      '<span style="color:'+(surplus>=0?'var(--teal)':'var(--red)')+'">'+(surplus>=0?'Surplus: ':'Overspend: ')+fmtFull(Math.abs(surplus))+'/mo</span>';
+  }
+}
+
+// ── SCENARIOS ─────────────────────────────────────────────────
+function getScenarios() { try { return JSON.parse(localStorage.getItem(SCK) || '[]'); } catch(e){ return []; } }
+function saveScenarios(arr) { try { localStorage.setItem(SCK, JSON.stringify(arr)); } catch(e){} }
+function saveScenario() {
+  const nameEl = document.getElementById('scenarioName');
+  const name = (nameEl.value||'').trim() || ('Scenario ' + (getScenarios().length+1));
+  const d = getData(), c = calc(d);
+  const scenarios = getScenarios();
+  scenarios.push({ id:Date.now(), name, date:todayStr(), data:JSON.parse(JSON.stringify(d)),
+    snapshot:{ retAge:d.retAge, target:d.target, baseAt:Math.round(c.baseAt), nw:Math.round(c.totalNW), monthly:c.monthlyTotal } });
+  saveScenarios(scenarios);
+  nameEl.value = '';
+  renderScenariosList();
+  showToast('Scenario saved');
+}
+function loadScenario(id) {
+  const s = getScenarios().find(function(x){ return x.id===id; });
+  if (!s) return;
+  if (!confirm('Load "'+s.name+'"? This replaces your current figures (your data is still saved in other scenarios).')) return;
+  saveData(s.data);
+  renderAll();
+  window.scrollTo({top:0,behavior:'smooth'});
+  showToast('Loaded: ' + s.name);
+}
+function deleteScenario(id) {
+  saveScenarios(getScenarios().filter(function(x){ return x.id!==id; }));
+  renderScenariosList();
+}
+function renderScenariosList() {
+  const list = document.getElementById('scenarioList');
+  const empty = document.getElementById('scenarioEmpty');
+  if (!list) return;
+  const scenarios = getScenarios();
+  if (!scenarios.length) { list.innerHTML=''; if(empty) empty.style.display='block'; return; }
+  if (empty) empty.style.display='none';
+  list.innerHTML = scenarios.map(function(s){
+    const sn = s.snapshot || {};
+    return '<div class="scenario-saved-card"><div class="sscard-name">'+s.name+'</div><div class="sscard-date">Saved '+s.date+' · Retire at '+(sn.retAge||'?')+'</div>'+
+      '<div class="sscard-stats">'+
+      '<div><div class="sscard-stat-val">'+fmtS(sn.baseAt||0)+'</div><div class="sscard-stat-lbl">Base at '+(sn.retAge||'?')+'</div></div>'+
+      '<div><div class="sscard-stat-val">'+fmtS(sn.target||0)+'</div><div class="sscard-stat-lbl">Target</div></div>'+
+      '</div><div class="sscard-actions"><button class="sscard-btn sscard-load" data-id="'+s.id+'">Load</button><button class="sscard-btn sscard-del" data-id="'+s.id+'">Delete</button></div></div>';
+  }).join('');
+  list.querySelectorAll('.sscard-load').forEach(function(b){ b.addEventListener('click', function(){ loadScenario(parseInt(this.dataset.id)); }); });
+  list.querySelectorAll('.sscard-del').forEach(function(b){ b.addEventListener('click', function(){ deleteScenario(parseInt(this.dataset.id)); }); });
+}
+
+// ── CLAUDE API ────────────────────────────────────────────────
+function getApiKey() { try { return localStorage.getItem(KEYK) || ''; } catch(e){ return ''; } }
+function updateApiIndicator() {
+  const has = !!getApiKey();
+  const dot = document.getElementById('aiApiDot');
+  const lbl = document.getElementById('aiApiLabel');
+  if (dot) dot.className = 'ai-api-dot ' + (has ? 'active' : 'inactive');
+  if (lbl) lbl.textContent = has ? 'Claude connected' : 'Offline mode';
+}
+function openAISettings() {
+  const ov = document.getElementById('aiSettingsOverlay');
+  const inp = document.getElementById('aisKeyInput');
+  const status = document.getElementById('aisStatus');
+  const key = getApiKey();
+  if (inp) inp.value = key;
+  if (status) {
+    status.className = 'ais-status ' + (key ? 'ok' : 'none');
+    status.textContent = key ? '✓ Claude API key saved — conversational AI active' : 'No key set — using built-in offline knowledge engine';
+  }
+  if (ov) ov.classList.remove('hidden');
+}
+function closeAISettings() { const ov=document.getElementById('aiSettingsOverlay'); if(ov) ov.classList.add('hidden'); }
+function saveApiKey() {
+  const inp = document.getElementById('aisKeyInput');
+  const key = (inp.value||'').trim();
+  try { if (key) localStorage.setItem(KEYK, key); else localStorage.removeItem(KEYK); } catch(e){}
+  updateApiIndicator();
+  closeAISettings();
+  showToast(key ? 'Claude connected ✓' : 'Key removed');
+}
+function clearApiKey() {
+  try { localStorage.removeItem(KEYK); } catch(e){}
+  const inp = document.getElementById('aisKeyInput'); if (inp) inp.value='';
+  updateApiIndicator();
+  const status = document.getElementById('aisStatus');
+  if (status) { status.className='ais-status none'; status.textContent='No key set — using built-in offline knowledge engine'; }
+  showToast('Key removed');
+}
+
+let convHistory = []; // {role, content}
+function renderConvHistory() {
+  const el = document.getElementById('aiConvHistory');
+  if (!el) return;
+  el.innerHTML = convHistory.map(function(m){
+    if (m.role === 'typing') return '<div class="conv-msg typing">Claude is thinking…</div>';
+    const cls = m.role === 'user' ? 'user' : 'assistant';
+    const txt = m.content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    return '<div class="conv-msg '+cls+'">'+txt+'</div>';
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+function clearConversation() {
+  convHistory = [];
+  renderConvHistory();
+  const d=getData(), c=calc(d); buildBriefing(d,c);
+  showToast('Conversation cleared');
+}
+
+function buildSystemPrompt() {
+  const d = getData(), c = calc(d);
+  const debts = getDebts();
+  const totalDebt = debts.reduce(function(s,x){ return s+x.balance; },0);
+  const sp = window._spEstimate;
+  return 'You are a knowledgeable, friendly UK personal finance assistant embedded in a user\'s private wealth dashboard. '+
+    'Give clear, practical, conversational answers. Use British terms and £ sterling. Keep responses concise (2-4 short paragraphs max) unless asked for depth. '+
+    'You can discuss markets, the economy, and financial concepts as well as their personal numbers. '+
+    'You are NOT a regulated financial adviser — for specific product/investment decisions, gently remind them to consult an FCA-authorised IFA, but still be genuinely helpful.\n\n'+
+    'THE USER\'S CURRENT SITUATION:\n'+
+    '- Age '+d.age+', target retirement age '+d.retAge+' ('+c.years+' years away)\n'+
+    '- Total net worth: '+fmtFull(c.totalNW)+' (invested '+fmtFull(c.totalInvested)+', property equity '+fmtFull(c.equity)+', cash '+fmtFull(d.cash)+')\n'+
+    '- Personal SIPP '+fmtFull(d.sipp)+', Workplace pension '+fmtFull(d.workPension)+', S&S ISA '+fmtFull(d.isa)+'\n'+
+    '- Property '+fmtFull(d.propVal)+' with '+fmtFull(d.mortgage)+' mortgage outstanding ('+(d.mortgageRate||4.5)+'% rate)\n'+
+    '- Monthly contributions: '+fmtFull(c.monthlyTotal)+' total ('+fmtFull(d.wpMonthly)+' work pension, '+fmtFull(d.sippMonthly)+' SIPP, '+fmtFull(d.isaMonthly)+' ISA)\n'+
+    '- Target portfolio: '+fmtFull(d.target)+'\n'+
+    '- Projections (invested assets, real returns): Base case '+d.baseRet+'% → '+fmtFull(c.baseAt)+' at '+d.retAge+'; Bull '+d.bullRet+'% → '+fmtFull(c.bullAt)+'; Bear '+d.bearRet+'% → '+fmtFull(c.bearAt)+'\n'+
+    (c.millionAge ? '- Crosses £1M around age '+c.millionAge+' in base case\n' : '')+
+    '- Minimum real return needed to hit target: '+c.minRet.toFixed(1)+'%\n'+
+    (totalDebt > 0 ? '- Other debts: '+fmtFull(totalDebt)+' across '+debts.length+' account(s)\n' : '')+
+    (sp ? '- Estimated State Pension at 68: '+fmtFull(sp.annual)+'/yr\n' : '')+
+    '- Market context: BoE base rate '+d.boeRate+'%, CPI inflation '+d.cpiInflation+'%, FTSE 100 YTD '+sgn(d.ftseYTD)+d.ftseYTD+'%, global equities YTD '+sgn(d.globalYTD)+d.globalYTD+'%\n'+
+    '- Main investment: Vanguard FTSE Global All Cap Index Fund (VAFTGAG)';
+}
+
+async function askClaude(question, deep) {
+  const key = getApiKey();
+  if (!key) { answerQuestion(question); return; }
+  convHistory.push({ role:'user', content: question });
+  convHistory.push({ role:'typing' });
+  renderConvHistory();
+  const userTurns = convHistory.filter(function(m){ return m.role==='user'||m.role==='assistant'; });
+  const messages = userTurns.map(function(m){ return { role:m.role, content:m.content }; });
+  if (deep) messages.push({ role:'user', content:'Please give me a thorough deep-dive analysis of my overall financial position, the biggest risks and opportunities, and the 3 most impactful actions I could take. Be specific to my numbers.' });
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{ 'content-type':'application/json', 'x-api-key':key, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
+      body: JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:1024, system:buildSystemPrompt(), messages: messages })
+    });
+    convHistory = convHistory.filter(function(m){ return m.role!=='typing'; });
+    if (!res.ok) {
+      const err = await res.text();
+      let msg = 'Claude API error ('+res.status+').';
+      if (res.status===401) msg = 'Your API key was rejected (401). Check it in AI Settings.';
+      else if (res.status===429) msg = 'Rate limited (429) — try again shortly.';
+      else if (res.status===529) msg = 'Anthropic is overloaded (529) — try again in a moment.';
+      convHistory.push({ role:'assistant', content: msg + ' Falling back to offline answer below.' });
+      renderConvHistory();
+      answerQuestion(question);
+      return;
+    }
+    const data = await res.json();
+    const text = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : 'No response.';
+    convHistory.push({ role:'assistant', content: text });
+    renderConvHistory();
+    speak(text);
+  } catch(e) {
+    convHistory = convHistory.filter(function(m){ return m.role!=='typing'; });
+    convHistory.push({ role:'assistant', content:'Couldn\'t reach Claude (network/CORS). Using offline answer below.' });
+    renderConvHistory();
+    answerQuestion(question);
+  }
+}
+
+function handleAsk(q) {
+  if (!q) return;
+  if (getApiKey()) askClaude(q, false);
+  else answerQuestion(q);
+}
+
+// ── PDF EXPORT ────────────────────────────────────────────────
+function exportPDF() {
+  try {
+    const jsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+    if (!jsPDF) { showToast('PDF library not loaded'); return; }
+    const d = getData(), c = calc(d);
+    const doc = new jsPDF({ unit:'pt', format:'a4' });
+    const W = doc.internal.pageSize.getWidth();
+    let y = 56;
+    doc.setFillColor(5,8,16); doc.rect(0,0,W,90,'F');
+    doc.setTextColor(212,165,32); doc.setFont('helvetica','bold'); doc.setFontSize(22);
+    doc.text('Wealth Report', 40, 50);
+    doc.setTextColor(170,170,170); doc.setFont('helvetica','normal'); doc.setFontSize(10);
+    doc.text('Generated ' + todayStr() + '  ·  Age ' + d.age + ' → ' + d.retAge, 40, 70);
+    y = 130;
+    function heading(t){ doc.setTextColor(26,23,20); doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text(t, 40, y); y+=20; doc.setDrawColor(220,215,205); doc.line(40,y-8,W-40,y-8); }
+    function row(l,v){ doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(90,85,78); doc.text(l, 48, y); doc.setTextColor(26,23,20); doc.setFont('helvetica','bold'); doc.text(v, W-40, y, {align:'right'}); y+=18; }
+    heading('Net Worth Summary');
+    row('Total net worth', fmtFull(c.totalNW));
+    row('Total invested (pensions + ISA)', fmtFull(c.totalInvested));
+    row('Property equity', fmtFull(c.equity));
+    row('Cash savings', fmtFull(d.cash));
+    y += 12;
+    heading('Holdings');
+    row('Personal SIPP', fmtFull(d.sipp));
+    row('Workplace pension', fmtFull(d.workPension));
+    row('Stocks & Shares ISA', fmtFull(d.isa));
+    row('Property value', fmtFull(d.propVal));
+    row('Mortgage outstanding', fmtFull(d.mortgage));
+    y += 12;
+    heading('Monthly Contributions');
+    row('Work pension', fmtFull(d.wpMonthly));
+    row('Personal SIPP', fmtFull(d.sippMonthly));
+    row('Stocks & Shares ISA', fmtFull(d.isaMonthly));
+    row('Total per month', fmtFull(c.monthlyTotal));
+    y += 12;
+    heading('Projection to Age ' + d.retAge + ' (' + c.years + ' years)');
+    row('Bull case (' + d.bullRet + '% real)', fmtFull(c.bullAt));
+    row('Base case (' + d.baseRet + '% real)', fmtFull(c.baseAt));
+    row('Bear case (' + d.bearRet + '% real)', fmtFull(c.bearAt));
+    row('Target', fmtFull(d.target));
+    row('Minimum real return needed', c.minRet.toFixed(1) + '%');
+    if (c.millionAge) row('£1M reached around age', String(c.millionAge));
+    y += 20;
+    doc.setFontSize(8); doc.setTextColor(140,135,128); doc.setFont('helvetica','italic');
+    const disc = doc.splitTextToSize('Illustrative projections only, not regulated financial advice. Real returns shown (after inflation). Seek advice from an FCA-authorised IFA before making investment decisions.', W-80);
+    doc.text(disc, 40, y);
+    doc.save('wealth-report-' + new Date().toISOString().slice(0,10) + '.pdf');
+    showToast('PDF downloaded ✓');
+  } catch(e) { showToast('PDF export failed'); }
+}
+
+// ── DATA PORTABILITY ──────────────────────────────────────────
+function exportData() {
+  try {
+    const bundle = {
+      _app:'wealth-tracker', _version:1, _exported:new Date().toISOString(),
+      data: getData(),
+      history: JSON.parse(localStorage.getItem(HSK)||'[]'),
+      scenarios: getScenarios(), debts: getDebts(), budget: getBudget(),
+      niYears: localStorage.getItem('wealth_ni_years')||null,
+      milestones: JSON.parse(localStorage.getItem('wealth_milestones')||'[]')
+    };
+    const blob = new Blob([JSON.stringify(bundle,null,2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'wealth-backup-' + new Date().toISOString().slice(0,10) + '.json';
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+    showToast('Data exported ✓');
+  } catch(e) { showToast('Export failed'); }
+}
+function importData(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const b = JSON.parse(e.target.result);
+      if (b._app !== 'wealth-tracker') { if(!confirm('This doesn\'t look like a Wealth Tracker backup. Import anyway?')) return; }
+      if (!confirm('Import this backup? It will replace your current data.')) return;
+      if (b.data) saveData(b.data);
+      if (b.history) localStorage.setItem(HSK, JSON.stringify(b.history));
+      if (b.scenarios) saveScenarios(b.scenarios);
+      if (b.debts) saveDebts(b.debts);
+      if (b.budget) saveBudget(b.budget);
+      if (b.niYears) localStorage.setItem('wealth_ni_years', b.niYears);
+      if (b.milestones) localStorage.setItem('wealth_milestones', JSON.stringify(b.milestones));
+      shownMilestones = null;
+      renderAll(); renderStatePension(); renderDebtDashboard(); renderBudgetTracker(); renderScenariosList();
+      showToast('Data imported ✓');
+    } catch(err) { showToast('Couldn\'t read that file'); }
+  };
+  reader.readAsText(file);
+}
+function wipeAll() {
+  if (!confirm('Delete ALL saved data — figures, history, scenarios, debts, budget? This cannot be undone.')) return;
+  [SK,HSK,SCK,DBK,BGK,'wealth_milestones','wealth_ni_years'].forEach(function(k){ try{localStorage.removeItem(k);}catch(e){} });
+  shownMilestones = null;
+  renderAll(); renderStatePension(); renderDebtDashboard(); renderBudgetTracker(); renderScenariosList();
+  showToast('All data reset');
+}
+
+// ── ONBOARDING WIZARD ─────────────────────────────────────────
+const OB_STEPS = [
+  { title:'Welcome 👋', sub:'Let\'s set up your wealth tracker in under a minute.', fields:[] },
+  { title:'About you', sub:'The basics for your retirement timeline.', fields:[
+    { id:'age', label:'Your current age', type:'number', def:28 },
+    { id:'retAge', label:'Target retirement age', type:'number', def:55 } ] },
+  { title:'Your pensions', sub:'Roughly what you have today — you can refine later.', fields:[
+    { id:'sipp', label:'Personal SIPP (£)', type:'number', def:0 },
+    { id:'workPension', label:'Workplace pension (£)', type:'number', def:0 } ] },
+  { title:'ISA & cash', sub:'Your accessible savings.', fields:[
+    { id:'isa', label:'Stocks & Shares ISA (£)', type:'number', def:0 },
+    { id:'cash', label:'Cash savings (£)', type:'number', def:0 } ] },
+  { title:'Property', sub:'Skip if you don\'t own a home.', fields:[
+    { id:'propVal', label:'Property value (£)', type:'number', def:0 },
+    { id:'mortgage', label:'Mortgage outstanding (£)', type:'number', def:0 } ] },
+  { title:'Monthly saving', sub:'How much you invest each month.', fields:[
+    { id:'wpMonthly', label:'Into work pension (£/mo)', type:'number', def:0 },
+    { id:'sippMonthly', label:'Into SIPP (£/mo)', type:'number', def:0 },
+    { id:'isaMonthly', label:'Into ISA (£/mo)', type:'number', def:0 } ] },
+  { title:'Your goal 🎯', sub:'The number that means freedom for you.', fields:[
+    { id:'target', label:'Target portfolio (£)', type:'number', def:1000000 } ] }
+];
+let obStep = 0, obData = {};
+function checkOnboarding() {
+  let done = false;
+  try { done = localStorage.getItem(OBK)==='1' || !!localStorage.getItem(SK); } catch(e){}
+  if (!done) { obStep=0; obData=Object.assign({}, DEFAULTS); showOnboarding(); }
+}
+function showOnboarding() {
+  const ov = document.getElementById('obOverlay');
+  if (ov) ov.classList.remove('hidden');
+  renderObStep();
+}
+function renderObStep() {
+  const step = OB_STEPS[obStep];
+  document.getElementById('obTitle').textContent = step.title;
+  document.getElementById('obSub').textContent = step.sub;
+  document.getElementById('obSteps').innerHTML = OB_STEPS.map(function(_,i){
+    return '<div class="ob-step-dot '+(i<obStep?'done':i===obStep?'active':'')+'"></div>';
+  }).join('');
+  const body = document.getElementById('obBody');
+  if (!step.fields.length) {
+    body.innerHTML = '<div style="font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.8;">This is your private, browser-based wealth tracker. Everything is stored only on this device — nothing is uploaded. Track your net worth, project your retirement, run scenarios, and get AI insights.<br><br>Ready? Let\'s capture your starting numbers.</div>';
+  } else {
+    const rows = step.fields.map(function(f){
+      const val = obData[f.id] != null ? obData[f.id] : f.def;
+      return '<div class="ob-field"><label>'+f.label+'</label><input type="'+f.type+'" id="ob_'+f.id+'" value="'+val+'"></div>';
+    });
+    body.innerHTML = step.fields.length===2 || step.fields.length===3
+      ? '<div class="ob-field-row" style="grid-template-columns:repeat('+Math.min(step.fields.length,2)+',1fr)">'+rows.join('')+'</div>'
+      : rows.join('');
+  }
+  document.getElementById('obNext').textContent = obStep === OB_STEPS.length-1 ? 'Finish ✓' : 'Continue →';
+}
+function obSaveStep() {
+  const step = OB_STEPS[obStep];
+  step.fields.forEach(function(f){
+    const el = document.getElementById('ob_'+f.id);
+    if (el) obData[f.id] = f.type==='number' ? (parseFloat(el.value)||0) : el.value;
+  });
+}
+function obNext() {
+  obSaveStep();
+  if (obStep < OB_STEPS.length-1) { obStep++; renderObStep(); }
+  else { finishOnboarding(); }
+}
+function finishOnboarding() {
+  const d = Object.assign({}, DEFAULTS, obData);
+  d.lastUpdated = todayStr();
+  saveData(d);
+  try { localStorage.setItem(OBK,'1'); } catch(e){}
+  const c = calc(d); recordHistory(d,c);
+  document.getElementById('obOverlay').classList.add('hidden');
+  renderAll(); renderStatePension(); renderBudgetTracker();
+  showToast('All set up — welcome! 🎉');
+  spawnConfetti();
+}
+function skipOnboarding() {
+  try { localStorage.setItem(OBK,'1'); } catch(e){}
+  document.getElementById('obOverlay').classList.add('hidden');
+}
+
 function renderAll() {
   const d=getData(), c=calc(d);
   renderHeader(d,c); renderSnapshot(d,c); renderContributions(d,c);
@@ -1676,8 +2484,33 @@ document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeEdit
 window.addEventListener('resize', function(){ const d=getData(),c=calc(d); drawCanvas(d,c); });
 document.getElementById('aiSpeakBtn').addEventListener('click', function(){ speak(briefingText); });
 document.getElementById('aiStopBtn').addEventListener('click', stopSpeak);
-document.getElementById('aiAskBtn').addEventListener('click', function(){ const q=document.getElementById('aiAsk').value.trim(); if(q) answerQuestion(q); });
-document.getElementById('aiAsk').addEventListener('keydown', function(e){ if(e.key==='Enter'){ const q=this.value.trim(); if(q) answerQuestion(q); } });
+document.getElementById('aiAskBtn').addEventListener('click', function(){ const i=document.getElementById('aiAsk'); const q=i.value.trim(); if(q){ handleAsk(q); i.value=''; } });
+document.getElementById('aiAsk').addEventListener('keydown', function(e){ if(e.key==='Enter'){ const q=this.value.trim(); if(q){ handleAsk(q); this.value=''; } } });
+document.getElementById('aiDeepBtn').addEventListener('click', function(){ if(getApiKey()) askClaude('Deep analysis', true); else { const d=getData(),c=calc(d); answerQuestion('will i hit my target'); showToast('Connect Claude in AI Settings for full deep analysis'); } });
+document.getElementById('aiSettingsBtn').addEventListener('click', openAISettings);
+document.getElementById('aiClearBtn').addEventListener('click', clearConversation);
+document.getElementById('aisSaveBtn').addEventListener('click', saveApiKey);
+document.getElementById('aisClearKeyBtn').addEventListener('click', clearApiKey);
+document.getElementById('aisCloseBtn').addEventListener('click', closeAISettings);
+document.getElementById('aiSettingsOverlay').addEventListener('click', function(e){ if(e.target===this) closeAISettings(); });
+// State pension
+document.getElementById('spCalcBtn').addEventListener('click', calcStatePension);
+document.getElementById('spNiYears').addEventListener('change', calcStatePension);
+// Debt
+document.getElementById('debtAddBtn').addEventListener('click', addDebt);
+// Scenarios
+document.getElementById('scenarioSaveBtn').addEventListener('click', saveScenario);
+document.getElementById('scenarioName').addEventListener('keydown', function(e){ if(e.key==='Enter') saveScenario(); });
+// Portability
+document.getElementById('exportPdfBtn').addEventListener('click', exportPDF);
+document.getElementById('exportDataBtn').addEventListener('click', exportData);
+document.getElementById('importDataBtn').addEventListener('click', function(){ document.getElementById('importFile').click(); });
+document.getElementById('importFile').addEventListener('change', function(){ if(this.files[0]) importData(this.files[0]); this.value=''; });
+document.getElementById('printBtn').addEventListener('click', function(){ window.print(); });
+document.getElementById('wipeBtn').addEventListener('click', wipeAll);
+// Onboarding
+document.getElementById('obNext').addEventListener('click', obNext);
+document.getElementById('obSkip').addEventListener('click', skipOnboarding);
 document.getElementById('darkToggle').addEventListener('click', toggleDark);
 if ('speechSynthesis' in window) {
   window.speechSynthesis.getVoices();
@@ -1687,9 +2520,15 @@ if ('speechSynthesis' in window) {
 // ── BOOT ──────────────────────────────────────────────────────
 loadDarkMode();
 renderAll();
+renderStatePension();
+renderDebtDashboard();
+renderBudgetTracker();
+renderScenariosList();
+updateApiIndicator();
 initHeaderCanvas();
 initCalcs();
 initPWA();
+checkOnboarding();
 fetchLiveData();
 fetchNews().then(renderNews);
 setInterval(function(){ fetchNews().then(function(i){ renderNews(i, true); }); }, 30 * 60 * 1000);
