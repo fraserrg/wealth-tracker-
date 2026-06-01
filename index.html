@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050810">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Wealth Tracker — F's Retirement Journey</title>
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Wealth+Tracker%22%2C%22short_name%22%3A%22Wealth%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23050810%22%2C%22theme_color%22%3A%22%23050810%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg+xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27+viewBox%3D%270+0+192+192%27%253E%253Crect+width%3D%27192%27+height%3D%27192%27+fill%3D%27%23050810%27%2F%253E%253Ctext+y%3D%27140%27+x%3D%2796%27+font-size%3D%27120%27+text-anchor%3D%27middle%27+fill%3D%27%23d4a520%27%253E%25C2%25A3%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
@@ -12,26 +16,53 @@
   --border: #e2ddd5; --ink: #1a1714; --muted: #8a8278;
   --gold: #b8860b; --gold-light: #d4a520; --teal: #2a7a6f;
   --teal-light: #3d9e91; --red: #c0392b; --amber: #d4680a; --blue: #2c5f8a;
+  --cyan: #00b4d8; --cyan-glow: rgba(0,180,216,0.18);
   --serif: 'Instrument Serif', serif;
   --display: 'Syne', sans-serif;
   --mono: 'IBM Plex Mono', monospace;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--ink); font-family: var(--display); min-height: 100vh; }
-body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"); }
-.wrap { position: relative; z-index: 1; }
+body.dark {
+  --bg: #0e0c0a; --surface: #161310; --surface2: #1c1916;
+  --border: #2a2520; --ink: #f0ece4; --muted: #6b6258;
+}
+body.dark .milestone-table td,
+body.dark .milestone-table th { background: var(--surface); }
+body.dark .milestone-table tr:hover td { background: var(--surface2); }
+body.dark .highlight-row td { background: rgba(184,134,11,0.08); }
 
-/* HEADER */
-.header { background: var(--ink); color: var(--bg); padding: 56px 60px 48px; position: relative; overflow: hidden; }
-.header::after { content: 'WEALTH'; position: absolute; right: -20px; top: -20px; font-size: 180px; font-weight: 800; color: rgba(255,255,255,0.03); font-family: var(--display); pointer-events: none; line-height: 1; }
-.header-eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold-light); margin-bottom: 16px; }
-h1 { font-family: var(--serif); font-size: clamp(32px,5vw,56px); font-weight: 400; font-style: italic; line-height: 1.1; color: #fff; margin-bottom: 8px; }
-.header-sub { font-family: var(--mono); font-size: 12px; color: rgba(255,255,255,0.45); margin-bottom: 40px; }
-.header-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 1px; background: rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; max-width: 900px; }
-.hstat { background: rgba(255,255,255,0.04); padding: 20px 22px; }
-.hstat-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 6px; }
-.hstat-val { font-family: var(--serif); font-size: 24px; font-style: italic; color: var(--gold-light); line-height: 1; }
-.hstat-sub { font-size: 10px; font-family: var(--mono); color: rgba(255,255,255,0.3); margin-top: 4px; }
+/* DARK MODE TOGGLE */
+.dark-toggle { position: fixed; top: 20px; right: 90px; z-index: 600; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); font-family: var(--mono); font-size: 11px; padding: 7px 12px; border-radius: 20px; cursor: pointer; backdrop-filter: blur(8px); transition: all 0.2s; }
+.dark-toggle:hover { border-color: var(--cyan); color: var(--cyan); }
+
+/* FUTURISTIC HEADER */
+.header {
+  background: #050810;
+  color: #fff;
+  padding: 56px 60px 52px;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(0,180,216,0.15);
+}
+.header-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.header-content { position: relative; z-index: 2; }
+.header-glow { position: absolute; top: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(0,180,216,0.06) 0%, transparent 70%); pointer-events: none; z-index: 1; }
+.header-glow2 { position: absolute; bottom: -80px; left: 20%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(212,165,32,0.05) 0%, transparent 70%); pointer-events: none; z-index: 1; }
+.header-eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--cyan); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+.header-eyebrow::before { content: ''; display: inline-block; width: 6px; height: 6px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 8px var(--cyan); animation: blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+h1 { font-family: var(--serif); font-size: clamp(28px,4.5vw,52px); font-weight: 400; font-style: italic; line-height: 1.1; color: #fff; margin-bottom: 8px; text-shadow: 0 0 40px rgba(0,180,216,0.2); }
+.header-sub { font-family: var(--mono); font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 40px; letter-spacing: 0.05em; }
+.header-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 1px; background: rgba(0,180,216,0.1); border-radius: 12px; overflow: hidden; max-width: 960px; border: 1px solid rgba(0,180,216,0.12); }
+.hstat { background: rgba(5,8,16,0.8); padding: 20px 22px; position: relative; transition: background 0.2s; }
+.hstat::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(0,180,216,0.2), transparent); }
+.hstat:hover { background: rgba(0,180,216,0.05); }
+.hstat-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 8px; }
+.hstat-val { font-family: var(--mono); font-size: 20px; font-weight: 500; color: var(--gold-light); line-height: 1; text-shadow: 0 0 20px rgba(212,165,32,0.3); }
+.hstat-sub { font-size: 9px; font-family: var(--mono); color: rgba(255,255,255,0.25); margin-top: 5px; }
+.hstat-bar { height: 2px; background: rgba(255,255,255,0.06); border-radius: 1px; margin-top: 10px; overflow: hidden; }
+.hstat-bar-fill { height: 100%; background: linear-gradient(90deg, var(--cyan), var(--gold-light)); border-radius: 1px; transition: width 1.2s cubic-bezier(0.34,1.56,0.64,1); }
+/* scan line effect */
+.header::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); pointer-events: none; z-index: 3; }
 
 /* MAIN */
 .main { padding: 48px 60px; }
@@ -230,6 +261,58 @@ canvas { width: 100%; display: block; }
 
 .disclaimer { font-family: var(--mono); font-size: 10px; color: var(--muted); border-top: 1px solid var(--border); padding: 24px 60px; line-height: 1.8; }
 
+/* HISTORY CHART */
+.history-section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 48px; }
+.history-empty { font-family: var(--mono); font-size: 11px; color: var(--muted); padding: 20px 0; }
+
+/* CALCULATOR PANELS */
+.calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 48px; }
+.calc-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+.calc-title { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+.calc-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.calc-row label { font-family: var(--mono); font-size: 11px; color: var(--ink); flex: 1; }
+.calc-row input { width: 120px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-family: var(--mono); font-size: 12px; color: var(--ink); background: var(--surface2); text-align: right; outline: none; }
+.calc-row input:focus { border-color: var(--gold); }
+.calc-result { background: var(--ink); color: #fff; border-radius: 10px; padding: 16px 20px; margin-top: 16px; }
+.calc-result-val { font-family: var(--serif); font-size: 28px; font-style: italic; color: var(--gold-light); line-height: 1; margin-bottom: 4px; }
+.calc-result-label { font-family: var(--mono); font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 0.12em; text-transform: uppercase; }
+.calc-result-sub { font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 8px; line-height: 1.6; }
+.calc-btn { width: 100%; margin-top: 14px; background: var(--ink); color: #fff; border: none; border-radius: 8px; padding: 11px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; cursor: pointer; transition: background 0.15s; }
+.calc-btn:hover { background: #2d2925; }
+
+/* WRAPPER PRIORITY */
+.wrapper-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 14px; margin-bottom: 48px; }
+.wrapper-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; position: relative; }
+.wrapper-rank { position: absolute; top: 16px; right: 16px; font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--border); }
+.wrapper-name { font-family: var(--display); font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.wrapper-name span { font-family: var(--mono); font-size: 8px; letter-spacing: 0.15em; display: block; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
+.wrapper-reason { font-family: var(--mono); font-size: 10px; color: var(--muted); line-height: 1.65; }
+.wrapper-allowance { font-family: var(--mono); font-size: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+.wrapper-allowance strong { color: var(--ink); }
+.wrapper-card.top { border-left: 3px solid var(--teal); }
+.wrapper-card.mid { border-left: 3px solid var(--gold); }
+.wrapper-card.low { border-left: 3px solid var(--blue); }
+
+/* ANNUAL REVIEW */
+.review-banner { background: linear-gradient(135deg, rgba(42,122,111,0.08), rgba(44,95,138,0.08)); border: 1px solid rgba(42,122,111,0.2); border-radius: 12px; padding: 20px 24px; margin-bottom: 48px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.review-icon { font-size: 28px; }
+.review-text { flex: 1; }
+.review-title { font-family: var(--display); font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.review-sub { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+.review-btn { font-family: var(--mono); font-size: 10px; padding: 8px 14px; background: var(--teal); color: #fff; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap; }
+
+/* CONFETTI */
+@keyframes confettiFall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+.confetti-particle { position: fixed; top: -20px; pointer-events: none; z-index: 9999; animation: confettiFall linear forwards; border-radius: 2px; }
+/* MILESTONE TOAST */
+.milestone-toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px); z-index: 8000; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 13px; padding: 14px 24px; border-radius: 100px; border: 1px solid var(--gold); box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 20px rgba(212,165,32,0.2); opacity: 0; transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none; white-space: nowrap; }
+.milestone-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* PWA INSTALL */
+.pwa-banner { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); z-index: 500; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 11px; padding: 12px 20px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 8px 32px rgba(0,0,0,0.4); display: none; align-items: center; gap: 12px; cursor: pointer; transition: border-color 0.2s; }
+.pwa-banner:hover { border-color: var(--cyan); }
+.pwa-banner.visible { display: flex; }
+
 /* EDIT FAB */
 .edit-fab { position: fixed; bottom: 32px; right: 32px; z-index: 300; background: var(--ink); color: #fff; border: none; border-radius: 100px; padding: 14px 22px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.1em; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.25); transition: transform 0.15s, box-shadow 0.15s; }
 .edit-fab:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.35); }
@@ -280,10 +363,15 @@ canvas { width: 100%; display: block; }
 <div class="wrap">
 
 <div class="header">
-  <div class="header-eyebrow" id="eyebrow"></div>
-  <h1 id="mainTitle"></h1>
-  <div class="header-sub" id="headerSub"></div>
-  <div class="header-stats" id="headerStats"></div>
+  <canvas class="header-canvas" id="headerCanvas"></canvas>
+  <div class="header-glow"></div>
+  <div class="header-glow2"></div>
+  <div class="header-content">
+    <div class="header-eyebrow" id="eyebrow"></div>
+    <h1 id="mainTitle"></h1>
+    <div class="header-sub" id="headerSub"></div>
+    <div class="header-stats" id="headerStats"></div>
+  </div>
 </div>
 
 <div class="main">
@@ -425,6 +513,97 @@ canvas { width: 100%; display: block; }
   </div>
   <div class="insights-grid" id="insightsGrid"></div>
 
+  <!-- NET WORTH HISTORY -->
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Net Worth History</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="history-section">
+    <div id="historyChart" style="height:200px;position:relative;"></div>
+    <div id="historyEmpty" class="history-empty" style="display:none;">No history yet — your net worth will be tracked each time you save updated figures. Check back after your first update.</div>
+  </div>
+
+  <!-- SMART CALCULATORS -->
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">Smart Calculators</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="calc-grid">
+    <!-- Income Target Calculator -->
+    <div class="calc-card">
+      <div class="calc-title">Retirement Income Calculator</div>
+      <div class="calc-row">
+        <label>Desired monthly income (£)</label>
+        <input type="number" id="calc_income" value="4000" min="500" max="20000" step="500">
+      </div>
+      <div class="calc-row">
+        <label>Withdrawal rate (%)</label>
+        <input type="number" id="calc_swr" value="4" min="2" max="6" step="0.5">
+      </div>
+      <button class="calc-btn" id="calcIncomeBtn">Calculate Required Pot</button>
+      <div class="calc-result" id="calcIncomeResult" style="display:none;"></div>
+    </div>
+    <!-- Cost of Delay -->
+    <div class="calc-card">
+      <div class="calc-title">Cost of Delay</div>
+      <div class="calc-row">
+        <label>Delay by (years)</label>
+        <input type="number" id="calc_delay" value="1" min="1" max="10" step="1">
+      </div>
+      <div class="calc-row">
+        <label>Monthly contributions (£)</label>
+        <input type="number" id="calc_delay_contrib" value="1150" min="0" step="50">
+      </div>
+      <button class="calc-btn" id="calcDelayBtn">Calculate Cost</button>
+      <div class="calc-result" id="calcDelayResult" style="display:none;"></div>
+    </div>
+    <!-- Mortgage vs Invest -->
+    <div class="calc-card">
+      <div class="calc-title">Mortgage Overpayment vs Investing</div>
+      <div class="calc-row">
+        <label>Mortgage rate (%)</label>
+        <input type="number" id="calc_mortRate" value="4.5" min="0" max="15" step="0.25">
+      </div>
+      <div class="calc-row">
+        <label>Monthly amount (£)</label>
+        <input type="number" id="calc_mortAmt" value="300" min="50" step="50">
+      </div>
+      <button class="calc-btn" id="calcMortBtn">Compare Options</button>
+      <div class="calc-result" id="calcMortResult" style="display:none;"></div>
+    </div>
+    <!-- Lump Sum Impact -->
+    <div class="calc-card">
+      <div class="calc-title">Lump Sum Impact</div>
+      <div class="calc-row">
+        <label>Lump sum to invest (£)</label>
+        <input type="number" id="calc_lump" value="10000" min="0" step="1000">
+      </div>
+      <div class="calc-row">
+        <label>Invest via (wrapper)</label>
+        <select id="calc_lump_wrapper" style="width:120px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-family:var(--mono);font-size:11px;background:var(--surface2);color:var(--ink);outline:none;">
+          <option value="sipp">SIPP (+25%)</option>
+          <option value="isa">ISA</option>
+          <option value="gia">General</option>
+        </select>
+      </div>
+      <button class="calc-btn" id="calcLumpBtn">Calculate Growth</button>
+      <div class="calc-result" id="calcLumpResult" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- WRAPPER PRIORITY -->
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div class="section-title">Tax Wrapper Priority Guide</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="wrapper-grid" id="wrapperGrid"></div>
+
+  <!-- ANNUAL REVIEW -->
+  <div id="reviewBanner" class="review-banner" style="display:none;"></div>
+
 </div>
 
 <div class="disclaimer">
@@ -432,7 +611,10 @@ canvas { width: 100%; display: block; }
 </div>
 </div>
 
+<button class="dark-toggle" id="darkToggle">◐ Theme</button>
 <button class="edit-fab" id="fabBtn">✎ Update Figures</button>
+<div class="pwa-banner" id="pwaBanner">📲 Install as App <span style="opacity:0.4;font-size:9px;margin-left:4px;">tap to add</span></div>
+<div class="milestone-toast" id="milestoneToast"></div>
 
 <div class="edit-overlay" id="editOverlay">
   <div class="edit-panel">
@@ -474,6 +656,12 @@ canvas { width: 100%; display: block; }
         <div class="ep-row"><label>Fund ticker (Yahoo symbol)</label><input type="text" id="f_fundSym" placeholder="VWRP.L"></div>
       </div>
       <div class="ep-section">
+        <div class="ep-section-title">Goals &amp; Planning</div>
+        <div class="ep-row"><label>Monthly income target (£/mo)</label><input type="number" id="f_monthlyIncome" min="0" step="100" placeholder="e.g. 4000"></div>
+        <div class="ep-row"><label>Mortgage rate (%)</label><input type="number" id="f_mortgageRate" min="0" max="20" step="0.25"></div>
+        <div class="ep-row"><label>Next review date</label><input type="date" id="f_reviewDate" style="width:130px;text-align:left;"></div>
+      </div>
+      <div class="ep-section">
         <div class="ep-section-title">Market Context (manual override)</div>
         <div class="ep-row"><label>BoE Base Rate (%)</label><input type="number" id="f_boeRate" min="0" max="20" step="0.25"></div>
         <div class="ep-row"><label>CPI Inflation (%)</label><input type="number" id="f_cpiInflation" min="0" max="20" step="0.1"></div>
@@ -505,8 +693,10 @@ const DEFAULTS = {
   boeRate: 4.75, cpiInflation: 2.3, ftseYTD: 8.2, globalYTD: 12.4,
   // 0P00018XAP.L = Yahoo/Morningstar ID for Vanguard FTSE Global All Cap Index Fund (VAFTGAG) GBP Acc
   fundSym: '0P00018XAP.L',
+  monthlyIncome: 4000, mortgageRate: 4.5, reviewDate: null,
   lastUpdated: null
 };
+const HSK = 'wealth_history_v1';
 
 function getData() {
   try { const r = localStorage.getItem(SK); if (r) return Object.assign({}, DEFAULTS, JSON.parse(r)); }
@@ -562,18 +752,28 @@ let allocChartInst=null, scenarioBarInst=null, scenarioHBarInst=null;
 
 // ── RENDER ────────────────────────────────────────────────────
 function renderHeader(d, c) {
-  document.getElementById('eyebrow').textContent = 'Personal Wealth Tracker · As of ' + (d.lastUpdated || todayStr());
-  document.getElementById('mainTitle').innerHTML = 'The Road from<br>' + fmtS(c.totalInvested) + ' to ' + fmtS(d.target);
-  document.getElementById('headerSub').textContent = 'Age ' + d.age + ' → ' + d.retAge + ' · ' + c.years + '-year accumulation horizon · FTSE Global All Cap core strategy';
+  document.getElementById('eyebrow').textContent = 'Personal Wealth Tracker · ' + (d.lastUpdated || todayStr());
+  document.getElementById('mainTitle').innerHTML = 'The Road to<br><span style="color:var(--cyan);text-shadow:0 0 30px rgba(0,180,216,0.4);">' + fmtS(d.target) + '</span>';
+  document.getElementById('headerSub').textContent = 'Age ' + d.age + ' → ' + d.retAge + ' · ' + c.years + '-year horizon · FTSE Global All Cap';
   document.getElementById('headerStats').innerHTML =
-    hs('Current Age', d.age, d.lastUpdated || todayStr()) +
-    hs('Total Invested', fmtS(c.totalInvested), 'Pensions + ISA') +
-    hs('Net Worth', fmtS(c.totalNW), 'Incl. property equity') +
-    hs('Monthly Contributions', fmtS(c.monthlyTotal), 'All wrappers') +
-    hs('Years to Target', c.years + ' yrs', 'Retiring at ' + d.retAge) +
-    hs('Retirement Target', fmtS(d.target), 'Invested portfolio only');
+    hs('Total Net Worth', fmtS(c.totalNW), 'All assets', c.totalNW, c.totalNW*1.2) +
+    hs('Total Invested', fmtS(c.totalInvested), 'Pensions + ISA', c.totalInvested, c.totalNW) +
+    hs('Monthly Into Future', fmtS(c.monthlyTotal), 'Across all wrappers', c.monthlyTotal, 2000) +
+    hs('Base Case at ' + d.retAge, fmtS(c.baseAt), d.baseRet+'% real return', c.baseAt, d.target*1.2) +
+    hs('Years to Go', c.years + ' yrs', 'Retirement runway', c.years, d.retAge - d.age) +
+    hs('Target', fmtS(d.target), 'Your freedom number', d.target, d.target);
+  // Animate bars
+  requestAnimationFrame(function() {
+    document.querySelectorAll('.hstat-bar-fill').forEach(function(el) {
+      const w = el.dataset.pct;
+      el.style.width = w;
+    });
+  });
 }
-function hs(l,v,s){return '<div class="hstat"><div class="hstat-label">'+l+'</div><div class="hstat-val">'+v+'</div><div class="hstat-sub">'+s+'</div></div>';}
+function hs(l,v,s,raw,max){
+  const pct = Math.min(raw/max*100, 100).toFixed(0) + '%';
+  return '<div class="hstat"><div class="hstat-label">'+l+'</div><div class="hstat-val" data-raw="'+raw+'">'+v+'</div><div class="hstat-sub">'+s+'</div><div class="hstat-bar"><div class="hstat-bar-fill" data-pct="'+pct+'" style="width:0"></div></div></div>';
+}
 
 function renderSnapshot(d, c) {
   function sc(hl,lbl,val,sub,tagCls,tagTxt){const h=hl?' highlight':'';const tag=tagCls?'<div class="snap-tag '+tagCls+'">'+tagTxt+'</div>':'';return '<div class="snap-card'+h+'"><div class="snap-label">'+lbl+'</div><div class="snap-val">'+val+'</div><div class="snap-sub">'+sub+'</div>'+tag+'</div>';}
@@ -743,13 +943,268 @@ function renderInsights(d, c) {
     ins('action','🎯','Minimum Real Return: '+c.minRet.toFixed(1)+'%','With current contributions of '+fmtS(c.monthlyTotal)+'/mo, you need <strong>at least '+c.minRet.toFixed(1)+'% real annual return</strong> to hit '+fmtS(d.target)+' at '+d.retAge+'. FTSE Global All Cap long-run real return is ~5–6% — you are positioned in the right range.');
 }
 
+// ── HISTORY ───────────────────────────────────────────────────
+let histChartInst = null;
+function recordHistory(d, c) {
+  try {
+    const hist = JSON.parse(localStorage.getItem(HSK) || '[]');
+    const today = new Date().toISOString().slice(0,10);
+    const last = hist[hist.length-1];
+    if (last && last.date === today) hist.pop(); // overwrite same-day
+    hist.push({ date:today, nw:Math.round(c.totalNW), inv:Math.round(c.totalInvested), equity:Math.round(c.equity), cash:d.cash });
+    if (hist.length > 120) hist.splice(0, hist.length - 120); // keep 10 years max
+    localStorage.setItem(HSK, JSON.stringify(hist));
+  } catch(e) {}
+}
+function renderHistory() {
+  try {
+    const hist = JSON.parse(localStorage.getItem(HSK) || '[]');
+    const empty = document.getElementById('historyEmpty');
+    const wrap = document.getElementById('historyChart');
+    if (!hist.length) { if(empty) empty.style.display='block'; if(wrap) wrap.style.display='none'; return; }
+    if (empty) empty.style.display='none';
+    if (wrap) wrap.style.display='block';
+    const canvas = document.getElementById('historyCanvas');
+    let c;
+    if (!canvas) {
+      const cv = document.createElement('canvas'); cv.id='historyCanvas'; cv.style.width='100%'; wrap.innerHTML=''; wrap.appendChild(cv); c=cv.getContext('2d');
+    } else { c=canvas.getContext('2d'); }
+    if (histChartInst) histChartInst.destroy();
+    const labels = hist.map(function(h){ return h.date.slice(5); });
+    const nw = hist.map(function(h){ return h.nw; });
+    const inv = hist.map(function(h){ return h.inv; });
+    histChartInst = new Chart(c, {
+      type:'line',
+      data:{ labels, datasets:[
+        { label:'Net Worth', data:nw, borderColor:'#d4a520', backgroundColor:'rgba(212,165,32,0.06)', borderWidth:2, pointRadius:3, tension:0.3, fill:true },
+        { label:'Invested', data:inv, borderColor:'#2a7a6f', backgroundColor:'rgba(42,122,111,0.04)', borderWidth:1.5, pointRadius:2, tension:0.3, fill:true }
+      ]},
+      options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{font:{family:'IBM Plex Mono',size:10},color:'#8a8278'} }, tooltip:{ callbacks:{ label:function(i){ return ' '+fmtFull(i.raw); }}, titleFont:{family:'IBM Plex Mono'}, bodyFont:{family:'IBM Plex Mono'} } }, scales:{ x:{ ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8a8278'}, grid:{color:'#e2ddd5'} }, y:{ ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8a8278',callback:function(v){return v>=1e6?'£'+(v/1e6).toFixed(1)+'M':'£'+(v/1000)+'K';}}, grid:{color:'#e2ddd5'} } } }
+    });
+  } catch(e) {}
+}
+
+// ── WRAPPER PRIORITY ──────────────────────────────────────────
+function renderWrapperPriority(d, c) {
+  const tp = d.sipp + d.workPension;
+  const sipAnn = 60000 - (d.sippMonthly + d.wpMonthly) * 12;
+  const isaRem = 20000 - d.isaMonthly * 12;
+  const el = document.getElementById('wrapperGrid');
+  if (!el) return;
+  function wc(rank, cls, name, tag, why, allowance) {
+    return '<div class="wrapper-card '+cls+'"><div class="wrapper-rank">'+rank+'</div><div class="wrapper-name">'+name+'<span>'+tag+'</span></div><div class="wrapper-reason">'+why+'</div><div class="wrapper-allowance">'+allowance+'</div></div>';
+  }
+  el.innerHTML =
+    wc('1','top','Employer Pension Match','Free money first','Every pound your employer matches is a 100% instant return — the best guaranteed return available anywhere. Never leave employer contributions on the table before investing elsewhere.','<strong>Action:</strong> Confirm you contribute enough to get maximum employer match.') +
+    wc('2','top','Personal SIPP','Tax relief boost','HMRC adds 25% tax relief to every contribution (basic rate). If you pay 40% tax on any income, relief is even greater. Contributions grow and compound tax-free. SIPP access from age 57.','<strong>Annual allowance:</strong> £60,000/yr · <strong>Approx. remaining:</strong> ' + fmtS(Math.max(0, sipAnn))) +
+    wc('3','mid','Stocks &amp; Shares ISA','Tax-free bridge fund','Withdrawals are completely tax-free at any age — critical for the years between your retirement at '+d.retAge+' and state pension at 68. Fill this after SIPP to fund your bridge decade.','<strong>Annual allowance:</strong> £20,000/yr · <strong>Approx. remaining:</strong> ' + fmtS(Math.max(0, isaRem))) +
+    wc('4','low','General Investment Account','No annual limit','Only use after filling ISA. No tax shelter — you pay CGT on gains above the £3,000 annual exempt amount and income tax on dividends above £500. Best for short-to-medium term goals or after maxing wrappers.','<strong>Allowance:</strong> Unlimited · CGT exempt: £3,000/yr');
+}
+
+// ── REVIEW BANNER ─────────────────────────────────────────────
+function renderReviewBanner(d) {
+  const el = document.getElementById('reviewBanner');
+  if (!el) return;
+  if (!d.reviewDate) { el.style.display='none'; return; }
+  const now = new Date(), rev = new Date(d.reviewDate);
+  const days = Math.round((rev - now) / 86400000);
+  el.style.display = 'flex';
+  const icon = days < 0 ? '📋' : days <= 30 ? '🔔' : '📅';
+  const msg = days < 0 ? 'Your annual review was ' + Math.abs(days) + ' days ago. Time to check in!'
+    : days === 0 ? 'Your annual review is today!'
+    : 'Your next annual review is in ' + days + ' day' + (days===1?'':'s') + '.';
+  el.innerHTML = '<div class="review-icon">'+icon+'</div><div class="review-text"><div class="review-title">Annual Review Reminder</div><div class="review-sub">'+msg+' · Set on: '+d.reviewDate+'</div></div><button class="review-btn" onclick="document.getElementById(\'fabBtn\').click()">Update Figures</button>';
+}
+
+// ── CALCULATORS ───────────────────────────────────────────────
+function initCalcs() {
+  document.getElementById('calcIncomeBtn').addEventListener('click', function() {
+    const d = getData(), c = calc(d);
+    const mo = parseFloat(document.getElementById('calc_income').value) || 4000;
+    const swr = parseFloat(document.getElementById('calc_swr').value) || 4;
+    const req = Math.round(mo * 12 / (swr / 100));
+    const gap = req - c.baseAt;
+    const el = document.getElementById('calcIncomeResult');
+    el.style.display='block';
+    el.innerHTML = '<div class="calc-result-val">' + fmtS(req) + '</div><div class="calc-result-label">Required pot (' + swr + '% rule)</div><div class="calc-result-sub">Monthly income: ' + fmtFull(mo) + ' · Annual: ' + fmtFull(mo*12) + '<br>' + (gap <= 0 ? '✓ Your base-case pot <strong style="color:#3d9e91">exceeds</strong> this by ' + fmtS(-gap) : '⚠ Your base case is <strong style="color:#e07070">' + fmtS(gap) + ' short</strong> of this target') + '</div>';
+  });
+  document.getElementById('calcDelayBtn').addEventListener('click', function() {
+    const d = getData(), c = calc(d);
+    const delay = parseInt(document.getElementById('calc_delay').value) || 1;
+    const contrib = parseFloat(document.getElementById('calc_delay_contrib').value) || c.monthlyTotal;
+    const withDelay = project(c.totalInvested, contrib, Math.max(1, c.years - delay), d.baseRet)[Math.max(1, c.years - delay)];
+    const cost = c.baseAt - withDelay;
+    const missedContribs = contrib * 12 * delay;
+    const el = document.getElementById('calcDelayResult');
+    el.style.display='block';
+    el.innerHTML = '<div class="calc-result-val" style="color:#e07070">-' + fmtS(cost) + '</div><div class="calc-result-label">Cost of delaying ' + delay + ' year' + (delay===1?'':'s') + '</div><div class="calc-result-sub">Missed contributions: ' + fmtS(missedContribs) + '<br>Lost compound growth: ' + fmtS(cost - missedContribs) + '<br>Every year costs roughly <strong style="color:#d4a520">' + fmtS(Math.round(cost/delay)) + '</strong> at retirement.</div>';
+  });
+  document.getElementById('calcMortBtn').addEventListener('click', function() {
+    const d = getData(), c = calc(d);
+    const rate = parseFloat(document.getElementById('calc_mortRate').value) || d.mortgageRate || 4.5;
+    const amt = parseFloat(document.getElementById('calc_mortAmt').value) || 300;
+    const yrs = c.years;
+    const mortSaving = Math.round(amt * 12 * yrs * (rate / 100)); // simplified interest saving
+    const investGain = project(0, amt, yrs, d.baseRet)[yrs];
+    const better = investGain > mortSaving ? 'investing' : 'overpaying';
+    const el = document.getElementById('calcMortResult');
+    el.style.display='block';
+    el.innerHTML = '<div class="calc-result-val" style="color:var(--gold-light)">' + (better === 'investing' ? 'Invest' : 'Overpay') + '</div><div class="calc-result-label">Better outcome over ' + yrs + ' years</div><div class="calc-result-sub">Investing ' + fmtS(amt) + '/mo → <strong>' + fmtS(investGain) + '</strong> at ' + d.baseRet + '% real<br>Overpaying ' + fmtS(amt) + '/mo → <strong>~' + fmtS(mortSaving) + '</strong> interest saved at ' + rate + '%<br>' + (better === 'investing' ? 'Equities outperform at these rates — but overpaying reduces risk.' : 'Guaranteed mortgage saving beats uncertain market returns here.') + '</div>';
+  });
+  document.getElementById('calcLumpBtn').addEventListener('click', function() {
+    const d = getData(), c = calc(d);
+    const lump = parseFloat(document.getElementById('calc_lump').value) || 10000;
+    const wrapper = document.getElementById('calc_lump_wrapper').value;
+    const effective = wrapper === 'sipp' ? lump * 1.25 : lump;
+    const grown = project(effective, 0, c.years, d.baseRet)[c.years];
+    const multiple = (grown / lump).toFixed(1);
+    const el = document.getElementById('calcLumpResult');
+    el.style.display='block';
+    el.innerHTML = '<div class="calc-result-val">' + fmtS(grown) + '</div><div class="calc-result-label">Value at age ' + d.retAge + ' (' + d.baseRet + '% real)</div><div class="calc-result-sub">' + (wrapper==='sipp'?'After 25% tax relief: effective ' + fmtS(effective)+'<br>':'') + 'Grows ' + multiple + 'x over ' + c.years + ' years<br><strong style="color:#d4a520">' + fmtS(grown - lump) + '</strong> of growth on top of your ' + fmtS(lump) + '.</div>';
+  });
+}
+
+// ── MILESTONE CELEBRATIONS ────────────────────────────────────
+const MILESTONES = [100000, 250000, 500000, 750000, 1000000, 1500000, 2000000];
+let shownMilestones = null;
+function checkMilestones(c) {
+  if (!shownMilestones) {
+    try { shownMilestones = new Set(JSON.parse(localStorage.getItem('wealth_milestones') || '[]')); }
+    catch(e) { shownMilestones = new Set(); }
+  }
+  for (const m of MILESTONES) {
+    if (c.totalInvested >= m && !shownMilestones.has(m)) {
+      shownMilestones.add(m);
+      try { localStorage.setItem('wealth_milestones', JSON.stringify([...shownMilestones])); } catch(e){}
+      spawnConfetti();
+      showMilestoneToast('🎉 ' + fmtS(m) + ' invested — milestone unlocked!');
+      break;
+    }
+  }
+}
+function showMilestoneToast(msg) {
+  const el = document.getElementById('milestoneToast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 4000);
+}
+function spawnConfetti() {
+  const colors = ['#d4a520','#2a7a6f','#00b4d8','#c0392b','#ffffff','#f0ece4'];
+  for (let i = 0; i < 80; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-particle';
+    const size = 4 + Math.random() * 7;
+    p.style.cssText = 'left:'+Math.random()*100+'vw;width:'+size+'px;height:'+size+'px;background:'+colors[Math.floor(Math.random()*colors.length)]+';animation-duration:'+(1.5+Math.random()*1.5)+'s;animation-delay:'+Math.random()*0.6+'s;border-radius:'+(Math.random()>0.5?'50%':'2px')+';';
+    document.body.appendChild(p);
+    setTimeout(function(){ p.remove(); }, 3500);
+  }
+}
+
+// ── DARK MODE ─────────────────────────────────────────────────
+function toggleDark() {
+  const dark = document.body.classList.toggle('dark');
+  localStorage.setItem('wealth_dark', dark ? '1' : '0');
+  document.getElementById('darkToggle').textContent = dark ? '☀ Theme' : '◐ Theme';
+}
+function loadDarkMode() {
+  if (localStorage.getItem('wealth_dark') === '1') {
+    document.body.classList.add('dark');
+    const btn = document.getElementById('darkToggle');
+    if (btn) btn.textContent = '☀ Theme';
+  }
+}
+
+// ── HEADER CANVAS ANIMATION ───────────────────────────────────
+function initHeaderCanvas() {
+  const canvas = document.getElementById('headerCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, particles, raf;
+  function resize() {
+    W = canvas.width = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  }
+  resize();
+  try { new ResizeObserver(resize).observe(canvas.parentElement); } catch(e){}
+  const N = Math.min(Math.max(Math.floor((window.innerWidth / 22)), 30), 80);
+  particles = Array.from({length: N}, function() {
+    return { x:Math.random()*1400, y:Math.random()*300, vx:(Math.random()-0.5)*0.35, vy:(Math.random()-0.5)*0.25, r:Math.random()*1.2+0.4, pulse:Math.random()*Math.PI*2 };
+  });
+  function draw() {
+    W = canvas.width = canvas.offsetWidth || 1400;
+    H = canvas.height = canvas.offsetHeight || 300;
+    ctx.clearRect(0, 0, W, H);
+    // Grid lines
+    ctx.strokeStyle = 'rgba(0,180,216,0.04)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 70) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 70) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    // Connections
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i+1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx*dx+dy*dy);
+        if (d < 120) {
+          ctx.beginPath();
+          ctx.strokeStyle = 'rgba(0,180,216,'+(( 1-d/120)*0.25)+')';
+          ctx.lineWidth = 0.6;
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    // Particles
+    particles.forEach(function(p) {
+      p.pulse += 0.018;
+      const g = (Math.sin(p.pulse)+1)*0.5;
+      const grad = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*5);
+      grad.addColorStop(0,'rgba(0,180,216,'+(0.35+g*0.25)+')');
+      grad.addColorStop(1,'rgba(0,180,216,0)');
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r*5,0,Math.PI*2); ctx.fillStyle=grad; ctx.fill();
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle='rgba(0,220,255,'+(0.7+g*0.3)+')'; ctx.fill();
+      p.x+=p.vx; p.y+=p.vy;
+      if (p.x<0||p.x>W) p.vx*=-1;
+      if (p.y<0||p.y>H) p.vy*=-1;
+    });
+    raf = requestAnimationFrame(draw);
+  }
+  draw();
+  document.addEventListener('visibilitychange', function(){ if(document.hidden) cancelAnimationFrame(raf); else draw(); });
+}
+
+// ── PWA ───────────────────────────────────────────────────────
+let pwaPrompt = null;
+function initPWA() {
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault(); pwaPrompt = e;
+    const banner = document.getElementById('pwaBanner');
+    if (banner) banner.classList.add('visible');
+  });
+  const banner = document.getElementById('pwaBanner');
+  if (banner) banner.addEventListener('click', function() {
+    if (pwaPrompt) { pwaPrompt.prompt(); pwaPrompt.userChoice.then(function(){ pwaPrompt=null; banner.classList.remove('visible'); }); }
+  });
+  // Inline service worker for offline support
+  if ('serviceWorker' in navigator) {
+    try {
+      const sw = 'const C="wt-v1";self.addEventListener("install",e=>e.waitUntil(caches.open(C).then(c=>c.add("/"))));self.addEventListener("fetch",e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))))';
+      const blob = new Blob([sw], {type:'application/javascript'});
+      navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(function(){});
+    } catch(e) {}
+  }
+}
+
 function renderAll() {
   const d=getData(), c=calc(d);
   renderHeader(d,c); renderSnapshot(d,c); renderContributions(d,c);
   renderProgress(d,c); renderAllocChart(d,c); renderScenarioBar(d,c);
   renderPercentiles(d,c); renderChart(d,c); renderScenarios(d,c);
   renderMilestones(d,c); renderGap(d,c); renderInsights(d,c);
+  renderHistory(); renderWrapperPriority(d,c); renderReviewBanner(d);
   buildBriefing(d,c);
+  checkMilestones(c);
 }
 
 // ── AI BRIEFING + VOICE ───────────────────────────────────────
@@ -1187,7 +1642,7 @@ function renderNews(items, silent) {
 // ── EDIT PANEL ────────────────────────────────────────────────
 function openEdit() {
   const d=getData();
-  const m={f_age:d.age,f_retAge:d.retAge,f_target:d.target,f_sipp:d.sipp,f_workPension:d.workPension,f_isa:d.isa,f_propVal:d.propVal,f_mortgage:d.mortgage,f_cash:d.cash,f_wpMonthly:d.wpMonthly,f_sippMonthly:d.sippMonthly,f_isaMonthly:d.isaMonthly,f_bullRet:d.bullRet,f_baseRet:d.baseRet,f_bearRet:d.bearRet,f_fundSym:d.fundSym,f_boeRate:d.boeRate,f_cpiInflation:d.cpiInflation,f_ftseYTD:d.ftseYTD,f_globalYTD:d.globalYTD};
+  const m={f_age:d.age,f_retAge:d.retAge,f_target:d.target,f_sipp:d.sipp,f_workPension:d.workPension,f_isa:d.isa,f_propVal:d.propVal,f_mortgage:d.mortgage,f_cash:d.cash,f_wpMonthly:d.wpMonthly,f_sippMonthly:d.sippMonthly,f_isaMonthly:d.isaMonthly,f_bullRet:d.bullRet,f_baseRet:d.baseRet,f_bearRet:d.bearRet,f_fundSym:d.fundSym,f_boeRate:d.boeRate,f_cpiInflation:d.cpiInflation,f_ftseYTD:d.ftseYTD,f_globalYTD:d.globalYTD,f_monthlyIncome:d.monthlyIncome||4000,f_mortgageRate:d.mortgageRate||4.5,f_reviewDate:d.reviewDate||''};
   Object.keys(m).forEach(function(id){const el=document.getElementById(id);if(el)el.value=m[id];});
   document.getElementById('editOverlay').classList.add('open'); document.body.style.overflow='hidden';
 }
@@ -1202,7 +1657,10 @@ function saveFromPanel() {
   d.bullRet=n('f_bullRet');d.baseRet=n('f_baseRet');d.bearRet=n('f_bearRet');
   const sym=(document.getElementById('f_fundSym').value||'').trim(); if(sym)d.fundSym=sym;
   d.boeRate=n('f_boeRate');d.cpiInflation=n('f_cpiInflation');d.ftseYTD=n('f_ftseYTD');d.globalYTD=n('f_globalYTD');
+  d.monthlyIncome=n('f_monthlyIncome')||4000; d.mortgageRate=n('f_mortgageRate')||4.5;
+  const rd=(document.getElementById('f_reviewDate').value||'').trim(); d.reviewDate=rd||null;
   d.lastUpdated=todayStr();
+  const c=calc(d); recordHistory(d,c);
   saveData(d); renderAll(); closeEdit(); showToast('Saved & recalculated ✓'); fetchLiveData();
 }
 function resetToDefaults(){ if(!confirm('Reset all values to defaults?'))return; try{localStorage.removeItem(SK);}catch(e){} renderAll(); openEdit(); showToast('Reset to defaults'); }
@@ -1220,17 +1678,20 @@ document.getElementById('aiSpeakBtn').addEventListener('click', function(){ spea
 document.getElementById('aiStopBtn').addEventListener('click', stopSpeak);
 document.getElementById('aiAskBtn').addEventListener('click', function(){ const q=document.getElementById('aiAsk').value.trim(); if(q) answerQuestion(q); });
 document.getElementById('aiAsk').addEventListener('keydown', function(e){ if(e.key==='Enter'){ const q=this.value.trim(); if(q) answerQuestion(q); } });
+document.getElementById('darkToggle').addEventListener('click', toggleDark);
 if ('speechSynthesis' in window) {
-  // Preload voices — Chrome loads them async on first call
   window.speechSynthesis.getVoices();
   window.speechSynthesis.onvoiceschanged = function(){ window.speechSynthesis.getVoices(); };
 }
 
 // ── BOOT ──────────────────────────────────────────────────────
+loadDarkMode();
 renderAll();
+initHeaderCanvas();
+initCalcs();
+initPWA();
 fetchLiveData();
 fetchNews().then(renderNews);
-// Auto-refresh news every 30 minutes and market data every 5 minutes
 setInterval(function(){ fetchNews().then(function(i){ renderNews(i, true); }); }, 30 * 60 * 1000);
 setInterval(function(){ fetchLiveData(); }, 5 * 60 * 1000);
 
