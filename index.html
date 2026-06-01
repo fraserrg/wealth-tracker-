@@ -481,6 +481,156 @@ canvas { width: 100%; display: block; }
   line-height: 1.8;
 }
 
+/* FUND TRACKER */
+.fund-tracker-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 48px;
+}
+.fund-live-card {
+  background: var(--ink);
+  border-radius: 12px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.fund-live-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(184,134,11,0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+.fund-returns-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+}
+.fund-price-large {
+  font-family: var(--serif);
+  font-size: 42px;
+  font-style: italic;
+  line-height: 1;
+  color: var(--gold-light);
+  margin-bottom: 6px;
+}
+.fund-change-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.fund-change-pill {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 4px;
+}
+.pill-up   { background: rgba(42,122,111,0.2); color: #5bb8a8; }
+.pill-down { background: rgba(192,57,43,0.2);  color: #e06060; }
+.pill-flat { background: rgba(138,130,120,0.15); color: var(--muted); }
+.fund-meta { font-family: var(--mono); font-size: 9px; color: rgba(255,255,255,0.3); margin-top: 2px; }
+.fund-refresh-btn {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.45);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 14px;
+  display: inline-block;
+}
+.fund-refresh-btn:hover { color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.25); }
+.fund-refresh-btn.spinning { opacity: 0.5; cursor: default; }
+.tracker-section-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+.tracker-field { margin-bottom: 12px; }
+.tracker-field-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.tracker-input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+.tracker-input:focus { border-color: var(--gold); }
+.tracker-return-box {
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.tracker-return-pct {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-style: italic;
+  line-height: 1;
+}
+.tracker-return-gbp { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 4px; }
+.return-positive { color: var(--teal); }
+.return-negative { color: var(--red); }
+.return-neutral  { color: var(--muted); }
+.fund-error { font-family: var(--mono); font-size: 10px; color: var(--red); margin-top: 8px; }
+.fund-proxy-note {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: rgba(255,255,255,0.22);
+  margin-top: 14px;
+  line-height: 1.65;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  padding-top: 10px;
+}
+.combined-returns {
+  background: var(--ink);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-top: 4px;
+  grid-column: 2 / 4;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.combined-stat { flex: 1; min-width: 100px; }
+.combined-stat-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 4px; }
+.combined-stat-val { font-family: var(--serif); font-size: 22px; font-style: italic; color: var(--gold-light); }
+
+@media (max-width: 900px) {
+  .fund-tracker-grid { grid-template-columns: 1fr; }
+  .combined-returns { grid-column: 1; }
+}
+
 @media (max-width: 700px) {
   .header, .main { padding: 28px 20px; }
   .disclaimer { padding: 20px; }
@@ -535,6 +685,92 @@ canvas { width: 100%; display: block; }
 </div>
 
 <div class="main">
+
+  <!-- LIVE FUND TRACKER -->
+  <div class="section-header">
+    <div class="section-num">00</div>
+    <div class="section-title">Live Fund — Vanguard FTSE Global All Cap</div>
+    <div class="section-rule"></div>
+  </div>
+
+  <div class="fund-tracker-grid">
+
+    <!-- Live Price Panel -->
+    <div class="fund-live-card">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:10px;">VWRP · LSE · Live Price</div>
+      <div class="fund-price-large" id="ft-price">—</div>
+      <div class="fund-change-row">
+        <span class="fund-change-pill pill-flat" id="ft-change-pct">Fetching…</span>
+        <span style="font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.3);" id="ft-change-gbp"></span>
+      </div>
+      <div class="fund-meta" id="ft-state"></div>
+      <div class="fund-meta" id="ft-updated"></div>
+      <button class="fund-refresh-btn" id="ft-btn" onclick="ftRefresh()">↻ Refresh price</button>
+      <div class="fund-error" id="ft-error" style="display:none;"></div>
+      <div class="fund-proxy-note">VWRP tracks the FTSE All-World index (large &amp; mid cap). The Vanguard FTSE Global All Cap adds ~2% small-cap exposure — no real-time price feed exists for unlisted OEICs, so VWRP serves as the nearest listed proxy. Daily moves are effectively identical.</div>
+    </div>
+
+    <!-- SIPP Returns Calculator -->
+    <div class="fund-returns-card">
+      <div class="tracker-section-label">Personal SIPP — FTSE Global All Cap</div>
+      <div class="tracker-field">
+        <div class="tracker-field-label">Total Contributions / Cost Basis £</div>
+        <input class="tracker-input" type="number" id="sipp-basis" placeholder="e.g. 65800" step="100" min="0" oninput="ftCalc()">
+      </div>
+      <div class="tracker-field">
+        <div class="tracker-field-label">Current Portfolio Value £</div>
+        <input class="tracker-input" type="number" id="sipp-current" placeholder="e.g. 68500" step="100" min="0" oninput="ftCalc()">
+      </div>
+      <div class="tracker-return-box">
+        <div>
+          <div class="tracker-return-pct return-neutral" id="sipp-pct">—</div>
+          <div class="tracker-return-gbp" id="sipp-gbp">Enter values to calculate</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);text-align:right;line-height:1.5;">Total<br>Return</div>
+      </div>
+    </div>
+
+    <!-- ISA Returns Calculator -->
+    <div class="fund-returns-card">
+      <div class="tracker-section-label">Stocks &amp; Shares ISA — Bridge Fund</div>
+      <div class="tracker-field">
+        <div class="tracker-field-label">Total Contributions / Cost Basis £</div>
+        <input class="tracker-input" type="number" id="isa-basis" placeholder="e.g. 10000" step="100" min="0" oninput="ftCalc()">
+      </div>
+      <div class="tracker-field">
+        <div class="tracker-field-label">Current Portfolio Value £</div>
+        <input class="tracker-input" type="number" id="isa-current" placeholder="e.g. 10400" step="100" min="0" oninput="ftCalc()">
+      </div>
+      <div class="tracker-return-box">
+        <div>
+          <div class="tracker-return-pct return-neutral" id="isa-pct">—</div>
+          <div class="tracker-return-gbp" id="isa-gbp">Enter values to calculate</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);text-align:right;line-height:1.5;">Total<br>Return</div>
+      </div>
+    </div>
+
+    <!-- Combined Summary Bar -->
+    <div class="combined-returns">
+      <div class="combined-stat">
+        <div class="combined-stat-label">Total Invested (SIPP + ISA)</div>
+        <div class="combined-stat-val" id="comb-basis">—</div>
+      </div>
+      <div class="combined-stat">
+        <div class="combined-stat-label">Total Current Value</div>
+        <div class="combined-stat-val" id="comb-current">—</div>
+      </div>
+      <div class="combined-stat">
+        <div class="combined-stat-label">Overall Gain / Loss</div>
+        <div class="combined-stat-val" id="comb-gain">—</div>
+      </div>
+      <div class="combined-stat">
+        <div class="combined-stat-label">Overall Return %</div>
+        <div class="combined-stat-val" id="comb-pct">—</div>
+      </div>
+    </div>
+
+  </div>
 
   <!-- NET WORTH SNAPSHOT -->
   <div class="section-header">
@@ -1070,6 +1306,147 @@ canvas { width: 100%; display: block; }
 
   setup();
   window.addEventListener('resize', setup);
+})();
+
+// ── FUND TRACKER ─────────────────────────────────────────────────────────────
+(function ftInit() {
+  const KEY = 'vanguard_ft_v1';
+  let refreshTimer;
+
+  function load() {
+    try {
+      const s = JSON.parse(localStorage.getItem(KEY) || '{}');
+      if (s.sippBasis)   document.getElementById('sipp-basis').value   = s.sippBasis;
+      if (s.sippCurrent) document.getElementById('sipp-current').value = s.sippCurrent;
+      if (s.isaBasis)    document.getElementById('isa-basis').value    = s.isaBasis;
+      if (s.isaCurrent)  document.getElementById('isa-current').value  = s.isaCurrent;
+    } catch(e) {}
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({
+        sippBasis:   document.getElementById('sipp-basis').value,
+        sippCurrent: document.getElementById('sipp-current').value,
+        isaBasis:    document.getElementById('isa-basis').value,
+        isaCurrent:  document.getElementById('isa-current').value,
+      }));
+    } catch(e) {}
+  }
+
+  function fmtGBP(v) {
+    const abs = Math.abs(v);
+    if (abs >= 1000000) return '£' + (abs / 1000000).toFixed(2) + 'M';
+    if (abs >= 1000)    return '£' + abs.toLocaleString('en-GB', { maximumFractionDigits: 0 });
+    return '£' + abs.toFixed(2);
+  }
+
+  window.ftCalc = function() {
+    save();
+    const sB = parseFloat(document.getElementById('sipp-basis').value)   || 0;
+    const sC = parseFloat(document.getElementById('sipp-current').value) || 0;
+    const iB = parseFloat(document.getElementById('isa-basis').value)    || 0;
+    const iC = parseFloat(document.getElementById('isa-current').value)  || 0;
+
+    function applyReturn(pctId, gbpId, basis, current) {
+      const pctEl = document.getElementById(pctId);
+      const gbpEl = document.getElementById(gbpId);
+      if (!basis || !current) {
+        pctEl.textContent = '—';
+        pctEl.className = 'tracker-return-pct return-neutral';
+        gbpEl.textContent = 'Enter values to calculate';
+        return;
+      }
+      const gain = current - basis;
+      const pct  = (gain / basis) * 100;
+      const sign = pct >= 0 ? '+' : '';
+      pctEl.textContent  = sign + pct.toFixed(2) + '%';
+      pctEl.className    = 'tracker-return-pct ' + (pct > 0 ? 'return-positive' : pct < 0 ? 'return-negative' : 'return-neutral');
+      gbpEl.textContent  = (gain >= 0 ? '+' : '−') + fmtGBP(gain) + ' total gain/loss';
+    }
+
+    applyReturn('sipp-pct', 'sipp-gbp', sB, sC);
+    applyReturn('isa-pct',  'isa-gbp',  iB, iC);
+
+    // Combined
+    const totalBasis   = (sB || 0) + (iB || 0);
+    const totalCurrent = (sC || 0) + (iC || 0);
+    const totalGain    = totalCurrent - totalBasis;
+    const totalPct     = totalBasis > 0 ? (totalGain / totalBasis) * 100 : 0;
+
+    const combBasisEl   = document.getElementById('comb-basis');
+    const combCurrentEl = document.getElementById('comb-current');
+    const combGainEl    = document.getElementById('comb-gain');
+    const combPctEl     = document.getElementById('comb-pct');
+
+    if (totalBasis > 0) {
+      combBasisEl.textContent   = fmtGBP(totalBasis);
+      combCurrentEl.textContent = totalCurrent > 0 ? fmtGBP(totalCurrent) : '—';
+      if (totalCurrent > 0) {
+        const gainSign = totalGain >= 0 ? '+' : '−';
+        combGainEl.textContent  = gainSign + fmtGBP(totalGain);
+        combGainEl.style.color  = totalGain >= 0 ? 'var(--teal)' : 'var(--red)';
+        const pctSign = totalPct >= 0 ? '+' : '';
+        combPctEl.textContent   = pctSign + totalPct.toFixed(2) + '%';
+        combPctEl.style.color   = totalPct >= 0 ? 'var(--teal)' : 'var(--red)';
+      } else {
+        combGainEl.textContent = '—';
+        combPctEl.textContent  = '—';
+      }
+    } else {
+      ['comb-basis','comb-current','comb-gain','comb-pct'].forEach(id => {
+        document.getElementById(id).textContent = '—';
+        document.getElementById(id).style.color = '';
+      });
+    }
+  };
+
+  async function fetchPrice() {
+    const btn = document.getElementById('ft-btn');
+    btn.classList.add('spinning');
+    btn.textContent = '↻ Updating…';
+
+    try {
+      const res  = await fetch('/api/fund-price');
+      const json = await res.json();
+
+      if (!json.success) throw new Error(json.error || 'API error');
+
+      const d    = json.data;
+      const pct  = d.changePercent;
+      const sign = pct >= 0 ? '+' : '';
+      const cls  = pct > 0.02 ? 'pill-up' : pct < -0.02 ? 'pill-down' : 'pill-flat';
+
+      document.getElementById('ft-price').textContent = '£' + d.price.toFixed(2);
+
+      const pill = document.getElementById('ft-change-pct');
+      pill.textContent = sign + pct.toFixed(2) + '%  (' + (d.change >= 0 ? '+' : '') + '£' + Math.abs(d.change).toFixed(2) + ')';
+      pill.className   = 'fund-change-pill ' + cls;
+
+      document.getElementById('ft-change-gbp').textContent = '';
+      document.getElementById('ft-state').textContent   = 'Market: ' + (d.marketState === 'REGULAR' ? 'Open ●' : d.marketState === 'CLOSED' ? 'Closed' : d.marketState);
+      document.getElementById('ft-updated').textContent = 'Updated: ' + new Date(d.lastUpdated).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + ' · prev close £' + d.previousClose.toFixed(2);
+      document.getElementById('ft-error').style.display = 'none';
+    } catch(err) {
+      const pill = document.getElementById('ft-change-pct');
+      pill.textContent = 'Price unavailable';
+      pill.className   = 'fund-change-pill pill-flat';
+      const errEl = document.getElementById('ft-error');
+      errEl.textContent  = 'Could not load price: ' + err.message + '. Markets may be closed or rate-limited.';
+      errEl.style.display = 'block';
+    } finally {
+      btn.classList.remove('spinning');
+      btn.textContent = '↻ Refresh price';
+    }
+  }
+
+  window.ftRefresh = fetchPrice;
+
+  load();
+  ftCalc();
+  fetchPrice();
+  // Auto-refresh every 5 minutes while the page is open
+  refreshTimer = setInterval(fetchPrice, 5 * 60 * 1000);
 })();
 </script>
 </body>
