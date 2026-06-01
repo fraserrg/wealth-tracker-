@@ -3,810 +3,1074 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Finance Dashboard — The Monopoly Trader</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<title>Wealth Tracker — Age 28 to 55 | F's Retirement Journey</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:   #0d0d0a;
-    --bg-2: #14140f;
-    --bg-3: #1c1c16;
-    --cream: #f7f5ed;
-    --gold:  #c5a235;
-    --gold-2:#e6c557;
-    --gold-soft: rgba(197,162,53,0.15);
-    --red:   #c12d2d;
-    --green: #228747;
-    --amber: #d28811;
-    --mute:  #9a948a;
-    --soft:  #c4bda9;
-    --line:  rgba(247,245,237,0.08);
-    --line-g:rgba(197,162,53,0.35);
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;line-height:1.5;overflow-x:hidden;}
+:root {
+  --bg: #f5f2ec;
+  --surface: #ffffff;
+  --surface2: #f0ece4;
+  --border: #e2ddd5;
+  --ink: #1a1714;
+  --muted: #8a8278;
+  --gold: #b8860b;
+  --gold-light: #d4a520;
+  --teal: #2a7a6f;
+  --teal-light: #3d9e91;
+  --red: #c0392b;
+  --amber: #d4680a;
+  --blue: #2c5f8a;
+  --serif: 'Instrument Serif', serif;
+  --display: 'Syne', sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+}
 
-  /* ── NAV ── */
-  nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,13,10,0.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);}
-  .nav-inner{max-width:1400px;margin:0 auto;padding:16px 40px;display:flex;align-items:center;}
-  .brand{display:flex;align-items:center;gap:12px;font-family:'Playfair Display',serif;font-weight:900;font-size:17px;color:var(--gold);letter-spacing:.05em;text-transform:uppercase;text-decoration:none;margin-right:48px;}
-  .brand-mark{width:36px;height:36px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;color:var(--bg);font-weight:900;font-size:17px;font-family:'Playfair Display',serif;}
-  .nav-tabs{display:flex;gap:2px;flex:1;}
-  .nav-tab{background:none;border:none;color:var(--mute);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;padding:8px 18px;transition:color .2s;position:relative;}
-  .nav-tab:hover{color:var(--cream);}
-  .nav-tab.active{color:var(--gold);}
-  .nav-tab.active::after{content:'';position:absolute;bottom:-17px;left:0;right:0;height:2px;background:var(--gold);}
-  .nav-date{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--mute);letter-spacing:.06em;margin-left:auto;}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* ── LAYOUT ── */
-  .main{max-width:1400px;margin:0 auto;padding:96px 40px 60px;}
-  .tab-panel{display:none;}
-  .tab-panel.active{display:block;}
-  .g2{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
-  .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;}
-  .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
-  .mb{margin-bottom:24px;}
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--display);
+  min-height: 100vh;
+}
 
-  /* ── CARDS ── */
-  .card{background:var(--bg-2);border:1px solid var(--line);padding:28px;position:relative;}
-  .card::before{content:'';position:absolute;top:-1px;left:-1px;right:-1px;height:2px;background:linear-gradient(90deg,var(--gold),transparent);opacity:0;transition:opacity .3s;}
-  .card:hover::before{opacity:1;}
-  .card-title{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;}
+/* NOISE TEXTURE OVERLAY */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
 
-  /* ── STAT CARDS ── */
-  .stat{background:var(--bg-2);border:1px solid var(--line);padding:24px 28px;}
-  .stat-label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);margin-bottom:10px;}
-  .stat-val{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:var(--cream);line-height:1;}
-  .stat-val.g{color:var(--green);}
-  .stat-val.r{color:var(--red);}
-  .stat-val.gold{color:var(--gold);}
+.wrap { position: relative; z-index: 1; }
 
-  /* ── NW HERO ── */
-  .nw-hero{background:linear-gradient(135deg,var(--bg-3) 0%,var(--bg-2) 60%,rgba(197,162,53,.04) 100%);border:1px solid var(--line-g);padding:50px;margin-bottom:28px;position:relative;overflow:hidden;}
-  .nw-hero::before{content:'';position:absolute;top:-1px;left:-1px;right:-1px;height:3px;background:var(--gold);}
-  .nw-hero::after{content:'';position:absolute;top:0;right:0;width:380px;height:380px;background:radial-gradient(circle,rgba(197,162,53,.06) 0%,transparent 70%);pointer-events:none;}
-  .nw-label{font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--mute);margin-bottom:12px;}
-  .nw-amount{font-family:'Playfair Display',serif;font-size:clamp(44px,6vw,76px);font-weight:900;color:var(--gold);line-height:1;margin-bottom:28px;}
-  .nw-amount.neg{color:var(--red);}
-  .nw-split{display:flex;gap:0;}
-  .nw-split-item{padding:0 40px;}
-  .nw-split-item:first-child{padding-left:0;padding-right:40px;border-right:1px solid var(--line);}
-  .nw-split-item .val{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;}
-  .nw-split-item .lbl{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--mute);margin-top:4px;}
+/* HEADER */
+.header {
+  background: var(--ink);
+  color: var(--bg);
+  padding: 56px 60px 48px;
+  position: relative;
+  overflow: hidden;
+}
+.header::after {
+  content: 'WEALTH';
+  position: absolute;
+  right: -20px; top: -20px;
+  font-size: 180px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.03);
+  font-family: var(--display);
+  pointer-events: none;
+  line-height: 1;
+}
+.header-eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  margin-bottom: 16px;
+}
+h1 {
+  font-family: var(--serif);
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.1;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.header-sub {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 40px;
+}
 
-  /* ── TABLE ── */
-  .tbl{width:100%;border-collapse:collapse;font-size:13px;}
-  .tbl th{text-align:left;padding:9px 14px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);border-bottom:1px solid var(--line);}
-  .tbl td{padding:12px 14px;border-bottom:1px solid rgba(247,245,237,.05);color:var(--soft);vertical-align:middle;}
-  .tbl tr:last-child td{border-bottom:none;}
-  .tbl tbody tr:hover td{background:rgba(197,162,53,.03);}
-  .tbl tfoot td{padding:12px 14px;border-top:1px solid var(--line);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);}
-  .tbl .name{font-weight:500;color:var(--cream);}
-  .tbl .sub{font-size:11px;color:var(--mute);margin-top:2px;}
-  .mono{font-family:'JetBrains Mono',monospace;}
+.header-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  max-width: 900px;
+}
+.hstat {
+  background: rgba(255,255,255,0.04);
+  padding: 20px 22px;
+}
+.hstat-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 6px;
+}
+.hstat-val {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-style: italic;
+  color: var(--gold-light);
+  line-height: 1;
+}
+.hstat-sub {
+  font-size: 10px;
+  font-family: var(--mono);
+  color: rgba(255,255,255,0.3);
+  margin-top: 4px;
+}
 
-  /* ── BADGES ── */
-  .badge{display:inline-block;padding:3px 8px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
-  .b-cash{background:rgba(34,135,71,.2);color:#3db86b;}
-  .b-inv{background:rgba(91,143,224,.2);color:#7baae8;}
-  .b-prop{background:rgba(197,162,53,.2);color:var(--gold);}
-  .b-cry{background:rgba(156,92,224,.15);color:#b87de8;}
-  .b-veh{background:rgba(210,136,17,.2);color:var(--amber);}
-  .b-mort{background:rgba(193,45,45,.2);color:#e06060;}
-  .b-loan{background:rgba(193,45,45,.15);color:#d07070;}
-  .b-cc{background:rgba(210,136,17,.15);color:var(--amber);}
-  .b-other{background:rgba(154,148,138,.2);color:var(--mute);}
+/* MAIN GRID */
+.main { padding: 48px 60px; }
 
-  /* ── BUTTONS ── */
-  .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;border:none;}
-  .btn-g{background:var(--gold);color:var(--bg);}
-  .btn-g:hover{background:var(--gold-2);transform:translateY(-1px);}
-  .btn-o{background:transparent;color:var(--soft);border:1px solid var(--line-g);}
-  .btn-o:hover{color:var(--gold);border-color:var(--gold);}
-  .btn-sm{padding:6px 14px;font-size:10px;}
-  .btn-ico{background:transparent;border:none;cursor:pointer;color:var(--mute);font-family:'DM Sans',sans-serif;font-size:12px;padding:4px 7px;transition:color .2s;}
-  .btn-ico.edit:hover{color:var(--gold);}
-  .btn-ico.del:hover{color:var(--red);}
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.section-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.15em;
+}
+.section-title {
+  font-family: var(--serif);
+  font-size: 26px;
+  font-style: italic;
+  color: var(--ink);
+}
+.section-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
 
-  /* ── MODAL ── */
-  .modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .2s;}
-  .modal-wrap.open{opacity:1;visibility:visible;}
-  .modal{background:var(--bg-3);border:1px solid var(--line-g);padding:36px;width:100%;max-width:500px;position:relative;transform:translateY(20px);transition:transform .25s;}
-  .modal::before{content:'';position:absolute;top:-1px;left:-1px;right:-1px;height:3px;background:var(--gold);}
-  .modal-wrap.open .modal{transform:translateY(0);}
-  .modal-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--cream);margin-bottom:28px;}
+/* NET WORTH SNAPSHOT */
+.snapshot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 48px;
+}
+.snap-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  position: relative;
+}
+.snap-card.highlight {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+.snap-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.snap-card.highlight .snap-label { color: rgba(255,255,255,0.4); }
+.snap-val {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-style: italic;
+  color: var(--ink);
+  line-height: 1;
+}
+.snap-card.highlight .snap-val { color: var(--gold-light); }
+.snap-sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.snap-card.highlight .snap-sub { color: rgba(255,255,255,0.3); }
+.snap-tag {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 3px;
+  margin-top: 8px;
+}
+.tag-pension { background: rgba(42,122,111,0.1); color: var(--teal); border: 1px solid rgba(42,122,111,0.2); }
+.tag-isa { background: rgba(44,95,138,0.1); color: var(--blue); border: 1px solid rgba(44,95,138,0.2); }
+.tag-property { background: rgba(184,134,11,0.1); color: var(--gold); border: 1px solid rgba(184,134,11,0.2); }
+.tag-cash { background: rgba(138,130,120,0.1); color: var(--muted); border: 1px solid rgba(138,130,120,0.2); }
 
-  /* ── FORMS ── */
-  .fg{margin-bottom:18px;}
-  .fl{display:block;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin-bottom:8px;}
-  .fi,.fs{width:100%;background:var(--bg-2);border:1px solid var(--line);padding:11px 14px;color:var(--cream);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
-  .fi:focus,.fs:focus{border-color:var(--gold);}
-  .fi::placeholder{color:rgba(247,245,237,.2);}
-  .fs option{background:var(--bg-3);}
-  .fr{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-  .fa{display:flex;gap:12px;justify-content:flex-end;margin-top:24px;padding-top:20px;border-top:1px solid var(--line);}
+/* CONTRIBUTION FLOW */
+.contrib-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 48px;
+}
+.contrib-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+.contrib-flows {
+  display: flex;
+  gap: 20px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+.flow-item {
+  flex: 1;
+  min-width: 160px;
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 18px;
+}
+.flow-dest {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.flow-amount {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-style: italic;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.flow-annual {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+.flow-arrow { color: var(--muted); font-size: 20px; display: flex; align-items: center; }
+.flow-total {
+  flex: 1.2;
+  background: var(--ink);
+  color: #fff;
+  min-width: 180px;
+}
+.flow-total .flow-dest { color: rgba(255,255,255,0.4); }
+.flow-total .flow-amount { color: var(--gold-light); }
+.flow-total .flow-annual { color: rgba(255,255,255,0.35); }
 
-  /* ── MONTH NAV ── */
-  .month-nav{display:flex;align-items:center;gap:16px;margin-bottom:28px;}
-  .m-btn{background:var(--bg-2);border:1px solid var(--line);color:var(--soft);width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;transition:all .2s;}
-  .m-btn:hover{border-color:var(--gold);color:var(--gold);}
-  .m-disp{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--cream);min-width:210px;}
+/* PERCENTILE COMPARISON */
+.percentile-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 48px;
+}
+.perc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+.perc-item { }
+.perc-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.perc-bar-track {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  margin-bottom: 8px;
+  position: relative;
+}
+.perc-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  position: relative;
+}
+.perc-bar-marker {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 14px;
+  background: var(--ink);
+  border-radius: 1px;
+}
+.perc-values {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 10px;
+}
+.perc-yours { color: var(--ink); font-weight: 500; }
+.perc-rank { color: var(--teal); }
 
-  /* ── PROGRESS ── */
-  .prog-wrap{height:4px;background:rgba(247,245,237,.07);margin-top:8px;}
-  .prog-fill{height:100%;transition:width .5s ease;}
+/* PROJECTION CHART */
+.chart-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 20px;
+}
+.chart-controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.chart-legend {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.leg-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+.leg-line {
+  width: 20px;
+  height: 2px;
+  border-radius: 1px;
+}
+.chart-note {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--muted);
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+canvas { width: 100%; display: block; }
 
-  /* ── BUDGET ROW ── */
-  .brow{padding:18px 0;border-bottom:1px solid rgba(247,245,237,.06);}
-  .brow:last-child{border-bottom:none;}
-  .brow-top{display:flex;align-items:center;justify-content:space-between;}
-  .brow-name{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500;color:var(--cream);}
-  .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-  .brow-right{display:flex;align-items:center;gap:8px;}
-  .brow-amts{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mute);}
-  .brow-spent{color:var(--cream);font-weight:500;}
-  .brow-over{color:var(--red);}
-  .brow-pct{font-size:10px;color:var(--mute);margin-top:4px;text-align:right;}
+/* MILESTONE TABLE */
+.milestone-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-bottom: 48px;
+}
+.milestone-table th {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 10px 16px;
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+  background: var(--surface);
+}
+.milestone-table td {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  font-family: var(--mono);
+  font-size: 11px;
+}
+.milestone-table tr:hover td { background: var(--surface2); }
+.milestone-table .age-col { font-weight: 500; color: var(--ink); }
+.milestone-table .bull { color: var(--teal); }
+.milestone-table .base { color: var(--gold); }
+.milestone-table .bear { color: var(--red); }
+.milestone-table .highlight-row td { background: rgba(184,134,11,0.06); }
+.milestone-table .milestone-badge {
+  display: inline-block;
+  background: var(--gold);
+  color: #fff;
+  font-size: 8px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-left: 8px;
+  letter-spacing: 0.1em;
+  vertical-align: middle;
+}
 
-  /* ── TX ITEM ── */
-  .tx-item{display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid rgba(247,245,237,.06);}
-  .tx-item:last-child{border-bottom:none;}
-  .tx-icon{width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:.03em;flex-shrink:0;}
-  .tx-info{flex:1;min-width:0;}
-  .tx-desc{font-size:14px;font-weight:500;color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .tx-meta{font-size:11px;color:var(--mute);margin-top:2px;}
-  .tx-right{display:flex;align-items:center;gap:4px;}
-  .tx-amt{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;}
-  .tx-amt.inc{color:var(--green);}
-  .tx-amt.exp{color:var(--red);}
+/* SCENARIO CARDS */
+.scenario-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 48px;
+}
+.sc-card {
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid transparent;
+}
+.sc-card.bull { background: rgba(42,122,111,0.06); border-color: rgba(42,122,111,0.2); }
+.sc-card.base { background: rgba(184,134,11,0.06); border-color: rgba(184,134,11,0.2); }
+.sc-card.bear { background: rgba(192,57,43,0.06); border-color: rgba(192,57,43,0.2); }
+.sc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.sc-name { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; }
+.sc-card.bull .sc-name { color: var(--teal); }
+.sc-card.base .sc-name { color: var(--gold); }
+.sc-card.bear .sc-name { color: var(--red); }
+.sc-return { font-family: var(--serif); font-size: 32px; font-style: italic; line-height: 1; }
+.sc-card.bull .sc-return { color: var(--teal); }
+.sc-card.base .sc-return { color: var(--gold); }
+.sc-card.bear .sc-return { color: var(--red); }
+.sc-label { font-family: var(--mono); font-size: 9px; color: var(--muted); }
+.sc-at55 { font-family: var(--serif); font-size: 22px; font-style: italic; margin: 12px 0 4px; }
+.sc-sub { font-family: var(--mono); font-size: 10px; color: var(--muted); line-height: 1.6; }
 
-  /* ── INC ITEM ── */
-  .inc-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid rgba(247,245,237,.06);}
-  .inc-item:last-child{border-bottom:none;}
-  .inc-icon{width:38px;height:38px;background:rgba(34,135,71,.13);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
-  .inc-info{flex:1;}
-  .inc-name{font-size:13px;font-weight:500;color:var(--cream);}
-  .inc-type{font-size:10px;color:var(--mute);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;}
-  .inc-amt{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--green);}
+/* INSIGHTS */
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+  margin-bottom: 48px;
+}
+.insight {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+}
+.insight-icon { font-size: 20px; margin-bottom: 10px; }
+.insight-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.insight-body { font-family: var(--mono); font-size: 11px; color: var(--muted); line-height: 1.65; }
+.insight-body strong { color: var(--ink); }
+.insight.positive { border-left: 3px solid var(--teal); }
+.insight.warn { border-left: 3px solid var(--amber); }
+.insight.action { border-left: 3px solid var(--blue); }
 
-  /* ── FILTERS ── */
-  .filter-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;}
-  .fsel{background:var(--bg-2);border:1px solid var(--line);color:var(--soft);padding:8px 14px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;outline:none;-webkit-appearance:none;}
-  .fsel:focus{border-color:var(--gold);}
+.gap-box {
+  background: var(--ink);
+  color: #fff;
+  border-radius: 12px;
+  padding: 32px;
+  margin-bottom: 48px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.gap-box h3 { font-family: var(--serif); font-size: 22px; font-style: italic; color: var(--gold-light); margin-bottom: 6px; }
+.gap-box p { font-family: var(--mono); font-size: 11px; color: rgba(255,255,255,0.45); line-height: 1.65; }
+.gap-box p strong { color: rgba(255,255,255,0.85); }
+.gap-stat { }
+.gap-stat-val { font-family: var(--serif); font-size: 36px; font-style: italic; color: var(--gold-light); line-height: 1; }
+.gap-stat-label { font-family: var(--mono); font-size: 9px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.15em; margin-top: 4px; }
 
-  /* ── SECTION HEADER ── */
-  .sec-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;}
-  .sec-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--cream);}
-  .sec-sub{font-size:13px;color:var(--mute);margin-top:4px;}
+.disclaimer {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  padding: 24px 60px;
+  line-height: 1.8;
+}
 
-  /* ── CHART ── */
-  .ch-wrap{position:relative;}
-  .ch-220{height:220px;}
-  .ch-260{height:260px;}
-  .ch-300{height:300px;}
-
-  /* ── EMPTY ── */
-  .empty{text-align:center;padding:48px 20px;color:var(--mute);font-size:13px;}
-  .empty-ico{font-size:28px;margin-bottom:10px;opacity:.5;}
-
-  /* ── TOAST ── */
-  .toast{position:fixed;bottom:32px;right:32px;background:var(--bg-3);border:1px solid var(--gold);padding:14px 22px;font-size:13px;color:var(--cream);z-index:1000;transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none;}
-  .toast.show{transform:translateY(0);opacity:1;}
-
-  /* ── SCROLLBAR ── */
-  ::-webkit-scrollbar{width:5px;}
-  ::-webkit-scrollbar-track{background:var(--bg);}
-  ::-webkit-scrollbar-thumb{background:var(--bg-3);}
-
-  /* ── RESPONSIVE ── */
-  @media(max-width:1024px){.g4{grid-template-columns:1fr 1fr;}.g3{grid-template-columns:1fr 1fr;}}
-  @media(max-width:768px){.g2,.g3,.g4{grid-template-columns:1fr;}.main{padding:88px 20px 40px;}.nav-inner{padding:14px 20px;}.nw-hero{padding:32px 24px;}.nw-amount{font-size:44px;}.modal{padding:24px;margin:16px;}}
+@media (max-width: 700px) {
+  .header, .main { padding: 28px 20px; }
+  .disclaimer { padding: 20px; }
+  .header::after { display: none; }
+  .gap-box { grid-template-columns: 1fr; }
+  .contrib-flows { flex-direction: column; }
+  .flow-arrow { transform: rotate(90deg); }
+}
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<!-- NAV -->
-<nav>
-  <div class="nav-inner">
-    <a class="brand" href="index.html" title="Back to main site">
-      <div class="brand-mark">M</div>Finance
-    </a>
-    <div class="nav-tabs">
-      <button class="nav-tab active" onclick="switchTab('networth',this)">Net Worth</button>
-      <button class="nav-tab" onclick="switchTab('budget',this)">Budget</button>
-      <button class="nav-tab" onclick="switchTab('transactions',this)">Transactions</button>
+<!-- HEADER -->
+<div class="header">
+  <div class="header-eyebrow">Personal Wealth Tracker · As of 29 November 2025</div>
+  <h1>The Road from<br>£83,100 to £1,500,000</h1>
+  <div class="header-sub">Age 28 → 55 · 27-year accumulation horizon · FTSE Global All Cap core strategy</div>
+
+  <div class="header-stats">
+    <div class="hstat">
+      <div class="hstat-label">Current Age</div>
+      <div class="hstat-val">28</div>
+      <div class="hstat-sub">29 Nov 2025</div>
     </div>
-    <div class="nav-date" id="nav-date"></div>
-  </div>
-</nav>
-
-<main class="main">
-
-<!-- ═══════════════════════════════ NET WORTH ═══════════════════════════════ -->
-<div class="tab-panel active" id="tab-networth">
-
-  <div class="nw-hero">
-    <div class="nw-label">Total Net Worth</div>
-    <div class="nw-amount" id="hero-nw">£0</div>
-    <div class="nw-split">
-      <div class="nw-split-item">
-        <div class="val" id="hero-assets" style="color:var(--green)">£0</div>
-        <div class="lbl">Total Assets</div>
-      </div>
-      <div class="nw-split-item">
-        <div class="val" id="hero-liab" style="color:var(--red)">£0</div>
-        <div class="lbl">Total Liabilities</div>
-      </div>
+    <div class="hstat">
+      <div class="hstat-label">Total Invested Assets</div>
+      <div class="hstat-val">£83,100</div>
+      <div class="hstat-sub">Pensions + ISA</div>
     </div>
-  </div>
-
-  <div class="g2 mb">
-    <div class="card">
-      <div class="card-title">Net Worth Over Time
-        <button class="btn btn-o btn-sm" onclick="takeSnap()">+ Snapshot</button>
-      </div>
-      <div class="ch-wrap ch-260"><canvas id="ch-nw"></canvas></div>
+    <div class="hstat">
+      <div class="hstat-label">Net Worth (incl. property)</div>
+      <div class="hstat-val">£174,100</div>
+      <div class="hstat-sub">Excl. cash ring budget</div>
     </div>
-    <div class="card">
-      <div class="card-title">Asset Breakdown</div>
-      <div class="ch-wrap ch-260"><canvas id="ch-adonut"></canvas></div>
+    <div class="hstat">
+      <div class="hstat-label">Monthly Into Future</div>
+      <div class="hstat-val">£1,150</div>
+      <div class="hstat-sub">Pension + ISA combined</div>
     </div>
-  </div>
-
-  <div class="g2">
-    <div class="card">
-      <div class="card-title">Assets
-        <button class="btn btn-g btn-sm" onclick="openM('asset')">+ Add Asset</button>
-      </div>
-      <div id="assets-el"><div class="empty"><div class="empty-ico">📦</div>No assets yet</div></div>
+    <div class="hstat">
+      <div class="hstat-label">Years to Target</div>
+      <div class="hstat-val">27 yrs</div>
+      <div class="hstat-sub">Retiring at 55</div>
     </div>
-    <div class="card">
-      <div class="card-title">Liabilities
-        <button class="btn btn-g btn-sm" onclick="openM('liab')">+ Add</button>
-      </div>
-      <div id="liab-el"><div class="empty"><div class="empty-ico">✅</div>No liabilities — great!</div></div>
+    <div class="hstat">
+      <div class="hstat-label">Retirement Target</div>
+      <div class="hstat-val">£1.5M</div>
+      <div class="hstat-sub">Invested portfolio only</div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════ BUDGET ══════════════════════════════════ -->
-<div class="tab-panel" id="tab-budget">
+<div class="main">
 
-  <div class="month-nav">
-    <button class="m-btn" onclick="chMonth(-1)">&#8249;</button>
-    <div class="m-disp" id="month-disp"></div>
-    <button class="m-btn" onclick="chMonth(1)">&#8250;</button>
-    <div style="margin-left:auto;display:flex;gap:12px">
-      <button class="btn btn-o btn-sm" onclick="openM('income')">+ Income</button>
-      <button class="btn btn-g btn-sm" onclick="openM('bcat')">+ Category</button>
+  <!-- NET WORTH SNAPSHOT -->
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">Your Complete Financial Picture Today</div>
+    <div class="section-rule"></div>
+  </div>
+
+  <div class="snapshot-grid">
+    <div class="snap-card highlight">
+      <div class="snap-label">Total Net Worth</div>
+      <div class="snap-val">£174,100</div>
+      <div class="snap-sub">All assets minus mortgage</div>
+      <div class="snap-sub" style="margin-top:8px; font-size:9px;">£179,100 before ring budget</div>
+    </div>
+    <div class="snap-card">
+      <div class="snap-label">Personal SIPP</div>
+      <div class="snap-val">£65,800</div>
+      <div class="snap-sub">Vanguard FTSE Global All Cap</div>
+      <div class="snap-tag tag-pension">Pension</div>
+    </div>
+    <div class="snap-card">
+      <div class="snap-label">Work Pension</div>
+      <div class="snap-val">£7,300</div>
+      <div class="snap-sub">Workplace retirement pot</div>
+      <div class="snap-tag tag-pension">Pension</div>
+    </div>
+    <div class="snap-card">
+      <div class="snap-label">Stocks & Shares ISA</div>
+      <div class="snap-val">£10,000</div>
+      <div class="snap-sub">Early retirement bridge fund</div>
+      <div class="snap-tag tag-isa">ISA · Bridge</div>
+    </div>
+    <div class="snap-card">
+      <div class="snap-label">Property Equity</div>
+      <div class="snap-val">£55,000</div>
+      <div class="snap-sub">£395K value · £340K mortgage</div>
+      <div class="snap-tag tag-property">Property</div>
+    </div>
+    <div class="snap-card">
+      <div class="snap-label">Cash Savings</div>
+      <div class="snap-val">£16,000</div>
+      <div class="snap-sub">Post ring purchase (~£5K)</div>
+      <div class="snap-tag tag-cash">Emergency fund</div>
     </div>
   </div>
 
-  <div class="g4 mb">
-    <div class="stat"><div class="stat-label">Monthly Income</div><div class="stat-val g" id="s-income">£0</div></div>
-    <div class="stat"><div class="stat-label">Total Budgeted</div><div class="stat-val" id="s-budgeted">£0</div></div>
-    <div class="stat"><div class="stat-label">Spent This Month</div><div class="stat-val" id="s-spent">£0</div></div>
-    <div class="stat"><div class="stat-label">Remaining</div><div class="stat-val" id="s-rem">£0</div></div>
-  </div>
-
-  <div class="g2">
-    <div class="card">
-      <div class="card-title">Expense Categories</div>
-      <div id="bcats-el"><div class="empty"><div class="empty-ico">🗂️</div>Add categories to track your spending</div></div>
-    </div>
-    <div>
-      <div class="card mb">
-        <div class="card-title">Budget vs Actual</div>
-        <div class="ch-wrap ch-220"><canvas id="ch-bbar"></canvas></div>
+  <!-- CONTRIBUTION FLOW -->
+  <div class="contrib-section">
+    <div class="contrib-title">Monthly Money in Motion — £1,150/mo into your future</div>
+    <div class="contrib-flows">
+      <div class="flow-item">
+        <div class="flow-dest">Work Pension</div>
+        <div class="flow-amount" style="color:var(--teal)">£650</div>
+        <div class="flow-annual">£7,800/yr · Tax-relieved</div>
       </div>
-      <div class="card">
-        <div class="card-title">Income Sources
-          <button class="btn btn-o btn-sm" onclick="openM('income')">+ Add</button>
+      <div class="flow-arrow">+</div>
+      <div class="flow-item">
+        <div class="flow-dest">Personal SIPP</div>
+        <div class="flow-amount" style="color:var(--teal)">£100</div>
+        <div class="flow-annual">£1,200/yr · +25% HMRC top-up</div>
+      </div>
+      <div class="flow-arrow">+</div>
+      <div class="flow-item">
+        <div class="flow-dest">S&S ISA (Bridge)</div>
+        <div class="flow-amount" style="color:var(--blue)">£400</div>
+        <div class="flow-annual">£4,800/yr · Age 55–68 fund</div>
+      </div>
+      <div class="flow-arrow">=</div>
+      <div class="flow-item flow-total">
+        <div class="flow-dest">Total Monthly</div>
+        <div class="flow-amount">£1,150</div>
+        <div class="flow-annual">£13,800/yr · across all wrappers</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UK PERCENTILE COMPARISON -->
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">How You Compare — UK Peers at Age 28</div>
+    <div class="section-rule"></div>
+  </div>
+
+  <div class="percentile-section">
+    <div style="font-family:var(--mono); font-size:11px; color:var(--muted); margin-bottom:20px; line-height:1.7;">
+      Based on ONS Wealth & Assets Survey data and PensionBee/PLSA research on UK pension and savings benchmarks for 25–34 year olds. The median UK 28-year-old has a pension pot of approximately <strong style="color:var(--ink)">£8,000–£12,000</strong> and total net worth (excl. property) of around <strong style="color:var(--ink)">£18,000–£25,000</strong>.
+    </div>
+
+    <div class="perc-grid">
+      <div class="perc-item">
+        <div class="perc-label">Total Pension (SIPP + Work) vs UK peers</div>
+        <div class="perc-bar-track">
+          <div class="perc-bar-fill" style="width:94%; background: linear-gradient(90deg, var(--teal-light), var(--teal));"></div>
+          <div class="perc-bar-marker" style="left:50%;" title="Median"></div>
         </div>
-        <div id="incsrc-el"><div class="empty" style="padding:20px">No income sources added</div></div>
+        <div class="perc-values">
+          <span class="perc-yours">Your pot: £73,100</span>
+          <span class="perc-rank">~Top 5–8% nationally</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px;">UK median age 28: £8–12K · You are 6–8x ahead</div>
+      </div>
+
+      <div class="perc-item">
+        <div class="perc-label">Monthly pension contributions vs UK peers</div>
+        <div class="perc-bar-track">
+          <div class="perc-bar-fill" style="width:88%; background: linear-gradient(90deg, var(--teal-light), var(--teal));"></div>
+          <div class="perc-bar-marker" style="left:50%;"></div>
+        </div>
+        <div class="perc-values">
+          <span class="perc-yours">Your contrib: £750/mo</span>
+          <span class="perc-rank">~Top 8–10% nationally</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px;">UK median: £150–200/mo pension contribution at this age</div>
+      </div>
+
+      <div class="perc-item">
+        <div class="perc-label">Total savings rate (pension + ISA) as % income</div>
+        <div class="perc-bar-track">
+          <div class="perc-bar-fill" style="width:82%; background: linear-gradient(90deg, var(--gold-light), var(--gold));"></div>
+          <div class="perc-bar-marker" style="left:35%;"></div>
+        </div>
+        <div class="perc-values">
+          <span class="perc-yours">Est. ~18–22% of income</span>
+          <span class="perc-rank">~Top 10–15%</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px;">UK median savings rate for 25–34: approximately 5–8% of income</div>
+      </div>
+
+      <div class="perc-item">
+        <div class="perc-label">Net worth (excl. property) vs UK peers</div>
+        <div class="perc-bar-track">
+          <div class="perc-bar-fill" style="width:90%; background: linear-gradient(90deg, var(--teal-light), var(--teal));"></div>
+          <div class="perc-bar-marker" style="left:50%;"></div>
+        </div>
+        <div class="perc-values">
+          <span class="perc-yours">Your NW (ex-property): £99,100</span>
+          <span class="perc-rank">~Top 5–7% nationally</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px;">UK median 28-year-old ex-property net worth: ~£18–28K</div>
+      </div>
+
+      <div class="perc-item">
+        <div class="perc-label">Homeownership + equity at 28</div>
+        <div class="perc-bar-track">
+          <div class="perc-bar-fill" style="width:78%; background: linear-gradient(90deg, var(--gold-light), var(--gold));"></div>
+          <div class="perc-bar-marker" style="left:30%;"></div>
+        </div>
+        <div class="perc-values">
+          <span class="perc-yours">£55K equity · Homeowner</span>
+          <span class="perc-rank">Top ~25% by age</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px;">Only ~35–38% of under-35s own a home. Average FTB age is now 33–34.</div>
+      </div>
+
+      <div class="perc-item">
+        <div class="perc-label">Retirement readiness score vs target</div>
+        <div class="perc-bar-track">
+          <div class="perc-bar-fill" style="width:67%; background: linear-gradient(90deg, var(--gold-light), var(--teal));"></div>
+        </div>
+        <div class="perc-values">
+          <span class="perc-yours">On track in base case</span>
+          <span class="perc-rank" style="color:var(--teal)">✓ Target reachable</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px;">£1.5M by 55 is achievable in base + bull scenarios without increasing contributions</div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- ══════════════════════════════ TRANSACTIONS ══════════════════════════════ -->
-<div class="tab-panel" id="tab-transactions">
+  <!-- PROJECTION CHART -->
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">Invested Portfolio Projection — Age 28 to 60</div>
+    <div class="section-rule"></div>
+  </div>
 
-  <div class="sec-hdr">
+  <div class="chart-section">
+    <div class="chart-controls">
+      <div class="chart-legend">
+        <div class="leg-item"><div class="leg-line" style="background:var(--teal); height:3px;"></div>Bull (8% real)</div>
+        <div class="leg-item"><div class="leg-line" style="background:var(--gold);"></div>Base (5% real)</div>
+        <div class="leg-item"><div class="leg-line" style="background:var(--red);"></div>Bear (2% real)</div>
+        <div class="leg-item"><div class="leg-line" style="background:var(--ink); height:1px; border-top: 2px dashed var(--ink);"></div>£1.5M Target</div>
+      </div>
+    </div>
+    <canvas id="projChart" height="360"></canvas>
+    <div class="chart-note">
+      Invested assets only (SIPP + Work Pension + ISA). Assumes mid-range contributions of £650 work pension + £100 SIPP + £400 ISA = £1,150/mo. Starting balance: £83,100. 
+      State Pension not included — modelled separately. Property equity excluded from this projection. 5% real return = approximately 7–8% nominal minus 2.5–3% inflation.
+    </div>
+  </div>
+
+  <!-- SCENARIO CARDS -->
+  <div class="scenario-cards">
+    <div class="sc-card bull">
+      <div class="sc-header">
+        <div>
+          <div class="sc-name">Bull Scenario</div>
+          <div class="sc-return">8%</div>
+          <div class="sc-label">real annual return</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--teal);text-align:right;">≈ Strong decade<br>above avg. growth</div>
+      </div>
+      <div class="sc-at55" style="color:var(--teal)">£2,310,000</div>
+      <div class="sc-label">Invested portfolio at age 55</div>
+      <div class="sc-sub" style="margin-top:10px;">
+        Exceeds your £1.5M target by <strong style="color:var(--teal)">£810,000</strong>. You could retire earlier (age 51–52) or retire at 55 with significant buffer. ISA bridge fully funded. Property likely paid off, adding further security.<br><br>
+        <strong>Probability: ~25–30%</strong> based on historical FTSE Global All Cap data.
+      </div>
+    </div>
+
+    <div class="sc-card base">
+      <div class="sc-header">
+        <div>
+          <div class="sc-name">Base Scenario</div>
+          <div class="sc-return">5%</div>
+          <div class="sc-label">real annual return</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--gold);text-align:right;">≈ Long-run global<br>equity average</div>
+      </div>
+      <div class="sc-at55" style="color:var(--gold)">£1,530,000</div>
+      <div class="sc-label">Invested portfolio at age 55</div>
+      <div class="sc-sub" style="margin-top:10px;">
+        Hits your £1.5M target almost exactly at 55. You retire on plan. ISA bridge provides income from 55–68. State Pension supplements from 68. Ongoing contributions without a raise are sufficient.<br><br>
+        <strong>Probability: ~45–50%</strong> — most likely outcome range.
+      </div>
+    </div>
+
+    <div class="sc-card bear">
+      <div class="sc-header">
+        <div>
+          <div class="sc-name">Bear Scenario</div>
+          <div class="sc-return">2%</div>
+          <div class="sc-label">real annual return</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--red);text-align:right;">≈ Persistent low<br>growth / inflation</div>
+      </div>
+      <div class="sc-at55" style="color:var(--red)">£780,000</div>
+      <div class="sc-label">Invested portfolio at age 55</div>
+      <div class="sc-sub" style="margin-top:10px;">
+        Falls short of £1.5M by £720,000. Retirement at 55 would require reducing withdrawals significantly or delaying to age 59–60. Increasing contributions by ~£300–500/mo from age 35 would close most of this gap.<br><br>
+        <strong>Probability: ~20–25%</strong> — requires extended global stagnation.
+      </div>
+    </div>
+  </div>
+
+  <!-- MILESTONE TABLE -->
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">Age-by-Age Milestones — Invested Portfolio</div>
+    <div class="section-rule"></div>
+  </div>
+
+  <table class="milestone-table">
+    <thead>
+      <tr>
+        <th>Age</th>
+        <th>Year</th>
+        <th>Bull (8%)</th>
+        <th>Base (5%)</th>
+        <th>Bear (2%)</th>
+        <th>Key Milestone</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="age-col">28</td><td>2025</td><td class="bull">£83,100</td><td class="base">£83,100</td><td class="bear">£83,100</td><td style="font-family:var(--mono);font-size:10px;color:var(--muted)">Starting point · Today</td></tr>
+      <tr><td class="age-col">30</td><td>2027</td><td class="bull">£115,000</td><td class="base">£107,000</td><td class="bear">£99,200</td><td style="font-family:var(--mono);font-size:10px;color:var(--muted)">First £100K milestone</td></tr>
+      <tr class="highlight-row"><td class="age-col">32</td><td>2029</td><td class="bull">£153,000</td><td class="base">£133,000</td><td class="bear">£116,000</td><td style="font-family:var(--mono);font-size:10px;"><span class="milestone-badge">MILESTONE</span> £100K invested</td></tr>
+      <tr><td class="age-col">35</td><td>2032</td><td class="bull">£224,000</td><td class="base">£176,000</td><td class="bear">£140,000</td><td style="font-family:var(--mono);font-size:10px;color:var(--muted)">Consider salary raise → ↑ contributions</td></tr>
+      <tr><td class="age-col">38</td><td>2035</td><td class="bull">£323,000</td><td class="base">£232,000</td><td class="bear">£166,000</td><td style="font-family:var(--mono);font-size:10px;color:var(--muted)">Review ISA bridge fund size</td></tr>
+      <tr class="highlight-row"><td class="age-col">40</td><td>2037</td><td class="bull">£398,000</td><td class="base">£274,000</td><td class="bear">£183,000</td><td style="font-family:var(--mono);font-size:10px;"><span class="milestone-badge">REVIEW</span> Mid-journey stress test</td></tr>
+      <tr><td class="age-col">43</td><td>2040</td><td class="bull">£543,000</td><td class="base">£350,000</td><td class="bear">£207,000</td><td style="font-family:var(--mono);font-size:10px;color:var(--muted)">Compounding accelerates sharply</td></tr>
+      <tr><td class="age-col">45</td><td>2042</td><td class="bull">£661,000</td><td class="base">£409,000</td><td class="bear">£220,000</td><td style="font-family:var(--mono);font-size:10px;color:var(--muted)">10 years from target — final planning phase</td></tr>
+      <tr class="highlight-row"><td class="age-col">50</td><td>2047</td><td class="bull">£1,050,000</td><td class="base">£587,000</td><td class="bear">£256,000</td><td style="font-family:var(--mono);font-size:10px;"><span class="milestone-badge">KEY</span> Go/no-go retirement decision point</td></tr>
+      <tr><td class="age-col">52</td><td>2049</td><td class="bull">£1,350,000</td><td class="base">£683,000</td><td class="bear">£270,000</td><td style="font-family:var(--mono);font-size:10px;color:var(--muted)">Bull: could retire 3 years early</td></tr>
+      <tr class="highlight-row"><td class="age-col">55</td><td>2052</td><td class="bull">£2,310,000</td><td class="base">£1,530,000</td><td class="bear">£780,000</td><td style="font-family:var(--mono);font-size:10px;"><span class="milestone-badge" style="background:var(--teal)">TARGET</span> Retirement date</td></tr>
+      <tr><td class="age-col">58</td><td>2055</td><td class="bull">—</td><td class="base">£1,680,000</td><td class="bear">£960,000</td><td style="font-family:var(--mono);font-size:10px;color:var(--muted)">Bear: realistic delayed retirement date</td></tr>
+      <tr><td class="age-col">60</td><td>2057</td><td class="bull">—</td><td class="base">£1,820,000</td><td class="bear">£1,060,000</td><td style="font-family:var(--mono);font-size:10px;color:var(--muted)">Bear: comfortably past target with delay</td></tr>
+    </tbody>
+  </table>
+
+  <!-- GAP ANALYSIS -->
+  <div class="gap-box">
     <div>
-      <div class="sec-title">Transactions</div>
-      <div class="sec-sub" id="tx-summary"></div>
+      <h3>The Gap to £1.5M</h3>
+      <p>You need your invested portfolio to grow from <strong>£83,100 to £1,500,000</strong> in 27 years. That's a <strong>18x increase</strong>. With £1,150/mo contributions and a 5% real return, you get there. Here's what the numbers actually require:</p>
     </div>
-    <button class="btn btn-g" onclick="openM('tx')">+ Add Transaction</button>
-  </div>
-
-  <div class="filter-row">
-    <select class="fsel" id="f-month" onchange="renderTx()"><option value="">All Months</option></select>
-    <select class="fsel" id="f-type" onchange="renderTx()">
-      <option value="">All Types</option>
-      <option value="income">Income</option>
-      <option value="expense">Expense</option>
-    </select>
-    <select class="fsel" id="f-cat" onchange="renderTx()"><option value="">All Categories</option></select>
-  </div>
-
-  <div class="g2">
-    <div class="card">
-      <div class="card-title">All Transactions</div>
-      <div id="tx-list"><div class="empty"><div class="empty-ico">💳</div>No transactions yet</div></div>
-    </div>
-    <div class="card">
-      <div class="card-title">Spending by Category</div>
-      <div class="ch-wrap ch-300"><canvas id="ch-txdonut"></canvas></div>
-    </div>
-  </div>
-</div>
-
-</main>
-
-<!-- ═══════════════════════════════ MODALS ═══════════════════════════════════ -->
-
-<!-- Asset -->
-<div class="modal-wrap" id="m-asset">
-  <div class="modal">
-    <div class="modal-title" id="asset-title">Add Asset</div>
-    <input type="hidden" id="asset-id">
-    <div class="fg"><label class="fl">Name</label><input class="fi" type="text" id="asset-name" placeholder="e.g. Savings Account, Stocks ISA"></div>
-    <div class="fr">
-      <div class="fg"><label class="fl">Category</label>
-        <select class="fs" id="asset-cat">
-          <option value="Cash">Cash &amp; Savings</option>
-          <option value="Investments">Investments</option>
-          <option value="Property">Property</option>
-          <option value="Crypto">Crypto</option>
-          <option value="Vehicle">Vehicle</option>
-          <option value="Other">Other</option>
-        </select>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      <div class="gap-stat">
+        <div class="gap-stat-val">£1,416,900</div>
+        <div class="gap-stat-label">Growth needed from today</div>
       </div>
-      <div class="fg"><label class="fl">Current Value (£)</label><input class="fi" type="number" id="asset-val" placeholder="0.00" min="0" step="0.01"></div>
-    </div>
-    <div class="fg"><label class="fl">Note (optional)</label><input class="fi" type="text" id="asset-note" placeholder="e.g. Barclays, 3.5% interest"></div>
-    <div class="fa">
-      <button class="btn btn-o" onclick="closeM('asset')">Cancel</button>
-      <button class="btn btn-g" onclick="saveAsset()">Save Asset</button>
-    </div>
-  </div>
-</div>
-
-<!-- Liability -->
-<div class="modal-wrap" id="m-liab">
-  <div class="modal">
-    <div class="modal-title" id="liab-title">Add Liability</div>
-    <input type="hidden" id="liab-id">
-    <div class="fg"><label class="fl">Name</label><input class="fi" type="text" id="liab-name" placeholder="e.g. Mortgage, Car Finance"></div>
-    <div class="fr">
-      <div class="fg"><label class="fl">Category</label>
-        <select class="fs" id="liab-cat">
-          <option value="Mortgage">Mortgage</option>
-          <option value="Car Loan">Car Loan</option>
-          <option value="Student Loan">Student Loan</option>
-          <option value="Credit Card">Credit Card</option>
-          <option value="Personal Loan">Personal Loan</option>
-          <option value="Other">Other</option>
-        </select>
+      <div class="gap-stat">
+        <div class="gap-stat-val">£374,400</div>
+        <div class="gap-stat-label">Total new contributions (27 yrs)</div>
       </div>
-      <div class="fg"><label class="fl">Amount Owed (£)</label><input class="fi" type="number" id="liab-val" placeholder="0.00" min="0" step="0.01"></div>
-    </div>
-    <div class="fg"><label class="fl">Note (optional)</label><input class="fi" type="text" id="liab-note" placeholder="e.g. 3.5% fixed, ends 2027"></div>
-    <div class="fa">
-      <button class="btn btn-o" onclick="closeM('liab')">Cancel</button>
-      <button class="btn btn-g" onclick="saveLiab()">Save</button>
-    </div>
-  </div>
-</div>
-
-<!-- Income Source -->
-<div class="modal-wrap" id="m-income">
-  <div class="modal">
-    <div class="modal-title" id="income-title">Add Income Source</div>
-    <input type="hidden" id="inc-id">
-    <div class="fg"><label class="fl">Source Name</label><input class="fi" type="text" id="inc-name" placeholder="e.g. Salary, Freelance, Dividends"></div>
-    <div class="fr">
-      <div class="fg"><label class="fl">Monthly Amount (£)</label><input class="fi" type="number" id="inc-amt" placeholder="0.00" min="0" step="0.01"></div>
-      <div class="fg"><label class="fl">Type</label>
-        <select class="fs" id="inc-type">
-          <option value="employment">Employment</option>
-          <option value="freelance">Freelance</option>
-          <option value="investment">Investment</option>
-          <option value="rental">Rental</option>
-          <option value="other">Other</option>
-        </select>
+      <div class="gap-stat">
+        <div class="gap-stat-val">£1,042,500</div>
+        <div class="gap-stat-label">Must come from investment returns</div>
+      </div>
+      <div class="gap-stat">
+        <div class="gap-stat-val">5.0%</div>
+        <div class="gap-stat-label">Minimum real return required</div>
       </div>
     </div>
-    <div class="fa">
-      <button class="btn btn-o" onclick="closeM('income')">Cancel</button>
-      <button class="btn btn-g" onclick="saveInc()">Save</button>
+  </div>
+
+  <!-- KEY INSIGHTS -->
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">What the Numbers Are Telling You</div>
+    <div class="section-rule"></div>
+  </div>
+
+  <div class="insights-grid">
+    <div class="insight positive">
+      <div class="insight-icon">🚀</div>
+      <div class="insight-title">You Are Extraordinary for Your Age</div>
+      <div class="insight-body">At 28, £73,100 in pensions puts you in the <strong>top 5–8% of UK savers your age</strong>. The average 28-year-old has £8–12K in a pension. You are 6x ahead of the median. This matters enormously because of compounding — a 27-year runway means your current pot will roughly <strong>4x on its own at 5% real returns before you add another penny.</strong></div>
+    </div>
+    <div class="insight positive">
+      <div class="insight-icon">🏠</div>
+      <div class="insight-title">Property Is a Hidden Asset</div>
+      <div class="insight-body">Owning at 28 with £55K equity puts you ahead of ~75% of your peers. By retirement at 55, assuming modest 2% real house price growth, your home could be worth <strong>£650–700K with the mortgage paid off</strong>. This gives you an asset you can downsize from to supplement retirement income if needed — a meaningful backstop the projection doesn't even count.</div>
+    </div>
+    <div class="insight warn">
+      <div class="insight-icon">⚡</div>
+      <div class="insight-title">Your SIPP vs Work Pension Split Needs Attention</div>
+      <div class="insight-body">You're putting £650/mo into work pension and £100/mo into personal SIPP. Check whether your <strong>employer matches contributions above the minimum</strong> — if they do, it's almost always worth maximising matched contributions first. Every £1 of employer match is a 100% instant return. Also verify your work pension fund — if it's a default fund, it may be in a lifestyling strategy that de-risks too early for a 55-target retirement.</div>
+    </div>
+    <div class="insight warn">
+      <div class="insight-icon">🌉</div>
+      <div class="insight-title">The ISA Bridge Needs to Be Much Bigger</div>
+      <div class="insight-body">Your ISA (£10K + £400/mo) is designed to cover you from age 55–68 (13 years) before State Pension. At your planned retirement spend of £4,000/mo, you need <strong>£624,000 in accessible, non-pension assets</strong> for that bridge period. By 55 at £400/mo + 5% real growth, your ISA reaches approximately <strong>£230,000</strong> — a significant shortfall. You'll need to draw some pension too (from age 57) or increase ISA contributions significantly after the mortgage is paid off.</div>
+    </div>
+    <div class="insight action">
+      <div class="insight-icon">📈</div>
+      <div class="insight-title">Every £100/mo Extra Is Worth £100K+ at 55</div>
+      <div class="insight-body">Due to compounding, an extra <strong>£100/mo invested from today at 5% real</strong> grows to approximately <strong>£62,000 by age 55</strong>. Every pay rise, bonus, or reduction in expenses you can funnel into investing now has an outsized impact. Even going from £1,150 to £1,500/mo total contributions increases your base-case retirement pot by <strong>~£220,000</strong>.</div>
+    </div>
+    <div class="insight action">
+      <div class="insight-icon">🎯</div>
+      <div class="insight-title">The Critical Decade: Age 40–50</div>
+      <div class="insight-body">Your pot's most powerful compounding phase is roughly age 40–55. At 40, even the base-case shows ~£274K invested. That sum, untouched for 15 years at 5% real, becomes <strong>£570K on its own</strong>. This means career decisions in your 30s (promotions, salary growth, staying invested through volatility) disproportionately determine your retirement date. <strong>Don't derail the compounding in this phase.</strong></div>
     </div>
   </div>
+
+</div><!-- /main -->
+
+<div class="disclaimer">
+  ⚠ All projections are modelled estimates based on assumed real rates of return and are for illustrative purposes only. Actual investment returns will differ from projections. Past performance of the FTSE Global All Cap or any other index does not guarantee future returns. UK percentile comparisons are derived from ONS Wealth & Assets Survey data, PLSA, PensionBee, and MoneyHelper published benchmarks — these are estimates and may not reflect your specific region or income cohort. This analysis does not constitute regulated financial advice. Tax treatment depends on individual circumstances and is subject to change. Pension access age is currently 57 from 2028 (previously 55) — confirm current rules with an IFA before planning early drawdown. You should seek advice from an FCA-authorised independent financial adviser before making investment decisions.
 </div>
 
-<!-- Budget Category -->
-<div class="modal-wrap" id="m-bcat">
-  <div class="modal">
-    <div class="modal-title" id="bcat-title">Add Budget Category</div>
-    <input type="hidden" id="bcat-id">
-    <div class="fg"><label class="fl">Category Name</label><input class="fi" type="text" id="bcat-name" placeholder="e.g. Groceries, Rent, Entertainment"></div>
-    <div class="fr">
-      <div class="fg"><label class="fl">Monthly Budget (£)</label><input class="fi" type="number" id="bcat-amt" placeholder="0.00" min="0" step="0.01"></div>
-      <div class="fg"><label class="fl">Colour</label><input class="fi" type="color" id="bcat-color" value="#c5a235" style="height:44px;padding:4px;cursor:pointer;"></div>
-    </div>
-    <div class="fa">
-      <button class="btn btn-o" onclick="closeM('bcat')">Cancel</button>
-      <button class="btn btn-g" onclick="saveBcat()">Save Category</button>
-    </div>
-  </div>
-</div>
-
-<!-- Transaction -->
-<div class="modal-wrap" id="m-tx">
-  <div class="modal">
-    <div class="modal-title" id="tx-title">Add Transaction</div>
-    <input type="hidden" id="tx-id">
-    <div class="fg"><label class="fl">Description</label><input class="fi" type="text" id="tx-desc" placeholder="What was this for?"></div>
-    <div class="fr">
-      <div class="fg"><label class="fl">Type</label>
-        <select class="fs" id="tx-type" onchange="refreshTxCats()">
-          <option value="expense">Expense</option>
-          <option value="income">Income</option>
-        </select>
-      </div>
-      <div class="fg"><label class="fl">Amount (£)</label><input class="fi" type="number" id="tx-amt" placeholder="0.00" min="0" step="0.01"></div>
-    </div>
-    <div class="fr">
-      <div class="fg"><label class="fl">Category</label><select class="fs" id="tx-cat"></select></div>
-      <div class="fg"><label class="fl">Date</label><input class="fi" type="date" id="tx-date"></div>
-    </div>
-    <div class="fa">
-      <button class="btn btn-o" onclick="closeM('tx')">Cancel</button>
-      <button class="btn btn-g" onclick="saveTx()">Save</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
+</div><!-- /wrap -->
 
 <script>
-// ── DATA ──────────────────────────────────────────────────────────────────────
-const SK = 'mt_fin_v1';
-let DB = { assets:[], liabs:[], nwSnaps:[], txs:[], bcats:[], incs:[] };
-function dbLoad(){ try{ const s=localStorage.getItem(SK); if(s) DB=JSON.parse(s); }catch(e){} }
-function dbSave(){ localStorage.setItem(SK,JSON.stringify(DB)); }
-function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+(function() {
+  const canvas = document.getElementById('projChart');
+  if (!canvas) return;
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
-let budgetMonth = new Date().toISOString().slice(0,7);
-const CH = {};
+  function setup() {
+    const dpr = window.devicePixelRatio || 2;
+    const W = canvas.parentElement.clientWidth - 56;
+    const H = 360;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    draw(ctx, W, H);
+  }
 
-// ── BOOT ──────────────────────────────────────────────────────────────────────
-(function init(){
-  dbLoad();
-  document.getElementById('nav-date').textContent = new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long',year:'numeric'});
-  document.getElementById('tx-date').value = new Date().toISOString().slice(0,10);
-  renderAll();
-  document.querySelectorAll('.modal-wrap').forEach(el=>el.addEventListener('click',e=>{ if(e.target===el) el.classList.remove('open'); }));
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.modal-wrap.open').forEach(el=>el.classList.remove('open')); });
+  function draw(ctx, W, H) {
+    const padL = 72, padR = 40, padT = 20, padB = 48;
+    const cW = W - padL - padR;
+    const cH = H - padT - padB;
+
+    // Ages 28 to 60
+    const startAge = 28;
+    const endAge = 60;
+    const years = endAge - startAge;
+
+    const start = 83100;
+    const monthly = 1150;
+
+    function project(realReturn) {
+      const vals = [start];
+      let port = start;
+      for (let y = 1; y <= years; y++) {
+        port = port * (1 + realReturn / 100) + monthly * 12;
+        vals.push(Math.round(port));
+      }
+      return vals;
+    }
+
+    const bull = project(8);
+    const base = project(5);
+    const bear = project(2);
+
+    const maxV = bull[bull.length - 1];
+    const target = 1500000;
+
+    function xp(i) { return padL + (i / years) * cW; }
+    function yp(v) { return padT + cH - Math.min(v / maxV, 1) * cH; }
+
+    // Grid
+    const gridLines = [0, 500000, 1000000, 1500000, 2000000, 2500000];
+    ctx.font = '10px IBM Plex Mono, monospace';
+    ctx.fillStyle = '#8a8278';
+    ctx.textAlign = 'right';
+    gridLines.forEach(g => {
+      if (g > maxV * 1.05) return;
+      const y = yp(g);
+      ctx.strokeStyle = '#e2ddd5';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padL, y);
+      ctx.lineTo(padL + cW, y);
+      ctx.stroke();
+      const label = g >= 1000000 ? '£' + (g/1000000).toFixed(1) + 'M' : '£' + (g/1000).toFixed(0) + 'K';
+      ctx.fillText(label, padL - 8, y + 4);
+    });
+
+    // Age labels
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#8a8278';
+    for (let a = startAge; a <= endAge; a += 3) {
+      const i = a - startAge;
+      ctx.fillText(a, xp(i), H - padB + 18);
+    }
+
+    // Target line
+    const ty = yp(target);
+    ctx.strokeStyle = '#1a1714';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    ctx.moveTo(padL, ty);
+    ctx.lineTo(padL + cW, ty);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#1a1714';
+    ctx.textAlign = 'left';
+    ctx.font = 'bold 9px IBM Plex Mono, monospace';
+    ctx.fillText('£1.5M TARGET', padL + 8, ty - 5);
+
+    // Retirement age 55 vertical
+    const age55i = 55 - startAge;
+    ctx.strokeStyle = '#b8860b';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(xp(age55i), padT);
+    ctx.lineTo(xp(age55i), padT + cH);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#b8860b';
+    ctx.textAlign = 'center';
+    ctx.font = '9px IBM Plex Mono, monospace';
+    ctx.fillText('AGE 55', xp(age55i), padT + 10);
+
+    // Fill areas
+    function fillArea(data, color) {
+      ctx.beginPath();
+      ctx.moveTo(xp(0), yp(data[0]));
+      for (let i = 1; i < data.length; i++) ctx.lineTo(xp(i), yp(data[i]));
+      ctx.lineTo(xp(data.length - 1), padT + cH);
+      ctx.lineTo(xp(0), padT + cH);
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+    fillArea(bull, 'rgba(42,122,111,0.06)');
+    fillArea(base, 'rgba(184,134,11,0.06)');
+    fillArea(bear, 'rgba(192,57,43,0.06)');
+
+    // Draw lines
+    function drawLine(data, color, dash, width) {
+      ctx.beginPath();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width || 2.5;
+      if (dash) ctx.setLineDash(dash);
+      else ctx.setLineDash([]);
+      for (let i = 0; i < data.length; i++) {
+        const x = xp(i);
+        const y = yp(data[i]);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    drawLine(bull, '#2a7a6f', null, 3);
+    drawLine(base, '#b8860b', null, 2.5);
+    drawLine(bear, '#c0392b', null, 2);
+
+    // End value labels
+    const endData = [
+      { val: bull[bull.length-1], color: '#2a7a6f', label: '£' + (bull[bull.length-1]/1000000).toFixed(2) + 'M' },
+      { val: base[base.length-1], color: '#b8860b', label: '£' + (base[base.length-1]/1000000).toFixed(2) + 'M' },
+      { val: bear[bear.length-1], color: '#c0392b', label: '£' + (bear[bear.length-1]/1000000).toFixed(2) + 'M' },
+    ];
+    endData.forEach(d => {
+      ctx.fillStyle = d.color;
+      ctx.font = 'bold 10px IBM Plex Mono, monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(d.label, xp(years) + 4, yp(d.val) + 4);
+    });
+
+    // Dots at age 55
+    [bull, base, bear].forEach((data, i) => {
+      const colors = ['#2a7a6f', '#b8860b', '#c0392b'];
+      const v = data[age55i];
+      ctx.beginPath();
+      ctx.arc(xp(age55i), yp(v), 5, 0, Math.PI * 2);
+      ctx.fillStyle = colors[i];
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    });
+
+    // X axis
+    ctx.strokeStyle = '#e2ddd5';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padL, padT + cH);
+    ctx.lineTo(padL + cW, padT + cH);
+    ctx.stroke();
+  }
+
+  setup();
+  window.addEventListener('resize', setup);
 })();
-
-function renderAll(){ renderNW(); renderBudget(); renderTx(); }
-
-// ── TABS ──────────────────────────────────────────────────────────────────────
-function switchTab(id,btn){
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active');
-  btn.classList.add('active');
-}
-
-// ── NET WORTH ─────────────────────────────────────────────────────────────────
-const sumA  = ()=> DB.assets.reduce((s,a)=>s+ +a.val,0);
-const sumL  = ()=> DB.liabs.reduce((s,l)=>s+ +l.val,0);
-const nw    = ()=> sumA()-sumL();
-
-function renderNW(){
-  const a=sumA(), l=sumL(), n=nw();
-  const el=document.getElementById('hero-nw');
-  el.textContent=fmt(n);
-  el.className='nw-amount'+(n<0?' neg':'');
-  document.getElementById('hero-assets').textContent=fmt(a);
-  document.getElementById('hero-liab').textContent=fmt(l);
-  renderAssetsTable();
-  renderLiabTable();
-  renderNwChart();
-  renderAdonut();
-}
-
-function renderAssetsTable(){
-  const el=document.getElementById('assets-el');
-  if(!DB.assets.length){ el.innerHTML='<div class="empty"><div class="empty-ico">📦</div>No assets added yet — click "+ Add Asset" to start</div>'; return; }
-  el.innerHTML=`<table class="tbl">
-    <thead><tr><th>Name</th><th>Category</th><th style="text-align:right">Value</th><th></th></tr></thead>
-    <tbody>${DB.assets.map(a=>`<tr>
-      <td><div class="name">${esc(a.name)}</div>${a.note?`<div class="sub">${esc(a.note)}</div>`:''}</td>
-      <td><span class="badge ${abadge(a.cat)}">${esc(a.cat)}</span></td>
-      <td class="mono" style="text-align:right;color:var(--green)">${fmt(a.val)}</td>
-      <td><div style="display:flex;justify-content:flex-end">
-        <button class="btn-ico edit" onclick="editAsset('${a.id}')">✎</button>
-        <button class="btn-ico del" onclick="delAsset('${a.id}')">✕</button>
-      </div></td>
-    </tr>`).join('')}</tbody>
-    <tfoot><tr><td colspan="2">Total Assets</td><td class="mono" style="text-align:right;color:var(--green)">${fmt(sumA())}</td><td></td></tr></tfoot>
-  </table>`;
-}
-
-function renderLiabTable(){
-  const el=document.getElementById('liab-el');
-  if(!DB.liabs.length){ el.innerHTML='<div class="empty"><div class="empty-ico">✅</div>No liabilities — excellent!</div>'; return; }
-  el.innerHTML=`<table class="tbl">
-    <thead><tr><th>Name</th><th>Category</th><th style="text-align:right">Owed</th><th></th></tr></thead>
-    <tbody>${DB.liabs.map(l=>`<tr>
-      <td><div class="name">${esc(l.name)}</div>${l.note?`<div class="sub">${esc(l.note)}</div>`:''}</td>
-      <td><span class="badge ${lbadge(l.cat)}">${esc(l.cat)}</span></td>
-      <td class="mono" style="text-align:right;color:var(--red)">${fmt(l.val)}</td>
-      <td><div style="display:flex;justify-content:flex-end">
-        <button class="btn-ico edit" onclick="editLiab('${l.id}')">✎</button>
-        <button class="btn-ico del" onclick="delLiab('${l.id}')">✕</button>
-      </div></td>
-    </tr>`).join('')}</tbody>
-    <tfoot><tr><td colspan="2">Total Liabilities</td><td class="mono" style="text-align:right;color:var(--red)">${fmt(sumL())}</td><td></td></tr></tfoot>
-  </table>`;
-}
-
-function takeSnap(){
-  const today=new Date().toDateString();
-  DB.nwSnaps=DB.nwSnaps.filter(s=>new Date(s.ts).toDateString()!==today);
-  DB.nwSnaps.push({ts:Date.now(),date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),nw:nw(),a:sumA(),l:sumL()});
-  DB.nwSnaps.sort((a,b)=>a.ts-b.ts);
-  dbSave(); renderNwChart(); toast('Net worth snapshot saved');
-}
-
-function renderNwChart(){
-  const ctx=document.getElementById('ch-nw').getContext('2d');
-  if(CH.nw) CH.nw.destroy();
-  const hist=[...DB.nwSnaps];
-  const todayStr=new Date().toDateString();
-  if(!hist.length||new Date(hist[hist.length-1].ts).toDateString()!==todayStr)
-    hist.push({ts:Date.now(),date:'Now',nw:nw(),a:sumA(),l:sumL()});
-  CH.nw=new Chart(ctx,{
-    type:'line',
-    data:{labels:hist.map(h=>h.date),datasets:[
-      {label:'Net Worth',data:hist.map(h=>h.nw),borderColor:'#c5a235',backgroundColor:'rgba(197,162,53,.08)',fill:true,tension:.35,pointBackgroundColor:'#c5a235',pointRadius:4},
-      {label:'Assets',   data:hist.map(h=>h.a), borderColor:'#228747',backgroundColor:'transparent',tension:.35,borderDash:[4,4],pointRadius:3},
-      {label:'Liabilities',data:hist.map(h=>h.l),borderColor:'#c12d2d',backgroundColor:'transparent',tension:.35,borderDash:[4,4],pointRadius:3},
-    ]},
-    options:lineOpts()
-  });
-}
-
-function renderAdonut(){
-  const ctx=document.getElementById('ch-adonut').getContext('2d');
-  if(CH.adonut) CH.adonut.destroy();
-  if(!DB.assets.length){
-    CH.adonut=new Chart(ctx,{type:'doughnut',data:{labels:['No data'],datasets:[{data:[1],backgroundColor:['rgba(247,245,237,.07)'],borderWidth:0}]},options:donutOpts()});
-    return;
-  }
-  const cats={},cols={Cash:'#228747',Investments:'#5b8fe0',Property:'#c5a235',Crypto:'#b87de8',Vehicle:'#d28811',Other:'#9a948a'};
-  DB.assets.forEach(a=>cats[a.cat]=(cats[a.cat]||0)+ +a.val);
-  const lb=Object.keys(cats);
-  CH.adonut=new Chart(ctx,{type:'doughnut',data:{labels:lb,datasets:[{data:lb.map(l=>cats[l]),backgroundColor:lb.map(l=>cols[l]||'#888'),borderWidth:2,borderColor:'#14140f'}]},options:donutOpts()});
-}
-
-// ── BUDGET ────────────────────────────────────────────────────────────────────
-function chMonth(d){
-  const[y,m]=budgetMonth.split('-').map(Number);
-  const dt=new Date(y,m-1+d,1);
-  budgetMonth=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
-  renderBudget();
-}
-const mIncome  = ()=> DB.incs.reduce((s,i)=>s+ +i.amt,0);
-const spentCat = id=> DB.txs.filter(t=>t.type==='expense'&&t.cat===id&&(t.date||'').slice(0,7)===budgetMonth).reduce((s,t)=>s+ +t.amt,0);
-const budgCat  = id=> +(DB.bcats.find(c=>c.id===id)?.amt||0);
-
-function renderBudget(){
-  const[y,m]=budgetMonth.split('-').map(Number);
-  document.getElementById('month-disp').textContent=new Date(y,m-1).toLocaleDateString('en-GB',{month:'long',year:'numeric'});
-  const inc=mIncome(), budgd=DB.bcats.reduce((s,c)=>s+budgCat(c.id),0), spnt=DB.bcats.reduce((s,c)=>s+spentCat(c.id),0), rem=inc-spnt;
-  document.getElementById('s-income').textContent=fmt(inc);
-  document.getElementById('s-budgeted').textContent=fmt(budgd);
-  document.getElementById('s-spent').textContent=fmt(spnt);
-  const remEl=document.getElementById('s-rem');
-  remEl.textContent=fmt(rem); remEl.className='stat-val '+(rem>=0?'g':'r');
-  renderBcats(); renderBbar(); renderIncs();
-}
-
-function renderBcats(){
-  const el=document.getElementById('bcats-el');
-  if(!DB.bcats.length){ el.innerHTML='<div class="empty"><div class="empty-ico">🗂️</div>Add categories to track spending</div>'; return; }
-  el.innerHTML=DB.bcats.map(cat=>{
-    const b=budgCat(cat.id),s=spentCat(cat.id),pct=b>0?Math.min(100,(s/b)*100):0,over=s>b&&b>0;
-    return `<div class="brow">
-      <div class="brow-top">
-        <div class="brow-name"><div class="dot" style="background:${cat.color}"></div>${esc(cat.name)}${over?'<span style="font-size:10px;color:var(--red);background:rgba(193,45,45,.1);padding:2px 6px">OVER</span>':''}</div>
-        <div class="brow-right">
-          <div class="brow-amts"><span class="${over?'brow-over':'brow-spent'}">${fmt(s)}</span><span> / ${fmt(b)}</span></div>
-          <button class="btn-ico edit" onclick="editBcat('${cat.id}')">✎</button>
-          <button class="btn-ico del" onclick="delBcat('${cat.id}')">✕</button>
-        </div>
-      </div>
-      <div class="prog-wrap"><div class="prog-fill" style="width:${pct}%;background:${over?'#c12d2d':cat.color}"></div></div>
-      <div class="brow-pct">${b>0?Math.round(pct)+'% used'+(!over?' · '+fmt(b-s)+' left':''):'No budget set'}</div>
-    </div>`;
-  }).join('');
-}
-
-function renderIncs(){
-  const el=document.getElementById('incsrc-el');
-  const icons={employment:'💼',freelance:'💻',investment:'📈',rental:'🏠',other:'💰'};
-  if(!DB.incs.length){ el.innerHTML='<div class="empty" style="padding:20px">No income sources added</div>'; return; }
-  el.innerHTML=DB.incs.map(s=>`<div class="inc-item">
-    <div class="inc-icon">${icons[s.type]||'💰'}</div>
-    <div class="inc-info"><div class="inc-name">${esc(s.name)}</div><div class="inc-type">${s.type} · monthly</div></div>
-    <div style="display:flex;align-items:center;gap:6px">
-      <div class="inc-amt">${fmt(s.amt)}</div>
-      <button class="btn-ico edit" onclick="editInc('${s.id}')">✎</button>
-      <button class="btn-ico del" onclick="delInc('${s.id}')">✕</button>
-    </div>
-  </div>`).join('');
-}
-
-function renderBbar(){
-  const ctx=document.getElementById('ch-bbar').getContext('2d');
-  if(CH.bbar) CH.bbar.destroy();
-  if(!DB.bcats.length){
-    CH.bbar=new Chart(ctx,{type:'bar',data:{labels:['No data'],datasets:[{data:[0],backgroundColor:'rgba(247,245,237,.05)'}]},options:barOpts()});
-    return;
-  }
-  const lb=DB.bcats.map(c=>c.name),b=DB.bcats.map(c=>budgCat(c.id)),s=DB.bcats.map(c=>spentCat(c.id));
-  CH.bbar=new Chart(ctx,{type:'bar',data:{labels:lb,datasets:[
-    {label:'Budgeted',data:b,backgroundColor:'rgba(197,162,53,.25)',borderColor:'#c5a235',borderWidth:1,borderRadius:2},
-    {label:'Spent',data:s,backgroundColor:s.map((sv,i)=>sv>b[i]?'rgba(193,45,45,.7)':'rgba(34,135,71,.6)'),borderWidth:0,borderRadius:2},
-  ]},options:barOpts()});
-}
-
-// ── TRANSACTIONS ───────────────────────────────────────────────────────────────
-function renderTx(){
-  syncFilters();
-  const fm=document.getElementById('f-month').value,ft=document.getElementById('f-type').value,fc=document.getElementById('f-cat').value;
-  let txs=[...DB.txs].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  if(fm) txs=txs.filter(t=>(t.date||'').slice(0,7)===fm);
-  if(ft) txs=txs.filter(t=>t.type===ft);
-  if(fc) txs=txs.filter(t=>t.cat===fc);
-  const inc=txs.filter(t=>t.type==='income').reduce((s,t)=>s+ +t.amt,0),exp=txs.filter(t=>t.type==='expense').reduce((s,t)=>s+ +t.amt,0);
-  document.getElementById('tx-summary').textContent=`${txs.length} transaction${txs.length!==1?'s':''} · Income: ${fmt(inc)} · Expenses: ${fmt(exp)}`;
-  const cmap=Object.fromEntries(DB.bcats.map(c=>[c.id,c]));
-  const listEl=document.getElementById('tx-list');
-  if(!txs.length){ listEl.innerHTML='<div class="empty"><div class="empty-ico">💳</div>No transactions found</div>'; }
-  else {
-    listEl.innerHTML=txs.slice(0,60).map(t=>{
-      const cat=cmap[t.cat],col=cat?.color||(t.type==='income'?'#228747':'#9a948a'),label=(cat?.name||(t.type==='income'?'Income':'Other')),abbr=label.slice(0,2).toUpperCase();
-      return `<div class="tx-item">
-        <div class="tx-icon" style="background:${col}22;color:${col}">${abbr}</div>
-        <div class="tx-info">
-          <div class="tx-desc">${esc(t.desc)}</div>
-          <div class="tx-meta">${t.date?fmtDate(t.date):''}${cat?' · '+cat.name:''}</div>
-        </div>
-        <div class="tx-right">
-          <div class="tx-amt ${t.type==='income'?'inc':'exp'}">${t.type==='income'?'+':'-'}${fmt(t.amt)}</div>
-          <button class="btn-ico edit" onclick="editTx('${t.id}')">✎</button>
-          <button class="btn-ico del" onclick="delTx('${t.id}')">✕</button>
-        </div>
-      </div>`;
-    }).join('');
-  }
-  renderTxDonut(txs.filter(t=>t.type==='expense'));
-}
-
-function syncFilters(){
-  const months=[...new Set(DB.txs.map(t=>(t.date||'').slice(0,7)).filter(Boolean))].sort().reverse();
-  const mEl=document.getElementById('f-month'),mv=mEl.value;
-  mEl.innerHTML='<option value="">All Months</option>'+months.map(m=>{const[y,mo]=m.split('-').map(Number);return`<option value="${m}"${m===mv?' selected':''}>${new Date(y,mo-1).toLocaleDateString('en-GB',{month:'long',year:'numeric'})}</option>`;}).join('');
-  const cEl=document.getElementById('f-cat'),cv=cEl.value;
-  cEl.innerHTML='<option value="">All Categories</option>'+DB.bcats.map(c=>`<option value="${c.id}"${c.id===cv?' selected':''}>${esc(c.name)}</option>`).join('');
-}
-
-function renderTxDonut(expenses){
-  const ctx=document.getElementById('ch-txdonut').getContext('2d');
-  if(CH.txd) CH.txd.destroy();
-  if(!expenses.length){
-    CH.txd=new Chart(ctx,{type:'doughnut',data:{labels:['No data'],datasets:[{data:[1],backgroundColor:['rgba(247,245,237,.07)'],borderWidth:0}]},options:donutOpts()});
-    return;
-  }
-  const cmap=Object.fromEntries(DB.bcats.map(c=>[c.id,c])),cats={},colors={};
-  expenses.forEach(t=>{const c=cmap[t.cat],n=c?.name||'Uncategorised',col=c?.color||'#9a948a';cats[n]=(cats[n]||0)+ +t.amt;colors[n]=col;});
-  const lb=Object.keys(cats);
-  CH.txd=new Chart(ctx,{type:'doughnut',data:{labels:lb,datasets:[{data:lb.map(l=>cats[l]),backgroundColor:lb.map(l=>colors[l]),borderWidth:2,borderColor:'#14140f'}]},options:donutOpts()});
-}
-
-// ── MODALS ────────────────────────────────────────────────────────────────────
-function openM(type){
-  if(type==='asset'){document.getElementById('asset-id').value='';document.getElementById('asset-title').textContent='Add Asset';document.getElementById('asset-name').value='';document.getElementById('asset-val').value='';document.getElementById('asset-note').value='';document.getElementById('asset-cat').value='Cash';}
-  if(type==='liab'){document.getElementById('liab-id').value='';document.getElementById('liab-title').textContent='Add Liability';document.getElementById('liab-name').value='';document.getElementById('liab-val').value='';document.getElementById('liab-note').value='';document.getElementById('liab-cat').value='Mortgage';}
-  if(type==='income'){document.getElementById('inc-id').value='';document.getElementById('income-title').textContent='Add Income Source';document.getElementById('inc-name').value='';document.getElementById('inc-amt').value='';document.getElementById('inc-type').value='employment';}
-  if(type==='bcat'){document.getElementById('bcat-id').value='';document.getElementById('bcat-title').textContent='Add Budget Category';document.getElementById('bcat-name').value='';document.getElementById('bcat-amt').value='';document.getElementById('bcat-color').value='#c5a235';}
-  if(type==='tx'){document.getElementById('tx-id').value='';document.getElementById('tx-title').textContent='Add Transaction';document.getElementById('tx-desc').value='';document.getElementById('tx-type').value='expense';document.getElementById('tx-amt').value='';document.getElementById('tx-date').value=new Date().toISOString().slice(0,10);refreshTxCats();}
-  document.getElementById('m-'+type).classList.add('open');
-}
-function closeM(type){ document.getElementById('m-'+type).classList.remove('open'); }
-
-// ── CRUD: ASSETS ──────────────────────────────────────────────────────────────
-function saveAsset(){
-  const id=document.getElementById('asset-id').value,name=document.getElementById('asset-name').value.trim(),val=parseFloat(document.getElementById('asset-val').value),cat=document.getElementById('asset-cat').value,note=document.getElementById('asset-note').value.trim();
-  if(!name||isNaN(val)){alert('Enter name and value');return;}
-  if(id){const i=DB.assets.findIndex(a=>a.id===id);if(i>=0)DB.assets[i]={...DB.assets[i],name,val,cat,note};}
-  else DB.assets.push({id:uid(),name,val,cat,note});
-  dbSave();closeM('asset');renderNW();toast(id?'Asset updated':'Asset added');
-}
-function editAsset(id){const a=DB.assets.find(a=>a.id===id);if(!a)return;document.getElementById('asset-id').value=a.id;document.getElementById('asset-title').textContent='Edit Asset';document.getElementById('asset-name').value=a.name;document.getElementById('asset-val').value=a.val;document.getElementById('asset-cat').value=a.cat;document.getElementById('asset-note').value=a.note||'';document.getElementById('m-asset').classList.add('open');}
-function delAsset(id){if(!confirm('Delete this asset?'))return;DB.assets=DB.assets.filter(a=>a.id!==id);dbSave();renderNW();toast('Asset deleted');}
-
-// ── CRUD: LIABILITIES ─────────────────────────────────────────────────────────
-function saveLiab(){
-  const id=document.getElementById('liab-id').value,name=document.getElementById('liab-name').value.trim(),val=parseFloat(document.getElementById('liab-val').value),cat=document.getElementById('liab-cat').value,note=document.getElementById('liab-note').value.trim();
-  if(!name||isNaN(val)){alert('Enter name and value');return;}
-  if(id){const i=DB.liabs.findIndex(l=>l.id===id);if(i>=0)DB.liabs[i]={...DB.liabs[i],name,val,cat,note};}
-  else DB.liabs.push({id:uid(),name,val,cat,note});
-  dbSave();closeM('liab');renderNW();toast(id?'Liability updated':'Liability added');
-}
-function editLiab(id){const l=DB.liabs.find(l=>l.id===id);if(!l)return;document.getElementById('liab-id').value=l.id;document.getElementById('liab-title').textContent='Edit Liability';document.getElementById('liab-name').value=l.name;document.getElementById('liab-val').value=l.val;document.getElementById('liab-cat').value=l.cat;document.getElementById('liab-note').value=l.note||'';document.getElementById('m-liab').classList.add('open');}
-function delLiab(id){if(!confirm('Delete this liability?'))return;DB.liabs=DB.liabs.filter(l=>l.id!==id);dbSave();renderNW();toast('Liability deleted');}
-
-// ── CRUD: INCOME ──────────────────────────────────────────────────────────────
-function saveInc(){
-  const id=document.getElementById('inc-id').value,name=document.getElementById('inc-name').value.trim(),amt=parseFloat(document.getElementById('inc-amt').value),type=document.getElementById('inc-type').value;
-  if(!name||isNaN(amt)){alert('Enter name and amount');return;}
-  if(id){const i=DB.incs.findIndex(s=>s.id===id);if(i>=0)DB.incs[i]={...DB.incs[i],name,amt,type};}
-  else DB.incs.push({id:uid(),name,amt,type});
-  dbSave();closeM('income');renderBudget();toast(id?'Income updated':'Income added');
-}
-function editInc(id){const s=DB.incs.find(s=>s.id===id);if(!s)return;document.getElementById('inc-id').value=s.id;document.getElementById('income-title').textContent='Edit Income Source';document.getElementById('inc-name').value=s.name;document.getElementById('inc-amt').value=s.amt;document.getElementById('inc-type').value=s.type;document.getElementById('m-income').classList.add('open');}
-function delInc(id){if(!confirm('Delete this income source?'))return;DB.incs=DB.incs.filter(s=>s.id!==id);dbSave();renderBudget();toast('Income source deleted');}
-
-// ── CRUD: BUDGET CATS ─────────────────────────────────────────────────────────
-function saveBcat(){
-  const id=document.getElementById('bcat-id').value,name=document.getElementById('bcat-name').value.trim(),amt=parseFloat(document.getElementById('bcat-amt').value),color=document.getElementById('bcat-color').value;
-  if(!name||isNaN(amt)){alert('Enter name and budget amount');return;}
-  if(id){const i=DB.bcats.findIndex(c=>c.id===id);if(i>=0)DB.bcats[i]={...DB.bcats[i],name,amt,color};}
-  else DB.bcats.push({id:uid(),name,amt,color});
-  dbSave();closeM('bcat');renderBudget();renderTx();toast(id?'Category updated':'Category added');
-}
-function editBcat(id){const c=DB.bcats.find(c=>c.id===id);if(!c)return;document.getElementById('bcat-id').value=c.id;document.getElementById('bcat-title').textContent='Edit Category';document.getElementById('bcat-name').value=c.name;document.getElementById('bcat-amt').value=c.amt;document.getElementById('bcat-color').value=c.color||'#c5a235';document.getElementById('m-bcat').classList.add('open');}
-function delBcat(id){if(!confirm('Delete category? Transactions will become uncategorised.'))return;DB.bcats=DB.bcats.filter(c=>c.id!==id);dbSave();renderBudget();renderTx();toast('Category deleted');}
-
-// ── CRUD: TRANSACTIONS ────────────────────────────────────────────────────────
-function refreshTxCats(){
-  const type=document.getElementById('tx-type').value,el=document.getElementById('tx-cat'),cur=el.value;
-  if(type==='expense') el.innerHTML='<option value="">Uncategorised</option>'+DB.bcats.map(c=>`<option value="${c.id}"${c.id===cur?' selected':''}>${esc(c.name)}</option>`).join('');
-  else el.innerHTML='<option value="income">General Income</option>'+DB.incs.map(s=>`<option value="${s.id}"${s.id===cur?' selected':''}>${esc(s.name)}</option>`).join('');
-}
-function saveTx(){
-  const id=document.getElementById('tx-id').value,desc=document.getElementById('tx-desc').value.trim(),type=document.getElementById('tx-type').value,amt=parseFloat(document.getElementById('tx-amt').value),cat=document.getElementById('tx-cat').value,date=document.getElementById('tx-date').value;
-  if(!desc||isNaN(amt)||!date){alert('Fill in description, amount and date');return;}
-  if(id){const i=DB.txs.findIndex(t=>t.id===id);if(i>=0)DB.txs[i]={...DB.txs[i],desc,type,amt,cat,date};}
-  else DB.txs.push({id:uid(),desc,type,amt,cat,date});
-  dbSave();closeM('tx');renderBudget();renderTx();toast(id?'Transaction updated':'Transaction added');
-}
-function editTx(id){const t=DB.txs.find(t=>t.id===id);if(!t)return;document.getElementById('tx-id').value=t.id;document.getElementById('tx-title').textContent='Edit Transaction';document.getElementById('tx-desc').value=t.desc;document.getElementById('tx-type').value=t.type;document.getElementById('tx-amt').value=t.amt;document.getElementById('tx-date').value=t.date;refreshTxCats();document.getElementById('tx-cat').value=t.cat;document.getElementById('m-tx').classList.add('open');}
-function delTx(id){if(!confirm('Delete this transaction?'))return;DB.txs=DB.txs.filter(t=>t.id!==id);dbSave();renderBudget();renderTx();toast('Transaction deleted');}
-
-// ── CHART HELPERS ─────────────────────────────────────────────────────────────
-function lineOpts(){return{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9a948a',font:{size:11,family:"'DM Sans',sans-serif"},boxWidth:12,padding:14}},tooltip:{backgroundColor:'#1c1c16',borderColor:'rgba(197,162,53,.35)',borderWidth:1,titleColor:'#f7f5ed',bodyColor:'#9a948a',callbacks:{label:ctx=>' '+fmt(ctx.raw)}}},scales:{x:{ticks:{color:'#9a948a',font:{size:10}},grid:{color:'rgba(247,245,237,.05)'},border:{display:false}},y:{ticks:{color:'#9a948a',font:{size:10},callback:v=>'£'+(Math.abs(v)>=1000?(v/1000).toFixed(0)+'k':v)},grid:{color:'rgba(247,245,237,.05)'},border:{display:false}}}};}
-function barOpts(){return{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9a948a',font:{size:11,family:"'DM Sans',sans-serif"},boxWidth:12,padding:14}},tooltip:{backgroundColor:'#1c1c16',borderColor:'rgba(197,162,53,.35)',borderWidth:1,titleColor:'#f7f5ed',bodyColor:'#9a948a',callbacks:{label:ctx=>' '+fmt(ctx.raw)}}},scales:{x:{ticks:{color:'#9a948a',font:{size:10},maxRotation:30},grid:{display:false},border:{display:false}},y:{ticks:{color:'#9a948a',font:{size:10},callback:v=>'£'+(v>=1000?(v/1000).toFixed(0)+'k':v)},grid:{color:'rgba(247,245,237,.05)'},border:{display:false}}}};}
-function donutOpts(){return{responsive:true,maintainAspectRatio:false,cutout:'64%',plugins:{legend:{position:'right',labels:{color:'#9a948a',font:{size:11,family:"'DM Sans',sans-serif"},boxWidth:10,padding:12,generateLabels(c){const d=c.data;return d.labels.map((lb,i)=>({text:`${lb}  ${fmt(d.datasets[0].data[i])}`,fillStyle:d.datasets[0].backgroundColor[i],strokeStyle:'transparent',index:i}));}}},tooltip:{backgroundColor:'#1c1c16',borderColor:'rgba(197,162,53,.35)',borderWidth:1,titleColor:'#f7f5ed',bodyColor:'#9a948a',callbacks:{label:ctx=>' '+fmt(ctx.raw)}}}};}
-
-// ── UTILS ─────────────────────────────────────────────────────────────────────
-function fmt(v){const n=parseFloat(v||0),a=Math.abs(n),s=a>=1e6?'£'+(a/1e6).toFixed(2)+'m':a>=1000?'£'+a.toLocaleString('en-GB',{maximumFractionDigits:0}):'£'+a.toFixed(2);return n<0?'-'+s:s;}
-function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function fmtDate(d){try{return new Date(d+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(e){return d;}}
-function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2600);}
-function abadge(c){return({Cash:'b-cash',Investments:'b-inv',Property:'b-prop',Crypto:'b-cry',Vehicle:'b-veh'}[c]||'b-other');}
-function lbadge(c){return({Mortgage:'b-mort','Car Loan':'b-loan','Student Loan':'b-loan','Personal Loan':'b-loan','Credit Card':'b-cc'}[c]||'b-other');}
 </script>
 </body>
 </html>
