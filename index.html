@@ -93,14 +93,23 @@ h1 { font-family: var(--serif); font-size: clamp(32px,5vw,56px); font-weight: 40
 
 /* NEWS */
 .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-bottom: 48px; }
-.news-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; text-decoration: none; display: block; }
-.news-card:hover { border-color: var(--gold); box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.news-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s; text-decoration: none; display: block; position: relative; z-index: 1; pointer-events: all; }
+.news-card:hover { border-color: var(--gold); box-shadow: 0 4px 20px rgba(0,0,0,0.1); transform: translateY(-1px); z-index: 10; }
 .news-source { font-family: var(--mono); font-size: 8px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
 .news-title { font-family: var(--display); font-size: 13px; font-weight: 700; color: var(--ink); line-height: 1.4; margin-bottom: 6px; }
 .news-desc { font-family: var(--mono); font-size: 10px; color: var(--muted); line-height: 1.5; margin-bottom: 8px; }
 .news-date { font-family: var(--mono); font-size: 9px; color: var(--muted); }
 .news-loading { font-family: var(--mono); font-size: 11px; color: var(--muted); padding: 20px 0; grid-column: 1 / -1; }
 .news-retry { color: var(--gold); cursor: pointer; text-decoration: underline; }
+/* Link preview tooltip */
+.news-tip { position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%) translateY(6px); width: 300px; background: var(--ink); border-radius: 12px; padding: 16px; z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.18s ease, transform 0.18s ease; box-shadow: 0 16px 48px rgba(0,0,0,0.4); }
+.news-card:hover .news-tip { opacity: 1; transform: translateX(-50%) translateY(0); }
+.news-tip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 7px solid transparent; border-top-color: var(--ink); }
+.ntp-src { font-family: var(--mono); font-size: 8px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold-light); margin-bottom: 6px; }
+.ntp-title { font-family: var(--display); font-size: 12px; font-weight: 700; color: #fff; line-height: 1.4; margin-bottom: 8px; }
+.ntp-desc { font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.55); line-height: 1.55; margin-bottom: 10px; }
+.ntp-url { font-family: var(--mono); font-size: 9px; color: rgba(255,255,255,0.25); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 8px; }
+.ntp-cta { font-family: var(--mono); font-size: 9px; color: var(--gold-light); margin-top: 6px; }
 
 /* SNAPSHOT */
 .snapshot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 12px; margin-bottom: 48px; }
@@ -494,8 +503,8 @@ const DEFAULTS = {
   wpMonthly: 650, sippMonthly: 100, isaMonthly: 400,
   bullRet: 8, baseRet: 5, bearRet: 2,
   boeRate: 4.75, cpiInflation: 2.3, ftseYTD: 8.2, globalYTD: 12.4,
-  // VWRP.L = Vanguard FTSE All-World UCITS ETF Acc (closest Yahoo Finance proxy for VAFTGAG/VAFTA)
-  fundSym: 'VWRP.L',
+  // 0P00018XAP.L = Yahoo/Morningstar ID for Vanguard FTSE Global All Cap Index Fund (VAFTGAG) GBP Acc
+  fundSym: '0P00018XAP.L',
   lastUpdated: null
 };
 
@@ -773,50 +782,162 @@ function buildBriefing(d, c) {
 }
 function dayPart() { const h=new Date().getHours(); return h<12?'morning':h<18?'afternoon':'evening'; }
 
+function getBestVoice() {
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return null;
+  // Priority order: Google UK English Female > named British females > any en-GB > any en
+  const priority = [
+    function(v){ return /google uk english female/i.test(v.name); },
+    function(v){ return /en-GB/i.test(v.lang) && /libby|sonia|hazel|emily|kate|serena/i.test(v.name); },
+    function(v){ return /en-GB/i.test(v.lang) && /female/i.test(v.name); },
+    function(v){ return /en-GB/i.test(v.lang); },
+    function(v){ return /google uk english/i.test(v.name); },
+    function(v){ return /en-AU|en-NZ/i.test(v.lang); },
+    function(v){ return /en/i.test(v.lang); }
+  ];
+  for (const fn of priority) { const v = voices.find(fn); if (v) return v; }
+  return null;
+}
+
 function speak(text) {
   if (!('speechSynthesis' in window)) { showToast('Voice not supported in this browser'); return; }
   window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-GB'; u.rate = 1.0; u.pitch = 1.0;
-  const voices = window.speechSynthesis.getVoices();
-  const gb = voices.find(v => /en-GB/i.test(v.lang) && /female|libby|sonia|hazel|google uk/i.test(v.name)) || voices.find(v => /en-GB/i.test(v.lang)) || voices.find(v => /en/i.test(v.lang));
-  if (gb) u.voice = gb;
+  // Clean text for smoother TTS: strip HTML, expand £ signs, add pauses
+  const clean = text.replace(/<[^>]+>/g,' ')
+    .replace(/£(\d[\d,]*)/g, function(_,n){ return n + ' pounds'; })
+    .replace(/(\d+)%/g, '$1 percent')
+    .replace(/\bM\b/g, ' million')
+    .replace(/\bK\b/g, ' thousand')
+    .replace(/—/g, ', ')
+    .replace(/\s+/g, ' ').trim();
+  const u = new SpeechSynthesisUtterance(clean);
+  u.lang = 'en-GB';
+  u.rate = 0.91;   // slightly slower = clearer and more natural
+  u.pitch = 0.97;  // very slightly lower = warmer tone
+  u.volume = 1.0;
+  const voice = getBestVoice();
+  if (voice) u.voice = voice;
   u.onstart = function(){ document.getElementById('aiSpeakBtn').disabled = true; document.getElementById('aiStopBtn').disabled = false; };
-  u.onend = function(){ document.getElementById('aiSpeakBtn').disabled = false; document.getElementById('aiStopBtn').disabled = true; };
+  u.onend = u.onerror = function(){ document.getElementById('aiSpeakBtn').disabled = false; document.getElementById('aiStopBtn').disabled = true; };
   window.speechSynthesis.speak(u);
+  // Chrome bug workaround: speechSynthesis pauses after ~15s without this
+  const keepAlive = setInterval(function(){ if (!window.speechSynthesis.speaking) { clearInterval(keepAlive); return; } window.speechSynthesis.pause(); window.speechSynthesis.resume(); }, 14000);
+  u.onend = function(){ clearInterval(keepAlive); document.getElementById('aiSpeakBtn').disabled=false; document.getElementById('aiStopBtn').disabled=true; };
 }
 function stopSpeak() { window.speechSynthesis.cancel(); document.getElementById('aiSpeakBtn').disabled=false; document.getElementById('aiStopBtn').disabled=true; }
 
 function answerQuestion(q) {
   const d = getData(), c = calc(d);
-  const ql = q.toLowerCase();
+  const ql = q.toLowerCase().trim();
   let ans = '';
-  const retMatch = ql.match(/retire\s*(?:at|by)?\s*(\d{2})/);
-  const millionMatch = /million|1m|£1m|1,000,000|1000000/.test(ql);
-  const extraMatch = ql.match(/(?:extra|add|more)\s*£?\s*(\d+)/);
+
+  // ── PERSONAL FINANCE ──────────────────────────────────────
+  const retMatch = ql.match(/retire\s*(?:at|by|aged?)?\s*(\d{2})/);
+  const millionMatch = /million|£1m\b|1,000,000|1000000/.test(ql);
+  const extraMatch = ql.match(/(?:extra|add|more|increase)[\s+]*(?:£|GBP)?\s*(\d+)/);
+  const contributionMatch = ql.match(/(?:if i (?:save|contribute|put in))\s*(?:£)?\s*(\d+)/);
+  const reduceMatch = ql.match(/(?:reduce|cut|less|drop)\s*(?:£)?\s*(\d+)/);
+
   if (retMatch) {
     const newAge = parseInt(retMatch[1]);
     const yrs = Math.max(1, newAge - d.age);
     const v = project(c.totalInvested, c.monthlyTotal, yrs, d.baseRet)[yrs];
-    ans = 'If you retire at ' + newAge + ', that is ' + yrs + ' years of growth. In the base case your portfolio would reach about ' + fmtFull(v) + '. ' + (v >= d.target ? 'That meets your ' + fmtFull(d.target) + ' target.' : 'That is ' + fmtFull(d.target - v) + ' short of your ' + fmtFull(d.target) + ' target.');
+    const bullV = project(c.totalInvested, c.monthlyTotal, yrs, d.bullRet)[yrs];
+    const bearV = project(c.totalInvested, c.monthlyTotal, yrs, d.bearRet)[yrs];
+    ans = 'Retiring at ' + newAge + ' gives you ' + yrs + ' years of compounding. In the base case (' + d.baseRet + '% real) your portfolio would reach ' + fmtFull(v) + '. Bull case: ' + fmtFull(bullV) + '. Bear case: ' + fmtFull(bearV) + '. ' + (v >= d.target ? 'That meets your ' + fmtFull(d.target) + ' target.' : 'That is ' + fmtFull(d.target - v) + ' short of your ' + fmtFull(d.target) + ' target — you would need to increase contributions or accept a later date.');
   } else if (millionMatch) {
-    ans = c.millionAge ? ('In the base case at ' + d.baseRet + '% real, your invested portfolio passes £1,000,000 around age ' + c.millionAge + ' (' + (c.millionAge - d.age) + ' years from now).') : ('At your current ' + d.baseRet + '% base case, the portfolio does not reach £1M within the projection window. Try increasing contributions or the return assumption.');
-  } else if (extraMatch) {
-    const extra = parseInt(extraMatch[1]);
+    ans = c.millionAge ? ('Your invested portfolio crosses one million pounds around age ' + c.millionAge + ' in the base case — that is ' + (c.millionAge - d.age) + ' years from now, roughly ' + (c.millionAge - d.age > 10 ? 'the mid-point of your journey' : 'sooner than you might think') + '. In the bull scenario you could get there even earlier.') : ('At a ' + d.baseRet + '% real return the portfolio does not reach £1M within the projection window. Increasing your monthly contributions or the return assumption would bring that milestone forward.');
+  } else if (extraMatch || contributionMatch) {
+    const extra = parseInt((extraMatch || contributionMatch)[1]);
     const v = project(c.totalInvested, c.monthlyTotal + extra, c.years, d.baseRet)[c.years];
     const diff = v - c.baseAt;
-    ans = 'Adding £' + extra + '/month would lift your base-case portfolio at age ' + d.retAge + ' to about ' + fmtFull(v) + ' — that is ' + fmtFull(diff) + ' more than your current plan.';
-  } else if (/property|house|home|equity/.test(ql)) {
-    ans = 'Your property is worth ' + fmtFull(d.propVal) + ' with a ' + fmtFull(d.mortgage) + ' mortgage, giving ' + fmtFull(c.equity) + ' of equity. At 2% real growth it could be worth around ' + fmtS(Math.round(d.propVal*Math.pow(1.02,c.years)/50000)*50000) + ' by age ' + d.retAge + '.';
-  } else if (/isa|bridge/.test(ql)) {
+    ans = 'Adding ' + fmtFull(extra) + ' per month lifts your base-case portfolio at age ' + d.retAge + ' to ' + fmtFull(v) + ' — that is ' + fmtFull(diff) + ' more than your current plan. Over ' + c.years + ' years, that extra ' + fmtFull(extra) + ' a month compounds to roughly ' + Math.round(diff / (extra * 12 * c.years)).toFixed(0) + 'x what you put in — the power of compound growth.';
+  } else if (reduceMatch) {
+    const red = parseInt(reduceMatch[1]);
+    const v = project(c.totalInvested, Math.max(0, c.monthlyTotal - red), c.years, d.baseRet)[c.years];
+    const diff = c.baseAt - v;
+    ans = 'Reducing contributions by ' + fmtFull(red) + ' per month would leave your portfolio at ' + fmtFull(v) + ' at age ' + d.retAge + ' — ' + fmtFull(diff) + ' less than your current plan. That gap might be hard to recover.';
+  } else if (/property|house|home|equity|mortgage/.test(ql)) {
+    const propR = Math.round(d.propVal * Math.pow(1.025, c.years) / 50000) * 50000;
+    ans = 'Your property is worth ' + fmtFull(d.propVal) + ' with a ' + fmtFull(d.mortgage) + ' mortgage outstanding, giving ' + fmtFull(c.equity) + ' of equity today. UK house prices have grown at roughly 2.5% real per year historically — at that rate your home could be worth around ' + fmtS(propR) + ' by age ' + d.retAge + '. This is outside your core retirement projection and acts as a financial backstop.';
+  } else if (/\bisa\b|bridge fund|bridge gap|stocks.shares/.test(ql)) {
     const isaR = project(d.isa, d.isaMonthly, c.years, d.baseRet)[c.years];
-    ans = 'Your ISA is ' + fmtFull(d.isa) + ' growing at ' + fmtS(d.isaMonthly) + '/month. By age ' + d.retAge + ' it should reach about ' + fmtFull(isaR) + ', which funds your bridge years before the state pension.';
-  } else if (/target|on track|enough|will i/.test(ql)) {
-    ans = c.baseAt >= d.target ? ('Yes — in the base case you reach ' + fmtFull(c.baseAt) + ' by age ' + d.retAge + ', meeting your ' + fmtFull(d.target) + ' target. Minimum return needed is ' + c.minRet.toFixed(1) + '% real.') : ('In the base case you reach ' + fmtFull(c.baseAt) + ', which is ' + fmtFull(d.target - c.baseAt) + ' short of ' + fmtFull(d.target) + '. You need ' + c.minRet.toFixed(1) + '% real return or more contributions.');
-  } else {
-    ans = briefingText;
+    const bridge = Math.round(4000 * 12 * (68 - d.retAge));
+    ans = 'Your ISA is ' + fmtFull(d.isa) + ' growing at ' + fmtS(d.isaMonthly) + ' per month. By age ' + d.retAge + ' it should reach ' + fmtFull(isaR) + '. The annual ISA allowance is £20,000 — tax-free growth and withdrawals. This acts as your bridge fund from age ' + d.retAge + ' to 68, covering the years before state pension. You need roughly ' + fmtS(bridge) + ' for that bridge at £4,000 per month spend — your ISA ' + (isaR >= bridge ? 'comfortably covers that.' : 'may fall short, so consider boosting contributions.');
+  } else if (/target|on track|enough|will i make it|gap/.test(ql)) {
+    ans = c.baseAt >= d.target ? ('Yes — on current trajectory you reach ' + fmtFull(c.baseAt) + ' by age ' + d.retAge + ' in the base case, meeting your ' + fmtFull(d.target) + ' target. The minimum real return you need is just ' + c.minRet.toFixed(1) + '%, which is below the long-run average for global equities. You have a comfortable margin.') : ('In the base case you reach ' + fmtFull(c.baseAt) + ' — ' + fmtFull(d.target - c.baseAt) + ' short of your ' + fmtFull(d.target) + ' target. You need ' + c.minRet.toFixed(1) + '% real return or higher contributions. See the gap analysis section for specific numbers.');
+  } else if (/sipp|self.invested|personal pension/.test(ql)) {
+    ans = 'A SIPP is a Self-Invested Personal Pension — one of the most tax-efficient wrappers available. Your current SIPP stands at ' + fmtFull(d.sipp) + '. You contribute ' + fmtS(d.sippMonthly) + ' per month, and HMRC adds 25% tax relief on top automatically. The annual allowance is £60,000. You cannot access a SIPP until age 57 from 2028, so it is ideal for your core retirement pot rather than your bridge fund.';
+  } else if (/drawdown|withdrawal|4.percent|swr|safe withdrawal/.test(ql)) {
+    const safeWithdraw = Math.round(c.baseAt * 0.04);
+    ans = 'The 4% safe withdrawal rule — developed from the Trinity Study — suggests you can withdraw 4% of your portfolio per year in retirement with a very high probability of it lasting 30 years. Based on your base-case portfolio of ' + fmtFull(c.baseAt) + ' at age ' + d.retAge + ', that would give you roughly ' + fmtFull(safeWithdraw) + ' per year, or ' + fmtFull(Math.round(safeWithdraw / 12)) + ' per month, in today's money. At your target of ' + fmtFull(d.target) + ' it would be ' + fmtFull(Math.round(d.target * 0.04)) + ' per year.';
+  } else if (/state pension|nsp|national insurance/.test(ql)) {
+    const spAge = 68, spVal = 11502;
+    ans = 'The full UK State Pension is currently £11,502 per year — roughly £960 per month. You qualify with 35 qualifying National Insurance years. You will not receive it until age ' + spAge + ', which is why the ISA bridge is so important for the gap between your retirement at ' + d.retAge + ' and age ' + spAge + '. Your SIPP and workplace pension will cover this, but the state pension is a meaningful guaranteed income in later years.';
+  } else if (/compound|compounding|eighth wonder/.test(ql)) {
+    const double = (72 / d.baseRet).toFixed(1);
+    ans = 'Compound growth is the mechanism behind your entire wealth plan. At ' + d.baseRet + '% real per year, your money doubles roughly every ' + double + ' years (the Rule of 72). Your current invested pot of ' + fmtFull(c.totalInvested) + ' would reach ' + fmtFull(Math.round(c.totalInvested * Math.pow(1 + d.baseRet/100, c.years))) + ' by age ' + d.retAge + ' without adding a single pound more. Contributions on top of that are where the real acceleration comes from.';
+  } else if (/diversif|allocation|how to invest|what to buy|asset.?mix/.test(ql)) {
+    ans = 'With ' + c.years + ' years to retirement, academic research supports a high-equity allocation — broadly 90-100% global equities, with a gradual shift toward bonds and cash as you approach the target date. The Vanguard FTSE Global All Cap gives you exposure to over 7,000 companies across 50+ countries in one fund — that is the closest you can get to owning the entire global economy. As you near age ' + d.retAge + ', consider gradually introducing bonds through lifestrategy funds.';
+  } else if (/lump sum|bonus|windfall|inheritance/.test(ql)) {
+    const lumpMatch = ql.match(/£?\s*(\d[\d,]*)/);
+    if (lumpMatch) {
+      const lump = parseInt(lumpMatch[1].replace(/,/g,''));
+      const extra = project(c.totalInvested + lump, c.monthlyTotal, c.years, d.baseRet)[c.years] - c.baseAt;
+      ans = 'Investing ' + fmtFull(lump) + ' as a lump sum today would boost your base-case retirement pot by ' + fmtFull(extra) + ' by age ' + d.retAge + ' — that is compound growth turning every pound into roughly ' + (extra/lump).toFixed(1) + 'x over ' + c.years + ' years. Consider splitting across SIPP and ISA to maximise tax efficiency.';
+    } else {
+      ans = 'A lump sum invested early has an outsized impact thanks to compound growth. Even a modest windfall — say £10,000 — at ' + d.baseRet + '% real over ' + c.years + ' years grows to ' + fmtFull(Math.round(10000 * Math.pow(1 + d.baseRet/100, c.years))) + '. Prioritise SIPP for tax relief, then ISA for flexibility.';
+    }
   }
-  document.getElementById('aiText').textContent = ans;
+  // ── MARKET & ECONOMIC QUESTIONS ───────────────────────────
+  else if (/boe|base rate|bank of england|interest rate/.test(ql)) {
+    ans = 'The Bank of England base rate is currently ' + d.boeRate + '%. This is the benchmark rate that influences mortgage rates, savings rates, and the economy broadly. A higher base rate makes borrowing expensive — your mortgage repayments are affected — but also means better cash savings rates. For long-term equity investors like you, rate cycles matter less than staying invested: global equities have delivered through multiple rate cycles.';
+  } else if (/inflation|cpi|rpi|cost of living|prices rising/.test(ql)) {
+    const realRet = (d.baseRet - d.cpiInflation).toFixed(1);
+    ans = 'UK CPI inflation is currently ' + d.cpiInflation + '%. This is why all projections in your dashboard use real returns — nominal returns minus inflation. At ' + d.cpiInflation + '% inflation, your base case nominal return of roughly ' + (d.baseRet + d.cpiInflation).toFixed(1) + '% becomes ' + d.baseRet + '% real, which is what matters for purchasing power. The Vanguard FTSE Global All Cap has historically beaten inflation by 5-6% per year over long periods.';
+  } else if (/ftse 100|ftse100|uk stock|uk market|uk equit/.test(ql)) {
+    ans = 'The FTSE 100 is ' + sgn(d.ftseYTD) + d.ftseYTD + '% year to date. The FTSE 100 is dominated by large multinationals — oil, banks, mining — and earns roughly 70% of its revenue overseas. It is not a great proxy for the UK economy. Historically it has underperformed global equities, which is why the Vanguard FTSE Global All Cap gives you broader and better exposure than concentrating in the FTSE 100 alone.';
+  } else if (/global.equit|world.market|global.stock|all.world|all.cap|vwrp|vaftgag/.test(ql)) {
+    ans = 'Global equities are ' + sgn(d.globalYTD) + d.globalYTD + '% year to date. The long-run historical real return of global equities — after inflation — is approximately 5 to 7% per year. The FTSE Global All Cap index tracks over 7,000 stocks across developed and emerging markets including small-caps, giving maximum diversification. Your ' + d.baseRet + '% base case assumption is conservative relative to the historical average, which gives you a margin of safety.';
+  } else if (/recession|downturn|crash|bear market|market.?down|economy/.test(ql)) {
+    const dropYr = project(c.totalInvested * 0.7, c.monthlyTotal, c.years, d.baseRet)[c.years];
+    ans = 'Market crashes are part of long-term investing. The average bear market drops around 30% and lasts 14 months. With ' + c.years + ' years of runway, you have time to recover fully — and downturns are buying opportunities: your monthly contributions purchase more units when prices fall. Even if markets dropped 30% today and you stayed invested, your base-case projection would still reach roughly ' + fmtFull(dropYr) + ' by age ' + d.retAge + ' because time and contributions rebuild the pot.';
+  } else if (/bond|gilt|uk gilt|fixed.income/.test(ql)) {
+    ans = 'UK Gilts are government bonds — low risk, low return. The VGOV ETF tracks UK gilts and currently reflects a yield around ' + (d.boeRate + 0.3).toFixed(2) + '% approximately. At your age with ' + c.years + ' years to retirement, you likely need very little gilt exposure — equities outperform over long horizons. Gilts become valuable as you approach retirement to reduce sequence-of-returns risk. Many advisors suggest a gradual shift toward bonds in the final 10 years.';
+  } else if (/tax|capital gain|cgt|tax.?free|dividend/.test(ql)) {
+    ans = 'The main tax-efficient wrappers available to you are: ISA (£20,000 per year — tax-free growth and withdrawals at any age), SIPP (contributions get 25% tax relief added by HMRC, grows tax-free, taxable on withdrawal but 25% can be taken tax-free), and Workplace Pension (employer contributions are effectively free money). Holding your Vanguard fund inside these wrappers means no capital gains tax and no income tax on dividends.';
+  } else if (/employer|employer match|workplace pension|work pension/.test(ql)) {
+    ans = 'Employer pension matching is the highest guaranteed return available to any investor — typically 100% instant return on your contribution up to the match limit. Your workplace pension currently stands at ' + fmtFull(d.workPension) + ' with ' + fmtS(d.wpMonthly) + ' going in monthly. Always confirm you are contributing enough to get the full employer match before putting money anywhere else — no investment in history beats a 100% instant return.';
+  } else if (/gold|commodity|commodit|bitcoin|crypto/.test(ql)) {
+    ans = 'Gold has historically returned about 1-2% real per year — it is a store of value and inflation hedge rather than a growth asset. Crypto is highly speculative with no underlying earnings or cash flows — volatility of 50-80% drawdowns is common. For a retirement portfolio with a ' + c.years + '-year horizon, broad global equities have significantly outperformed both on a risk-adjusted basis. A small satellite allocation to alternatives (5-10%) is reasonable, but the core should be diversified equity.';
+  } else if (/how.?long|years.?left|runway|time.?horizon/.test(ql)) {
+    ans = 'You have ' + c.years + ' years until your target retirement age of ' + d.retAge + '. That is a significant runway — long enough for compound growth to do most of the heavy lifting, long enough to weather multiple market cycles, and long enough for even a 30% crash to be fully recovered. The longer your horizon, the more risk you can afford to take in the short term.';
+  } else if (/what.?is\s+(\w+)/.test(ql)) {
+    const term = ql.match(/what.?is\s+(.+)/)?.[1] || '';
+    const defs = {
+      'sipp': 'A SIPP is a Self-Invested Personal Pension — a pension where you choose your own investments, with tax relief from HMRC. You cannot access it until age 57.',
+      'isa': 'An ISA (Individual Savings Account) is a tax-free investment wrapper. You can invest up to £20,000 per year and all growth and withdrawals are completely tax-free.',
+      'compound interest': 'Compound interest is earning returns on your returns. At 5% per year, £10,000 grows to £16,289 in 10 years and £43,219 in 30 years — the growth accelerates over time.',
+      'vanguard': 'Vanguard is the world\'s largest fund manager, known for ultra-low-cost index funds. The FTSE Global All Cap tracks over 7,000 global companies for roughly 0.23% annual charge.',
+      'real return': 'Real return is your investment return after subtracting inflation. If the market returns 7% and inflation is 2.3%, your real return is approximately 4.7%. This is what matters for purchasing power.',
+      'drawdown': 'Pension drawdown means keeping your money invested in retirement and withdrawing from it gradually, rather than buying an annuity. Gives flexibility but requires managing longevity risk.',
+      'annuity': 'An annuity is a guaranteed income for life purchased with your pension pot. It removes longevity risk but gives up flexibility and any remaining pot on death. Less popular since pension freedoms in 2015.',
+      'cpi': 'CPI (Consumer Prices Index) is the UK\'s main measure of inflation — the rate at which prices are rising. Currently ' + d.cpiInflation + '%. Your savings must beat CPI to grow in real terms.'
+    };
+    const match = Object.keys(defs).find(function(k){ return term.includes(k); });
+    ans = match ? defs[match] : 'I don\'t have a specific definition for that term. Try asking about: SIPP, ISA, compound interest, Vanguard, real return, drawdown, annuity, or CPI.';
+  } else if (/hello|hi|hey|good\s*(morning|afternoon|evening)|how are you/.test(ql)) {
+    ans = 'Good ' + dayPart() + '! I am your personal finance AI. You can ask me about your portfolio, market conditions, economic questions, or anything about financial planning. Try: "when do I hit a million?", "what is the base rate?", "explain compound interest", or "retire at 50".';
+  } else if (/news|headline|what.?happen|market.?today|today/.test(ql)) {
+    ans = 'I can\'t access real-time news directly, but the headlines panel above is pulling live stories from BBC Business and The Guardian — check that for today\'s market-moving news. I can answer questions about economic indicators like the ' + d.boeRate + '% base rate, ' + d.cpiInflation + '% CPI, or your portfolio\'s performance in various scenarios.';
+  } else if (/advice|should i|recommend/.test(ql)) {
+    ans = 'I can model scenarios and explain concepts, but I\'m not regulated to give personal financial advice under FCA rules. What I can tell you: at ' + d.age + ' with ' + c.years + ' years to go, your current setup — ' + fmtFull(c.totalInvested) + ' invested, ' + fmtS(c.monthlyTotal) + '/month, in a low-cost global index fund — is textbook good practice. The main levers you control are: how much you save, how long you stay invested, and how you react in downturns. An FCA-authorised IFA can give you regulated, personalised advice.';
+  } else {
+    // Fallback: summary of what I can help with
+    ans = 'I can help with questions about your portfolio, market conditions, and financial concepts. For example: "retire at 50", "when do I hit a million", "add £200 a month", "what is the base rate", "explain compound interest", "how is the FTSE doing", "what is a SIPP", or "will I hit my target". What would you like to know?';
+  }
+
+  document.getElementById('aiText').innerHTML = ans;
   speak(ans);
 }
 
@@ -861,23 +982,33 @@ async function fetchLiveData() {
   banner.innerHTML = '<div class="live-item"><div class="live-ticker" style="color:rgba(255,255,255,0.4)">Fetching live data…</div><div class="live-price" style="color:rgba(255,255,255,0.25)">—</div></div>';
   const d = getData();
   const tickers = [
-    { sym: d.fundSym || 'VWRP.L', label:'VAFTGAG / All Cap Acc', sub:'VWRP proxy · Vanguard FTSE All-World Acc', fund:true },
+    { sym: d.fundSym || 'VWRP.L', label:'VAFTGAG · All Cap Acc', sub:'Vanguard FTSE Global All Cap Acc', fund:true },
     { sym:'^FTSE',  label:'FTSE 100', sub:'UK large-cap index' },
     { sym:'VGOV.L', label:'VGOV · UK Gilts', sub:'Vanguard UK Gov Bond ETF' },
-    { sym:'IGLT.L', label:'IGLT · UK Gilts', sub:'iShares Core UK Gilts ETF' }
+    { sym:'VWRP.L', label:'VWRP · All-World', sub:'Vanguard FTSE All-World Acc' }
   ];
   const results = await Promise.allSettled(tickers.map(function(t){ return fetchTicker(t.sym); }));
   let html = '', fundData = null, sparkCloses = null;
+  // If fund (OEIC) ticker failed, try VWRP.L as proxy
+  let fundResult = results[0];
+  let fundLabel = tickers[0].label, fundSub = tickers[0].sub;
+  if ((!fundResult || fundResult.status !== 'fulfilled' || !fundResult.value) && tickers[3]) {
+    const proxy = await fetchTicker('VWRP.L');
+    if (proxy) { fundResult = { status:'fulfilled', value:proxy }; fundSub = 'VWRP proxy · FTSE All-World Acc'; }
+  }
+  results[0] = fundResult;
   results.forEach(function(res, i) {
     const t = tickers[i];
-    if (res.status === 'fulfilled' && res.value) {
+    const label = (i===0) ? fundLabel : t.label;
+    const sub = (i===0) ? fundSub : t.sub;
+    if (res && res.status === 'fulfilled' && res.value) {
       const v = res.value;
-      if (t.fund) { fundData = v; sparkCloses = v.closes; }
+      if (i===0) { fundData = v; sparkCloses = v.closes; }
       if (!sparkCloses) sparkCloses = v.closes;
       const pc = v.dayPct>0?'up':v.dayPct<0?'down':'flat';
-      html += '<div class="live-item"><div class="live-ticker">'+t.label+'</div><div class="live-price">'+v.price+'</div><div class="live-change '+pc+'">'+sgn(v.dayPct)+v.dayPct.toFixed(2)+'% today · 1yr '+sgn(v.yrPct)+v.yrPct.toFixed(1)+'%</div><div class="live-status"><span class="live-dot"></span>'+t.sub+'</div></div>';
+      html += '<div class="live-item"><div class="live-ticker">'+label+'</div><div class="live-price">'+v.price+'</div><div class="live-change '+pc+'">'+sgn(v.dayPct)+v.dayPct.toFixed(2)+'% today · 1yr '+sgn(v.yrPct)+v.yrPct.toFixed(1)+'%</div><div class="live-status"><span class="live-dot"></span>'+sub+'</div></div>';
     } else {
-      html += '<div class="live-item"><div class="live-ticker">'+t.label+'</div><div class="live-price" style="color:rgba(255,255,255,0.3)">—</div><div class="live-change flat">Data unavailable</div><div class="live-status"><span class="live-dot stale"></span>'+t.sub+'</div></div>';
+      html += '<div class="live-item"><div class="live-ticker">'+label+'</div><div class="live-price" style="color:rgba(255,255,255,0.3)">—</div><div class="live-change flat">Data unavailable</div><div class="live-status"><span class="live-dot stale"></span>'+sub+'</div></div>';
     }
   });
   if (sparkCloses) html += '<div class="sparkline-wrap"><canvas id="sparkCanvas" width="120" height="48"></canvas></div>';
@@ -1024,17 +1155,18 @@ async function fetchNews() {
   return allItems.length ? allItems.slice(0, 6) : null;
 }
 
-function renderNews(items) {
+function renderNews(items, silent) {
   const grid = document.getElementById('newsGrid');
   const ts = document.getElementById('newsTimestamp');
   if (!items || !items.length) {
+    if (silent) return; // keep existing content on silent refresh failure
     grid.innerHTML = '<div class="news-loading">Headlines couldn\'t load right now — proxy may be busy. <span class="news-retry" id="newsRetry">Retry ↻</span></div>';
     if (ts) ts.textContent = 'Failed · ' + new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
     const r = document.getElementById('newsRetry');
     if (r) r.addEventListener('click', function(){
       grid.innerHTML='<div class="news-loading">Fetching BBC Business &amp; Guardian headlines…</div>';
       if (ts) ts.textContent = '';
-      fetchNews().then(renderNews);
+      fetchNews().then(function(i){ renderNews(i, false); });
     });
     return;
   }
@@ -1043,8 +1175,12 @@ function renderNews(items) {
   grid.innerHTML = items.slice(0,6).map(function(item) {
     const dt = new Date(item.pubDate);
     const dateStr = isNaN(dt.getTime()) ? '' : dt.toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
-    const desc = item.description ? '<div class="news-desc">'+clean(item.description)+'</div>' : '';
-    return '<a class="news-card" href="'+(item.link||'#')+'" target="_blank" rel="noopener"><div class="news-source">'+(item.source||'Business')+'</div><div class="news-title">'+clean(item.title)+'</div>'+desc+'<div class="news-date">'+dateStr+'</div></a>';
+    const fullDesc = clean(item.description || '');
+    const shortDesc = fullDesc.slice(0, 110) + (fullDesc.length > 110 ? '…' : '');
+    const desc = shortDesc ? '<div class="news-desc">'+shortDesc+'</div>' : '';
+    const linkHost = (function(){ try { return new URL(item.link||'').hostname.replace('www.',''); } catch(e){ return item.source||''; } })();
+    const tip = '<div class="news-tip"><div class="ntp-src">'+clean(item.source||'Business')+'</div><div class="ntp-title">'+clean(item.title)+'</div><div class="ntp-desc">'+(fullDesc||'Read the full story at '+linkHost)+'</div><div class="ntp-url">'+linkHost+'</div><div class="ntp-cta">Click to open in new tab →</div></div>';
+    return '<a class="news-card" href="'+(item.link||'#')+'" target="_blank" rel="noopener">'+tip+'<div class="news-source">'+clean(item.source||'Business')+'</div><div class="news-title">'+clean(item.title)+'</div>'+desc+'<div class="news-date">'+dateStr+'</div></a>';
   }).join('');
 }
 
@@ -1084,14 +1220,18 @@ document.getElementById('aiSpeakBtn').addEventListener('click', function(){ spea
 document.getElementById('aiStopBtn').addEventListener('click', stopSpeak);
 document.getElementById('aiAskBtn').addEventListener('click', function(){ const q=document.getElementById('aiAsk').value.trim(); if(q) answerQuestion(q); });
 document.getElementById('aiAsk').addEventListener('keydown', function(e){ if(e.key==='Enter'){ const q=this.value.trim(); if(q) answerQuestion(q); } });
-if ('speechSynthesis' in window) { window.speechSynthesis.onvoiceschanged = function(){}; window.speechSynthesis.getVoices(); }
+if ('speechSynthesis' in window) {
+  // Preload voices — Chrome loads them async on first call
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged = function(){ window.speechSynthesis.getVoices(); };
+}
 
 // ── BOOT ──────────────────────────────────────────────────────
 renderAll();
 fetchLiveData();
 fetchNews().then(renderNews);
 // Auto-refresh news every 30 minutes and market data every 5 minutes
-setInterval(function(){ fetchNews().then(renderNews); }, 30 * 60 * 1000);
+setInterval(function(){ fetchNews().then(function(i){ renderNews(i, true); }); }, 30 * 60 * 1000);
 setInterval(function(){ fetchLiveData(); }, 5 * 60 * 1000);
 
 })();
