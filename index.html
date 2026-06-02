@@ -424,16 +424,19 @@ canvas { width: 100%; display: block; }
 .debt-sum-label { font-family: var(--mono); font-size: 9px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 2px; }
 
 /* BUDGET TRACKER */
-.budget-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 12px; margin-bottom: 24px; }
+.budget-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 12px; margin-bottom: 16px; }
 .budget-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
-.budget-cat { font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; display: flex; justify-content: space-between; }
-.budget-inputs { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
-.budget-inputs input { flex: 1; padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; font-family: var(--mono); font-size: 12px; color: var(--ink); background: var(--surface2); text-align: right; outline: none; }
-.budget-inputs input:focus { border-color: var(--gold); }
-.budget-vs { font-family: var(--mono); font-size: 9px; color: var(--muted); }
-.budget-bar-wrap { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
-.budget-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s; }
-.budget-summary-row { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; padding: 12px 0; border-top: 1px solid var(--border); margin-top: 4px; }
+.budget-cat { font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+.budget-status-chip { font-family: var(--mono); font-size: 8px; padding: 2px 7px; border-radius: 10px; letter-spacing: 0.05em; }
+.budget-inputs { display: grid; grid-template-columns: 1fr auto 1fr; gap: 6px; align-items: center; margin-bottom: 10px; }
+.budget-inputs input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-family: var(--mono); font-size: 13px; color: var(--ink); background: var(--surface2); text-align: right; outline: none; transition: border-color 0.15s; }
+.budget-inputs input:focus { border-color: var(--gold); background: var(--surface); }
+.budget-input-lbl { font-family: var(--mono); font-size: 8px; color: var(--muted); text-align: center; margin-bottom: 2px; }
+.budget-col { display: flex; flex-direction: column; }
+.budget-vs { font-family: var(--mono); font-size: 10px; color: var(--muted); text-align: center; padding-top: 18px; }
+.budget-bar-wrap { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; margin-top: 2px; }
+.budget-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+.budget-summary-row { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; padding: 14px 0; border-top: 1px solid var(--border); margin-top: 4px; flex-wrap: wrap; gap: 8px; }
 
 /* SCENARIOS */
 .scenario-save-row { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
@@ -480,6 +483,106 @@ canvas { width: 100%; display: block; }
 .port-btn.primary:hover { background: #050810; }
 .port-btn.danger:hover { border-color: var(--red); color: var(--red); }
 
+/* TAB NAV */
+.tabnav { position: sticky; top: 0; z-index: 350; background: rgba(245,242,236,0.85); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); display: flex; gap: 4px; padding: 0 60px; overflow-x: auto; }
+body.dark .tabnav { background: rgba(14,12,10,0.85); }
+.tab-btn { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; padding: 18px 20px; background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted); cursor: pointer; white-space: nowrap; transition: color 0.15s, border-color 0.15s; display: flex; align-items: center; gap: 8px; }
+.tab-btn:hover { color: var(--ink); }
+.tab-btn.active { color: var(--ink); border-bottom-color: var(--gold); }
+.tab-btn .tab-icon { font-size: 14px; }
+.page { display: none; animation: pageIn 0.35s ease; }
+.page.active { display: block; }
+@keyframes pageIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* EXPANDABLE / CLICKABLE */
+.expandable { cursor: pointer; }
+.chart-expand-hint { position: absolute; top: 16px; right: 18px; font-family: var(--mono); font-size: 9px; color: var(--muted); opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+.chart-card:hover .chart-expand-hint, .chart-section:hover .chart-expand-hint, .mc-section:hover .chart-expand-hint { opacity: 0.7; }
+.chart-card, .chart-section { position: relative; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(5,8,16,0.85); z-index: 900; display: none; align-items: center; justify-content: center; padding: 40px; backdrop-filter: blur(6px); }
+.modal-overlay.open { display: flex; }
+.modal-box { background: var(--surface); border-radius: 16px; width: 100%; max-width: 980px; max-height: 90vh; overflow: auto; padding: 32px; box-shadow: 0 24px 80px rgba(0,0,0,0.5); position: relative; }
+.modal-close { position: absolute; top: 18px; right: 20px; background: none; border: none; font-size: 22px; color: var(--muted); cursor: pointer; }
+.modal-close:hover { color: var(--ink); }
+.modal-title { font-family: var(--serif); font-size: 26px; font-style: italic; color: var(--ink); margin-bottom: 20px; }
+.insight.expandable .insight-more { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; font-family: var(--mono); font-size: 11px; color: var(--muted); line-height: 1.7; }
+.insight.expandable.open .insight-more { max-height: 300px; margin-top: 10px; }
+.insight-toggle { font-family: var(--mono); font-size: 9px; color: var(--gold); margin-top: 8px; }
+
+/* MONTE CARLO */
+.mc-section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 24px; position: relative; }
+.mc-top { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; }
+.mc-controls { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; }
+.mc-control { }
+.mc-control label { display: block; font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.mc-control input { width: 90px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-family: var(--mono); font-size: 12px; color: var(--ink); background: var(--surface2); text-align: right; outline: none; }
+.mc-control input:focus { border-color: var(--gold); }
+.mc-run-btn { background: var(--ink); color: #fff; border: none; border-radius: 8px; padding: 10px 18px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; cursor: pointer; }
+.mc-run-btn:hover { background: #2d2925; }
+.mc-prob-banner { display: flex; gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 20px; flex-wrap: wrap; }
+.mc-prob-item { flex: 1; min-width: 120px; background: var(--surface); padding: 18px 20px; }
+.mc-prob-val { font-family: var(--serif); font-size: 28px; font-style: italic; line-height: 1; }
+.mc-prob-lbl { font-family: var(--mono); font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 6px; }
+.mc-percentile-row { display: grid; grid-template-columns: repeat(auto-fit,minmax(110px,1fr)); gap: 12px; margin-top: 20px; }
+.mc-pc { background: var(--surface2); border-radius: 8px; padding: 14px 16px; text-align: center; }
+.mc-pc-val { font-family: var(--mono); font-size: 16px; font-weight: 500; color: var(--ink); }
+.mc-pc-lbl { font-family: var(--mono); font-size: 8px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
+
+/* TAX CALCULATOR */
+.tax-section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 48px; }
+.tax-region-toggle { display: inline-flex; background: var(--surface2); border-radius: 100px; padding: 4px; margin-bottom: 24px; }
+.tax-region-btn { font-family: var(--mono); font-size: 11px; padding: 8px 20px; border: none; background: none; border-radius: 100px; cursor: pointer; color: var(--muted); transition: all 0.15s; }
+.tax-region-btn.active { background: var(--ink); color: #fff; }
+.tax-grid { display: grid; grid-template-columns: 340px 1fr; gap: 32px; }
+.tax-inputs { }
+.tax-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.tax-row label { font-family: var(--mono); font-size: 11px; color: var(--ink); flex: 1; }
+.tax-row input { width: 130px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-family: var(--mono); font-size: 12px; color: var(--ink); background: var(--surface2); text-align: right; outline: none; }
+.tax-row input:focus { border-color: var(--gold); }
+.tax-row.toggle-row { justify-content: space-between; }
+.tax-switch { position: relative; width: 44px; height: 24px; flex: none; }
+.tax-switch input { opacity: 0; width: 0; height: 0; }
+.tax-slider { position: absolute; inset: 0; background: var(--border); border-radius: 24px; cursor: pointer; transition: 0.2s; }
+.tax-slider::before { content: ''; position: absolute; height: 18px; width: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: 0.2s; }
+.tax-switch input:checked + .tax-slider { background: var(--teal); }
+.tax-switch input:checked + .tax-slider::before { transform: translateX(20px); }
+.tax-results { }
+.tax-result-main { background: var(--ink); color: #fff; border-radius: 12px; padding: 24px; margin-bottom: 16px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.tax-takehome { }
+.tax-takehome-val { font-family: var(--serif); font-size: 40px; font-style: italic; color: var(--gold-light); line-height: 1; }
+.tax-takehome-lbl { font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 6px; }
+.tax-breakdown-bar { display: flex; height: 36px; border-radius: 8px; overflow: hidden; margin-bottom: 12px; }
+.tax-seg { display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 9px; color: #fff; min-width: 2px; }
+.tax-lines { }
+.tax-line { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.tax-line.total { border-bottom: none; border-top: 2px solid var(--border); font-weight: 500; }
+.tax-line .tl-label { color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.tax-line .tl-dot { width: 9px; height: 9px; border-radius: 2px; }
+.tax-line .tl-val { color: var(--ink); }
+.tax-salsac-note { background: rgba(42,122,111,0.07); border: 1px solid rgba(42,122,111,0.2); border-radius: 8px; padding: 14px 16px; font-family: var(--mono); font-size: 11px; color: var(--teal); line-height: 1.6; margin-top: 16px; }
+
+/* WATCHLIST */
+.watchlist-add-row { display: flex; gap: 10px; margin-bottom: 16px; align-items: center; }
+.watchlist-add-row input { flex: 1; padding: 9px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--mono); font-size: 12px; color: var(--ink); background: var(--surface2); outline: none; }
+.watchlist-add-row input:focus { border-color: var(--gold); }
+.watchlist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 12px; margin-bottom: 12px; }
+.wl-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; position: relative; transition: border-color 0.2s, box-shadow 0.15s; }
+.wl-card:hover { border-color: var(--gold-light); box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+.wl-card-del { position: absolute; top: 10px; right: 12px; background: none; border: none; color: var(--muted); font-size: 13px; cursor: pointer; padding: 2px 6px; border-radius: 4px; opacity: 0; transition: opacity 0.15s; }
+.wl-card:hover .wl-card-del { opacity: 1; }
+.wl-card-del:hover { color: var(--red); }
+.wl-sym { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.wl-price { font-family: var(--serif); font-size: 26px; font-style: italic; color: var(--ink); line-height: 1; margin-bottom: 4px; }
+.wl-change { font-family: var(--mono); font-size: 11px; margin-bottom: 8px; }
+.wl-change.up { color: var(--teal); }
+.wl-change.down { color: var(--red); }
+.wl-change.flat { color: var(--muted); }
+.wl-meta { font-family: var(--mono); font-size: 9px; color: var(--muted); line-height: 1.6; }
+.wl-spark { display: block; width: 100%; height: 36px; margin-top: 10px; }
+.wl-loading { background: var(--surface2); border: 1px dashed var(--border); }
+.wl-error { border-color: rgba(192,57,43,0.2); }
+.wl-error .wl-price { color: var(--muted); font-size: 18px; }
+
 /* PRINT */
 @media print {
   .dark-toggle, .edit-fab, .pwa-banner, .milestone-toast, .ai-controls, #liveBanner, .fund-return-bar, #newsGrid, .section-header .section-num { display: none !important; }
@@ -491,7 +594,7 @@ canvas { width: 100%; display: block; }
   .main { padding: 20px; }
 }
 
-@media (max-width: 900px) { .visual-grid { grid-template-columns: 1fr; } .calc-grid { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .visual-grid { grid-template-columns: 1fr; } .calc-grid { grid-template-columns: 1fr; } .tax-grid { grid-template-columns: 1fr; } .tabnav { padding: 0 20px; } }
 @media (max-width: 700px) {
   .header, .main { padding: 28px 20px; }
   .disclaimer { padding: 20px; }
@@ -521,7 +624,16 @@ canvas { width: 100%; display: block; }
   </div>
 </div>
 
+<div class="tabnav" id="tabnav">
+  <button class="tab-btn active" data-page="home"><span class="tab-icon">◈</span> Home</button>
+  <button class="tab-btn" data-page="growth"><span class="tab-icon">📈</span> Growth &amp; Projections</button>
+  <button class="tab-btn" data-page="plan"><span class="tab-icon">🧮</span> Plan &amp; Tax</button>
+  <button class="tab-btn" data-page="manage"><span class="tab-icon">⚙</span> Manage &amp; Markets</button>
+</div>
+
 <div class="main">
+
+  <div class="page active" data-page="home">
 
   <!-- AI BRIEFING -->
   <div class="ai-section">
@@ -584,6 +696,10 @@ canvas { width: 100%; display: block; }
     <div class="contrib-flows" id="contribFlows"></div>
   </div>
 
+  </div><!-- /page home -->
+
+  <div class="page" data-page="growth">
+
   <!-- VISUAL DASHBOARD -->
   <div class="section-header">
     <div class="section-num">04</div>
@@ -628,7 +744,8 @@ canvas { width: 100%; display: block; }
     <div class="section-title" id="chartTitle"></div>
     <div class="section-rule"></div>
   </div>
-  <div class="chart-section">
+  <div class="chart-section expandable" id="projChartSection">
+    <span class="chart-expand-hint">⛶ click to expand</span>
     <div class="chart-legend">
       <div class="leg-item"><div class="leg-line" style="background:var(--teal);height:3px;"></div><span id="leg-bull"></span></div>
       <div class="leg-item"><div class="leg-line" style="background:var(--gold);"></div><span id="leg-base"></span></div>
@@ -644,6 +761,30 @@ canvas { width: 100%; display: block; }
   <div class="scenario-bar-section">
     <div class="scenario-bar-title" id="scenarioBarTitle"></div>
     <div style="height:160px;position:relative;"><canvas id="scenarioHBar"></canvas></div>
+  </div>
+
+  <!-- MONTE CARLO -->
+  <div class="section-header">
+    <div class="section-num">6B</div>
+    <div class="section-title">Monte Carlo Simulation</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="mc-section expandable" id="mcSection">
+    <span class="chart-expand-hint">⛶ click to expand</span>
+    <div class="mc-top">
+      <div style="flex:1;min-width:240px;font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.7;">
+        Instead of three fixed scenarios, this runs <strong style="color:var(--ink)" id="mcRunCount">2,000</strong> randomised market simulations using your contributions and a realistic volatility model — showing the full <em>range</em> of outcomes and your probability of success.
+      </div>
+      <div class="mc-controls" onclick="event.stopPropagation()">
+        <div class="mc-control"><label>Mean real return %</label><input type="number" id="mcReturn" step="0.5" min="0" max="15"></div>
+        <div class="mc-control"><label>Volatility %</label><input type="number" id="mcVol" step="1" min="1" max="40" value="15"></div>
+        <button class="mc-run-btn" id="mcRunBtn">↻ Re-run</button>
+      </div>
+    </div>
+    <div class="mc-prob-banner" id="mcProbBanner"></div>
+    <div style="position:relative;"><canvas id="mcCanvas" height="340"></canvas></div>
+    <div class="mc-percentile-row" id="mcPercentiles"></div>
+    <div class="chart-note" id="mcNote"></div>
   </div>
 
   <!-- MILESTONES -->
@@ -677,6 +818,10 @@ canvas { width: 100%; display: block; }
     <div id="historyChart" style="height:200px;position:relative;"></div>
     <div id="historyEmpty" class="history-empty" style="display:none;">No history yet — your net worth will be tracked each time you save updated figures. Check back after your first update.</div>
   </div>
+
+  </div><!-- /page growth -->
+
+  <div class="page" data-page="plan">
 
   <!-- SMART CALCULATORS -->
   <div class="section-header">
@@ -744,6 +889,41 @@ canvas { width: 100%; display: block; }
       </div>
       <button class="calc-btn" id="calcLumpBtn">Calculate Growth</button>
       <div class="calc-result" id="calcLumpResult" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- TAX CALCULATOR -->
+  <div class="section-header">
+    <div class="section-num">10B</div>
+    <div class="section-title">Income Tax &amp; Take-Home Calculator</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="tax-section">
+    <div class="tax-region-toggle" id="taxRegionToggle">
+      <button class="tax-region-btn active" data-region="england">🏴󠁧󠁢󠁥󠁮󠁧󠁿 England / Wales / NI</button>
+      <button class="tax-region-btn" data-region="scotland">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland</button>
+    </div>
+    <div class="tax-grid">
+      <div class="tax-inputs">
+        <div class="tax-row"><label>Gross annual salary (£)</label><input type="number" id="taxSalary" value="60000" min="0" step="1000"></div>
+        <div class="tax-row toggle-row">
+          <label>Salary sacrifice pension</label>
+          <span class="tax-switch"><input type="checkbox" id="taxSalSac"><span class="tax-slider"></span></span>
+        </div>
+        <div class="tax-row"><label>Pension contribution (%)</label><input type="number" id="taxPensionPct" value="10" min="0" max="100" step="1"></div>
+        <div class="tax-row"><label>Student loan plan</label>
+          <select id="taxStudentLoan" style="width:130px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-family:var(--mono);font-size:12px;background:var(--surface2);color:var(--ink);outline:none;">
+            <option value="none">None</option>
+            <option value="plan1">Plan 1</option>
+            <option value="plan2">Plan 2</option>
+            <option value="plan4">Plan 4 (Scot)</option>
+            <option value="plan5">Plan 5</option>
+            <option value="pgl">Postgrad</option>
+          </select>
+        </div>
+        <button class="calc-btn" id="taxCalcBtn">Calculate</button>
+      </div>
+      <div class="tax-results" id="taxResults"></div>
     </div>
   </div>
 
@@ -817,6 +997,10 @@ canvas { width: 100%; display: block; }
   <div class="budget-grid" id="budgetGrid"></div>
   <div class="budget-summary-row" id="budgetSummary"></div>
 
+  </div><!-- /page plan -->
+
+  <div class="page" data-page="manage">
+
   <!-- SCENARIOS -->
   <div class="section-header">
     <div class="section-num">15</div>
@@ -847,6 +1031,26 @@ canvas { width: 100%; display: block; }
 
   <!-- ANNUAL REVIEW -->
   <div id="reviewBanner" class="review-banner" style="display:none;"></div>
+
+  <!-- MARKET MOVERS & WATCHLIST -->
+  <div class="section-header">
+    <div class="section-num">17</div>
+    <div class="section-title">Market Pulse &amp; Watchlist</div>
+    <div class="section-rule"></div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--muted);white-space:nowrap;">Not financial advice · Illustrative only</div>
+  </div>
+  <div class="watchlist-add-row">
+    <input type="text" id="watchlistInput" placeholder="Add ticker… e.g. AAPL, TSLA, NVDA, SMT.L, VWRP.L">
+    <button class="calc-btn" id="watchlistAddBtn" style="margin-top:0;width:auto;padding:9px 18px;">+ Track</button>
+  </div>
+  <div class="watchlist-grid" id="watchlistGrid">
+    <div class="news-loading">Loading market data…</div>
+  </div>
+  <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:48px;line-height:1.8;">
+    ⚠ Data via Yahoo Finance (delayed 15–20 min). Not a recommendation to buy or sell. UK-listed funds shown in pence (p). Past performance is not a reliable indicator of future returns. All investment involves risk — you could get back less than you invest.
+  </div>
+
+  </div><!-- /page manage -->
 
 </div>
 
@@ -888,6 +1092,16 @@ canvas { width: 100%; display: block; }
       <button class="ais-close-btn" id="aisClearKeyBtn">Remove Key</button>
       <button class="ais-close-btn" id="aisCloseBtn">Close</button>
     </div>
+  </div>
+</div>
+
+<!-- CHART EXPAND MODAL -->
+<div class="modal-overlay" id="chartModal">
+  <div class="modal-box">
+    <button class="modal-close" id="chartModalClose">✕</button>
+    <div class="modal-title" id="chartModalTitle"></div>
+    <div style="position:relative;"><canvas id="chartModalCanvas" height="480"></canvas></div>
+    <div class="chart-note" id="chartModalNote"></div>
   </div>
 </div>
 
@@ -1175,10 +1389,11 @@ function renderChart(d, c) {
   drawCanvas(d, c);
 }
 
-function drawCanvas(d, c) {
-  const canvas = document.getElementById('projChart'); if (!canvas) return;
+function drawCanvasTo(canvasId, d, c, h) { drawCanvas(d, c, canvasId, h); }
+function drawCanvas(d, c, canvasId, customH) {
+  const canvas = document.getElementById(canvasId || 'projChart'); if (!canvas) return;
   const dpr = window.devicePixelRatio || 2;
-  const W = Math.max(canvas.parentElement.clientWidth - 56, 200), H = 360;
+  const W = Math.max(canvas.parentElement.clientWidth - 56, 200), H = customH || 360;
   canvas.width = W*dpr; canvas.height = H*dpr; canvas.style.width = W+'px'; canvas.style.height = H+'px';
   const ctx = canvas.getContext('2d'); ctx.scale(dpr, dpr);
   const bull=c.bullVals, base=c.baseVals, bear=c.bearVals;
@@ -1497,6 +1712,317 @@ function initPWA() {
   }
 }
 
+// ── TAB NAVIGATION ────────────────────────────────────────────
+function switchPage(page) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.toggle('active', p.dataset.page===page); });
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.page===page); });
+  window.scrollTo({ top:0, behavior:'smooth' });
+  try { localStorage.setItem('wealth_page', page); } catch(e){}
+  // Charts inside previously-hidden pages render at 0 width — redraw once visible
+  setTimeout(function(){ redrawVisible(page); }, 60);
+}
+function redrawVisible(page) {
+  const d=getData(), c=calc(d);
+  try {
+    if (allocChartInst) allocChartInst.resize();
+    if (scenarioBarInst) scenarioBarInst.resize();
+    if (scenarioHBarInst) scenarioHBarInst.resize();
+    if (histChartInst) histChartInst.resize();
+  } catch(e){}
+  if (page==='growth' || !page) {
+    drawCanvas(d,c);
+    if (window._mcLast) drawMonteCarlo(window._mcLast); else runMonteCarlo();
+  }
+}
+function initTabs() {
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.addEventListener('click', function(){ switchPage(this.dataset.page); }); });
+}
+
+// ── MONTE CARLO SIMULATION ────────────────────────────────────
+function gaussian(mean, sd) {
+  let u = 0, v = 0;
+  while (u === 0) u = Math.random();
+  while (v === 0) v = Math.random();
+  return mean + sd * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+function runMonteCarlo() {
+  const d = getData(), c = calc(d);
+  const retEl = document.getElementById('mcReturn'), volEl = document.getElementById('mcVol');
+  if (retEl && (retEl.value==='' || retEl.value==null)) retEl.value = d.baseRet;
+  const meanRet = parseFloat(retEl ? retEl.value : d.baseRet);
+  const vol = parseFloat(volEl ? volEl.value : 15);
+  const mean = (isNaN(meanRet)?d.baseRet:meanRet) / 100;
+  const sd = (isNaN(vol)?15:vol) / 100;
+  const years = c.years;
+  const start = c.totalInvested, annual = c.monthlyTotal * 12;
+  const N = 2000;
+  const finals = [];
+  const pathsByYear = []; for (let y=0; y<=years; y++) pathsByYear.push([]);
+  for (let i = 0; i < N; i++) {
+    let p = start;
+    pathsByYear[0].push(p);
+    for (let y = 1; y <= years; y++) {
+      const r = gaussian(mean, sd);
+      p = Math.max(0, p * (1 + r) + annual);
+      pathsByYear[y].push(p);
+    }
+    finals.push(p);
+  }
+  // percentiles per year
+  const pcts = [10,25,50,75,90];
+  const bands = {}; pcts.forEach(function(q){ bands[q] = []; });
+  for (let y = 0; y <= years; y++) {
+    const arr = pathsByYear[y].slice().sort(function(a,b){ return a-b; });
+    pcts.forEach(function(q){ bands[q].push(arr[Math.floor(q/100*(arr.length-1))]); });
+  }
+  finals.sort(function(a,b){ return a-b; });
+  const successProb = finals.filter(function(v){ return v >= d.target; }).length / N * 100;
+  const result = { bands, finals, years, target:d.target, age:d.age, retAge:d.retAge, successProb, N, mean:mean*100, sd:sd*100 };
+  window._mcLast = result;
+  renderMonteCarlo(result);
+}
+function pctile(sortedArr, q) { return sortedArr[Math.floor(q/100*(sortedArr.length-1))]; }
+function renderMonteCarlo(r) {
+  document.getElementById('mcRunCount').textContent = r.N.toLocaleString('en-GB');
+  const median = pctile(r.finals, 50), p10 = pctile(r.finals,10), p90 = pctile(r.finals,90);
+  const probCol = r.successProb >= 75 ? 'var(--teal)' : r.successProb >= 50 ? 'var(--gold)' : 'var(--red)';
+  document.getElementById('mcProbBanner').innerHTML =
+    '<div class="mc-prob-item"><div class="mc-prob-val" style="color:'+probCol+'">'+r.successProb.toFixed(0)+'%</div><div class="mc-prob-lbl">Probability of hitting '+fmtS(r.target)+'</div></div>'+
+    '<div class="mc-prob-item"><div class="mc-prob-val" style="color:var(--ink)">'+fmtS(median)+'</div><div class="mc-prob-lbl">Median outcome at '+r.retAge+'</div></div>'+
+    '<div class="mc-prob-item"><div class="mc-prob-val" style="color:var(--teal)">'+fmtS(p90)+'</div><div class="mc-prob-lbl">Best 10% (lucky)</div></div>'+
+    '<div class="mc-prob-item"><div class="mc-prob-val" style="color:var(--red)">'+fmtS(p10)+'</div><div class="mc-prob-lbl">Worst 10% (unlucky)</div></div>';
+  document.getElementById('mcPercentiles').innerHTML =
+    [['10th','p10',p10],['25th','p25',pctile(r.finals,25)],['50th','p50',median],['75th','p75',pctile(r.finals,75)],['90th','p90',p90]]
+      .map(function(x){ return '<div class="mc-pc"><div class="mc-pc-val">'+fmtS(x[2])+'</div><div class="mc-pc-lbl">'+x[0]+' percentile</div></div>'; }).join('');
+  document.getElementById('mcNote').textContent = 'Based on '+r.N.toLocaleString('en-GB')+' randomised paths · mean real return '+r.mean.toFixed(1)+'%, volatility '+r.sd.toFixed(0)+'%. The shaded fan shows the 10th–90th percentile range of where your portfolio could land. A wider fan = more uncertainty. Equities historically have ~15% annual volatility.';
+  drawMonteCarlo(r);
+}
+function drawMonteCarlo(r, targetCanvas, bigH) {
+  const canvas = document.getElementById(targetCanvas || 'mcCanvas'); if (!canvas) return;
+  const dpr = window.devicePixelRatio || 2;
+  const W = Math.max(canvas.parentElement.clientWidth, 200), H = bigH || 340;
+  canvas.width = W*dpr; canvas.height = H*dpr; canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  const ctx = canvas.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
+  const padL=72,padR=40,padT=16,padB=40, cW=W-padL-padR, cH=H-padT-padB;
+  const years = r.years;
+  const maxV = Math.max(r.bands[90][years], r.target) * 1.08;
+  function xp(i){ return padL + (i/years)*cW; }
+  function yp(v){ return padT + cH - Math.min(v/maxV,1)*cH; }
+  // gridlines
+  const mag = Math.pow(10, Math.floor(Math.log10(maxV))-1), step = Math.ceil(maxV/(mag*40))*mag*10;
+  ctx.font='10px IBM Plex Mono,monospace'; ctx.textAlign='right';
+  const gridCol = document.body.classList.contains('dark') ? '#2a2520' : '#e2ddd5';
+  const txtCol = document.body.classList.contains('dark') ? '#6b6258' : '#8a8278';
+  for (let g=0; g<=maxV; g+=step) { const y=yp(g); if(y<padT-5||y>padT+cH+5) continue; ctx.strokeStyle=gridCol; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(padL+cW,y); ctx.stroke(); ctx.fillStyle=txtCol; ctx.fillText(g>=1e6?'£'+(g/1e6).toFixed(1)+'M':'£'+(g/1000).toFixed(0)+'K', padL-8, y+4); }
+  ctx.textAlign='center'; ctx.fillStyle=txtCol;
+  for (let i=0; i<=years; i+=Math.max(1,Math.floor(years/8))) ctx.fillText(r.age+i, xp(i), H-padB+18);
+  // fan band 10-90
+  function bandFill(lo,hi,color){ ctx.beginPath(); for(let i=0;i<=years;i++){ const x=xp(i),y=yp(r.bands[hi][i]); if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);} for(let i=years;i>=0;i--){ ctx.lineTo(xp(i),yp(r.bands[lo][i])); } ctx.closePath(); ctx.fillStyle=color; ctx.fill(); }
+  bandFill(10,90,'rgba(0,180,216,0.10)');
+  bandFill(25,75,'rgba(0,180,216,0.16)');
+  // median line
+  function line(key,color,lw,dash){ ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=lw; ctx.setLineDash(dash||[]); for(let i=0;i<=years;i++){ const x=xp(i),y=yp(r.bands[key][i]); if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);} ctx.stroke(); ctx.setLineDash([]); }
+  line(90,'rgba(42,122,111,0.5)',1.2); line(10,'rgba(192,57,43,0.5)',1.2);
+  line(50,'#b8860b',2.8);
+  // target line
+  if (r.target <= maxV) { const ty=yp(r.target); ctx.strokeStyle=document.body.classList.contains('dark')?'#f0ece4':'#1a1714'; ctx.lineWidth=1.5; ctx.setLineDash([6,4]); ctx.beginPath(); ctx.moveTo(padL,ty); ctx.lineTo(padL+cW,ty); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle=ctx.strokeStyle; ctx.textAlign='left'; ctx.font='bold 9px IBM Plex Mono,monospace'; ctx.fillText(fmtS(r.target)+' TARGET', padL+8, ty-5); }
+  // labels at end
+  ctx.textAlign='left'; ctx.font='bold 10px IBM Plex Mono,monospace';
+  ctx.fillStyle='#2a7a6f'; ctx.fillText(fmtS(r.bands[90][years]), xp(years)+4, yp(r.bands[90][years])+3);
+  ctx.fillStyle='#b8860b'; ctx.fillText(fmtS(r.bands[50][years]), xp(years)+4, yp(r.bands[50][years])+3);
+  ctx.fillStyle='#c0392b'; ctx.fillText(fmtS(r.bands[10][years]), xp(years)+4, yp(r.bands[10][years])+3);
+}
+
+// ── TAX CALCULATOR ────────────────────────────────────────────
+let taxRegion = 'england';
+function incomeTax(taxable, region) {
+  if (taxable <= 0) return 0;
+  let tax = 0;
+  if (region === 'scotland') {
+    const bands = [[2306,0.19],[11685,0.20],[17101,0.21],[31338,0.42],[50140,0.45]];
+    let rem = taxable;
+    for (const [w,rate] of bands) { if (rem<=0) break; const amt=Math.min(rem,w); tax+=amt*rate; rem-=amt; }
+    if (rem>0) tax += rem*0.48;
+  } else {
+    const bands = [[37700,0.20],[74870,0.40]];
+    let rem = taxable;
+    for (const [w,rate] of bands) { if (rem<=0) break; const amt=Math.min(rem,w); tax+=amt*rate; rem-=amt; }
+    if (rem>0) tax += rem*0.45;
+  }
+  return tax;
+}
+function nationalInsurance(gross) {
+  const PT = 12570, UEL = 50270;
+  if (gross <= PT) return 0;
+  if (gross <= UEL) return (gross-PT)*0.08;
+  return (UEL-PT)*0.08 + (gross-UEL)*0.02;
+}
+function studentLoanRepay(gross, plan) {
+  const t = { plan1:[24990,0.09], plan2:[27295,0.09], plan4:[31395,0.09], plan5:[25000,0.09], pgl:[21000,0.06] }[plan];
+  if (!t) return 0;
+  return gross > t[0] ? (gross-t[0])*t[1] : 0;
+}
+function computeTax(salary, region, pensionPct, salSac, slPlan) {
+  const pension = salary * pensionPct/100;
+  const taxableGross = salSac ? salary - pension : salary;
+  const niGross = salSac ? salary - pension : salary;
+  // personal allowance with taper
+  let PA = 12570;
+  if (taxableGross > 100000) PA = Math.max(0, 12570 - (taxableGross-100000)/2);
+  const taxable = Math.max(0, taxableGross - PA);
+  const tax = incomeTax(taxable, region);
+  const ni = nationalInsurance(niGross);
+  const sl = studentLoanRepay(niGross, slPlan);
+  let takeHome, pot;
+  if (salSac) { takeHome = taxableGross - tax - ni - sl; pot = pension; }
+  else { takeHome = salary - tax - ni - sl - pension; pot = pension/0.8; } // relief at source grosses up 20%
+  return { salary, pension, pot, tax, ni, sl, takeHome, PA, taxableGross };
+}
+function renderTax() {
+  const salary = parseFloat(document.getElementById('taxSalary').value) || 0;
+  const pensionPct = parseFloat(document.getElementById('taxPensionPct').value) || 0;
+  const salSac = document.getElementById('taxSalSac').checked;
+  const slPlan = document.getElementById('taxStudentLoan').value;
+  const res = computeTax(salary, taxRegion, pensionPct, salSac, slPlan);
+  // comparison: the other mode
+  const other = computeTax(salary, taxRegion, pensionPct, !salSac, slPlan);
+  const el = document.getElementById('taxResults');
+  if (!el) return;
+  const segs = [
+    ['Take-home', res.takeHome, 'var(--teal)'],
+    ['Income Tax', res.tax, 'var(--red)'],
+    ['Nat. Insurance', res.ni, 'var(--amber)'],
+    ['Pension', salSac ? res.pension : (res.pot*0.8), 'var(--blue)'],
+    ['Student Loan', res.sl, 'var(--muted)']
+  ].filter(function(s){ return s[1] > 0; });
+  const totalForBar = segs.reduce(function(s,x){ return s+x[1]; }, 0) || 1;
+  const bar = segs.map(function(s){ const pct=(s[1]/totalForBar*100); return '<div class="tax-seg" style="width:'+pct+'%;background:'+s[2]+'">'+(pct>9?Math.round(pct)+'%':'')+'</div>'; }).join('');
+  const line = function(label,val,col){ return '<div class="tax-line"><span class="tl-label"><span class="tl-dot" style="background:'+col+'"></span>'+label+'</span><span class="tl-val">'+fmtFull(Math.round(val))+'</span></div>'; };
+  const salSacSaving = salSac ? (other.takeHome + 0) : 0; // placeholder
+  const takeHomeDiff = res.takeHome - other.takeHome;
+  el.innerHTML =
+    '<div class="tax-result-main"><div class="tax-takehome"><div class="tax-takehome-val">'+fmtFull(Math.round(res.takeHome))+'</div><div class="tax-takehome-lbl">Annual take-home pay</div></div>'+
+    '<div class="tax-takehome"><div class="tax-takehome-val" style="font-size:28px;color:#fff">'+fmtFull(Math.round(res.takeHome/12))+'</div><div class="tax-takehome-lbl">Per month</div></div>'+
+    '<div class="tax-takehome"><div class="tax-takehome-val" style="font-size:28px;color:var(--teal-light)">'+fmtFull(Math.round(res.pot))+'</div><div class="tax-takehome-lbl">Into pension/yr</div></div></div>'+
+    '<div class="tax-breakdown-bar">'+bar+'</div>'+
+    '<div class="tax-lines">'+
+      line('Take-home pay', res.takeHome, 'var(--teal)')+
+      line('Income tax ('+(taxRegion==='scotland'?'Scotland':'rUK')+')', res.tax, 'var(--red)')+
+      line('National Insurance', res.ni, 'var(--amber)')+
+      (res.sl>0?line('Student loan', res.sl, 'var(--muted)'):'')+
+      line('Pension contribution', salSac?res.pension:res.pot*0.8, 'var(--blue)')+
+      '<div class="tax-line total"><span class="tl-label">Gross salary</span><span class="tl-val">'+fmtFull(salary)+'</span></div>'+
+    '</div>'+
+    '<div class="tax-salsac-note">'+
+      (salSac
+        ? '✓ <strong>Salary sacrifice ON.</strong> Your pension comes out of gross pay, so you save National Insurance as well as income tax on it. Pension pot gets the full '+fmtFull(Math.round(res.pension))+'. Versus relief-at-source, salary sacrifice leaves you '+(takeHomeDiff>=0?'+':'')+fmtFull(Math.round(takeHomeDiff))+'/yr in take-home for the same '+pensionPct+'% contribution.'
+        : 'ℹ <strong>Relief at source.</strong> You pay pension from net pay; the provider adds 20% basic-rate relief (higher-rate claimed via self-assessment). Switching to <strong>salary sacrifice</strong> would change your take-home by '+(takeHomeDiff>=0?'+':'')+fmtFull(Math.round(takeHomeDiff))+'/yr and save employee NI.')+
+      '<br><span style="color:var(--muted)">2024/25 rates. Estimate only — excludes employer NI savings, marriage allowance, benefits-in-kind &amp; other adjustments.</span>'+
+    '</div>';
+}
+
+// ── CHART EXPAND MODAL ────────────────────────────────────────
+function openChartModal(which) {
+  const overlay = document.getElementById('chartModal');
+  const title = document.getElementById('chartModalTitle');
+  const note = document.getElementById('chartModalNote');
+  const d = getData(), c = calc(d);
+  overlay.classList.add('open');
+  if (which === 'projection') {
+    title.textContent = 'Portfolio Projection — Age '+d.age+' to '+(d.age+c.chartYears);
+    note.textContent = document.getElementById('chartNote').textContent;
+    requestAnimationFrame(function(){ drawCanvasTo('chartModalCanvas', d, c, 460); });
+  } else if (which === 'montecarlo') {
+    title.textContent = 'Monte Carlo Simulation — '+(window._mcLast?window._mcLast.N.toLocaleString('en-GB'):'')+' paths';
+    note.textContent = document.getElementById('mcNote').textContent;
+    requestAnimationFrame(function(){ if(window._mcLast) drawMonteCarlo(window._mcLast, 'chartModalCanvas', 460); });
+  }
+}
+function closeChartModal(){ document.getElementById('chartModal').classList.remove('open'); }
+
+// ── WATCHLIST ─────────────────────────────────────────────────
+const WLK = 'wealth_watchlist_v1';
+const WL_DEFAULTS = ['VWRP.L','SMT.L','^FTSE','^GSPC','NVDA','AAPL'];
+function getWatchlist() { try { const s=localStorage.getItem(WLK); if(s) return JSON.parse(s); } catch(e){} return WL_DEFAULTS.slice(); }
+function saveWatchlist(arr) { try { localStorage.setItem(WLK, JSON.stringify(arr)); } catch(e){} }
+
+function renderWatchlistSkeleton(syms) {
+  const grid = document.getElementById('watchlistGrid');
+  if (!grid) return;
+  grid.innerHTML = syms.map(function(sym){
+    return '<div class="wl-card wl-loading" id="wlcard_'+sym.replace(/[^a-z0-9]/gi,'_')+'">'+
+      '<div class="wl-sym">'+sym+'</div><div class="wl-price" style="color:var(--muted)">—</div>'+
+      '<div class="wl-change flat">Fetching…</div></div>';
+  }).join('');
+}
+
+async function fetchWatchlist() {
+  const syms = getWatchlist();
+  if (!syms.length) { document.getElementById('watchlistGrid').innerHTML='<div class="history-empty">No tickers added yet. Try VWRP.L, AAPL, NVDA, SMT.L, or ^FTSE.</div>'; return; }
+  renderWatchlistSkeleton(syms);
+  for (const sym of syms) {
+    const card = document.getElementById('wlcard_'+sym.replace(/[^a-z0-9]/gi,'_'));
+    try {
+      const data = await fetchTicker(sym);
+      if (card) {
+        if (!data) { card.classList.add('wl-error'); card.innerHTML = '<div class="wl-sym">'+sym+'</div><div class="wl-price">Not found</div><div class="wl-change flat">Check symbol</div><button class="wl-card-del" data-sym="'+sym+'">✕</button>'; }
+        else {
+          const pc = data.dayPct>0.05?'up':data.dayPct<-0.05?'down':'flat';
+          const arrow = pc==='up'?'▲':pc==='down'?'▼':'—';
+          const canvas = 'wlsp_'+sym.replace(/[^a-z0-9]/gi,'_');
+          card.classList.remove('wl-loading');
+          card.innerHTML = '<button class="wl-card-del" data-sym="'+sym+'">✕</button>'+
+            '<div class="wl-sym">'+sym+'</div>'+
+            '<div class="wl-price">'+data.price+'</div>'+
+            '<div class="wl-change '+pc+'">'+arrow+' '+sgn(data.dayPct)+data.dayPct.toFixed(2)+'% today</div>'+
+            '<div class="wl-meta">1yr: '+sgn(data.yrPct)+data.yrPct.toFixed(1)+'%</div>'+
+            '<canvas class="wl-spark" id="'+canvas+'" height="36"></canvas>';
+          drawWlSpark(canvas, data.closes);
+        }
+        const del = card.querySelector('.wl-card-del');
+        if (del) del.addEventListener('click', function(){ removeFromWatchlist(this.dataset.sym); });
+      }
+    } catch(e) { if(card){ card.classList.add('wl-error'); card.innerHTML='<div class="wl-sym">'+sym+'</div><div class="wl-price">Error</div><button class="wl-card-del" data-sym="'+sym+'">✕</button>'; } }
+  }
+}
+
+function drawWlSpark(canvasId, closes) {
+  const c = document.getElementById(canvasId); if (!c) return;
+  const ctx = c.getContext('2d'), W = c.offsetWidth || 200, H = 36, pad = 3;
+  c.width = W; c.height = H;
+  if (!closes || closes.length < 2) return;
+  const min = Math.min.apply(null, closes), max = Math.max.apply(null, closes), range = max-min||1;
+  const col = closes[closes.length-1] >= closes[0] ? '#3d9e91' : '#c0392b';
+  ctx.beginPath(); ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.lineJoin = 'round';
+  closes.forEach(function(v,i){ const x=pad+(i/(closes.length-1))*(W-pad*2), y=H-pad-((v-min)/range)*(H-pad*2); if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y); });
+  ctx.stroke();
+  // fill under
+  ctx.lineTo(W-pad,H); ctx.lineTo(pad,H); ctx.closePath();
+  ctx.fillStyle = closes[closes.length-1] >= closes[0] ? 'rgba(42,122,111,0.08)' : 'rgba(192,57,43,0.08)';
+  ctx.fill();
+}
+
+function addToWatchlist() {
+  const inp = document.getElementById('watchlistInput');
+  const raw = (inp.value||'').trim().toUpperCase();
+  if (!raw) return;
+  const syms = getWatchlist();
+  const toAdd = raw.split(/[\s,]+/).filter(Boolean);
+  let added = 0;
+  toAdd.forEach(function(sym){ if (!syms.includes(sym) && syms.length < 20) { syms.push(sym); added++; } });
+  if (!added) { showToast('Already in watchlist'); return; }
+  saveWatchlist(syms);
+  inp.value = '';
+  fetchWatchlist();
+  showToast('Added to watchlist');
+}
+
+function removeFromWatchlist(sym) {
+  const syms = getWatchlist().filter(function(s){ return s !== sym; });
+  saveWatchlist(syms);
+  fetchWatchlist();
+}
+
 // ── STATE PENSION ─────────────────────────────────────────────
 const FULL_STATE_PENSION = 11502; // £/yr 2024/25 new State Pension
 const SP_MAX_YEARS = 35, SP_MIN_YEARS = 10, SP_AGE = 68;
@@ -1608,7 +2134,19 @@ function renderDebtDashboard() {
 
 // ── BUDGET TRACKER ────────────────────────────────────────────
 function getBudget() {
-  try { const s = localStorage.getItem(BGK); if (s) return JSON.parse(s); } catch(e){}
+  try {
+    const s = localStorage.getItem(BGK);
+    if (s) {
+      const saved = JSON.parse(s);
+      // Merge with defaults — ensures actual is always defined even if saved data is partial
+      return BUDGET_DEFAULTS.map(function(def, i) {
+        const item = (saved && saved[i]) ? saved[i] : {};
+        const plan = item.plan != null ? item.plan : def.plan;
+        const actual = item.actual != null ? item.actual : plan;
+        return { cat: item.cat || def.cat, plan: plan, actual: actual };
+      });
+    }
+  } catch(e){}
   return BUDGET_DEFAULTS.map(function(b){ return { cat:b.cat, plan:b.plan, actual:b.plan }; });
 }
 function saveBudget(arr) { try { localStorage.setItem(BGK, JSON.stringify(arr)); } catch(e){} }
@@ -1617,13 +2155,24 @@ function renderBudgetTracker() {
   if (!grid) return;
   const budget = getBudget();
   grid.innerHTML = budget.map(function(b, i){
-    const pct = b.plan > 0 ? Math.min(b.actual / b.plan * 100, 150) : 0;
-    const over = b.actual > b.plan;
+    const actual = b.actual != null ? b.actual : b.plan;
+    const pct = b.plan > 0 ? Math.min(actual / b.plan * 100, 150) : 0;
+    const over = actual > b.plan;
+    const under = actual < b.plan * 0.9;
     const col = over ? 'var(--red)' : pct > 90 ? 'var(--amber)' : 'var(--teal)';
-    return '<div class="budget-item"><div class="budget-cat"><span>'+b.cat+'</span><span style="color:'+col+'">'+(over?'+'+fmtS(b.actual-b.plan):'✓')+'</span></div>'+
-      '<div class="budget-inputs"><input type="number" data-i="'+i+'" data-f="plan" value="'+b.plan+'" title="Planned"><span style="color:var(--muted);font-family:var(--mono);font-size:11px;">vs</span><input type="number" data-i="'+i+'" data-f="actual" value="'+b.actual+'" title="Actual"></div>'+
-      '<div class="budget-vs">Plan '+fmtS(b.plan)+' · Actual '+fmtS(b.actual)+'</div>'+
-      '<div class="budget-bar-wrap"><div class="budget-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div></div>';
+    const chipBg = over ? 'rgba(192,57,43,0.1)' : 'rgba(42,122,111,0.1)';
+    const chipCol = over ? 'var(--red)' : 'var(--teal)';
+    const chipTxt = over ? '+'+fmtS(actual-b.plan)+' over' : under ? '-'+fmtS(b.plan-actual)+' under' : '✓ on plan';
+    return '<div class="budget-item">'+
+      '<div class="budget-cat"><span>'+b.cat+'</span>'+
+      '<span class="budget-status-chip" style="background:'+chipBg+';color:'+chipCol+'">'+chipTxt+'</span></div>'+
+      '<div class="budget-inputs">'+
+        '<div class="budget-col"><div class="budget-input-lbl">Budget</div><input type="number" data-i="'+i+'" data-f="plan" value="'+b.plan+'" min="0" step="10"></div>'+
+        '<div class="budget-vs">vs</div>'+
+        '<div class="budget-col"><div class="budget-input-lbl">Actual</div><input type="number" data-i="'+i+'" data-f="actual" value="'+actual+'" min="0" step="10"></div>'+
+      '</div>'+
+      '<div class="budget-bar-wrap"><div class="budget-bar-fill" style="width:'+pct.toFixed(0)+'%;background:'+col+'"></div></div>'+
+    '</div>';
   }).join('');
   grid.querySelectorAll('input').forEach(function(inp){
     inp.addEventListener('change', function(){
@@ -1634,14 +2183,16 @@ function renderBudgetTracker() {
     });
   });
   const totPlan = budget.reduce(function(s,b){ return s+b.plan; },0);
-  const totAct = budget.reduce(function(s,b){ return s+b.actual; },0);
+  const totAct = budget.reduce(function(s,b){ return s+(b.actual!=null?b.actual:b.plan); },0);
   const d = getData();
   const income = d.monthlyIncome || 4000;
   const sumEl = document.getElementById('budgetSummary');
   if (sumEl) {
     const surplus = income - totAct;
-    sumEl.innerHTML = '<span>Income: <strong>'+fmtFull(income)+'</strong> · Planned out: <strong>'+fmtFull(totPlan)+'</strong> · Actual out: <strong>'+fmtFull(totAct)+'</strong></span>'+
-      '<span style="color:'+(surplus>=0?'var(--teal)':'var(--red)')+'">'+(surplus>=0?'Surplus: ':'Overspend: ')+fmtFull(Math.abs(surplus))+'/mo</span>';
+    const pctSaved = income > 0 ? (Math.max(0, surplus) / income * 100).toFixed(0) : 0;
+    sumEl.innerHTML =
+      '<span style="font-family:var(--mono);font-size:11px;">Income: <strong>'+fmtFull(income)+'</strong> · Planned out: <strong>'+fmtFull(totPlan)+'</strong> · Actual out: <strong>'+fmtFull(totAct)+'</strong> · Savings rate: <strong>'+pctSaved+'%</strong></span>'+
+      '<span style="font-family:var(--mono);font-size:11px;color:'+(surplus>=0?'var(--teal)':'var(--red)')+'">'+(surplus>=0?'Surplus: +':'Overspend: ')+fmtFull(Math.abs(surplus))+'/mo</span>';
   }
 }
 
@@ -1881,6 +2432,7 @@ function exportData() {
       data: getData(),
       history: JSON.parse(localStorage.getItem(HSK)||'[]'),
       scenarios: getScenarios(), debts: getDebts(), budget: getBudget(),
+      watchlist: getWatchlist(),
       niYears: localStorage.getItem('wealth_ni_years')||null,
       milestones: JSON.parse(localStorage.getItem('wealth_milestones')||'[]')
     };
@@ -1907,8 +2459,9 @@ function importData(file) {
       if (b.budget) saveBudget(b.budget);
       if (b.niYears) localStorage.setItem('wealth_ni_years', b.niYears);
       if (b.milestones) localStorage.setItem('wealth_milestones', JSON.stringify(b.milestones));
+      if (b.watchlist) saveWatchlist(b.watchlist);
       shownMilestones = null;
-      renderAll(); renderStatePension(); renderDebtDashboard(); renderBudgetTracker(); renderScenariosList();
+      renderAll(); renderStatePension(); renderDebtDashboard(); renderBudgetTracker(); renderScenariosList(); fetchWatchlist();
       showToast('Data imported ✓');
     } catch(err) { showToast('Couldn\'t read that file'); }
   };
@@ -1916,7 +2469,7 @@ function importData(file) {
 }
 function wipeAll() {
   if (!confirm('Delete ALL saved data — figures, history, scenarios, debts, budget? This cannot be undone.')) return;
-  [SK,HSK,SCK,DBK,BGK,'wealth_milestones','wealth_ni_years'].forEach(function(k){ try{localStorage.removeItem(k);}catch(e){} });
+  [SK,HSK,SCK,DBK,BGK,WLK,'wealth_milestones','wealth_ni_years'].forEach(function(k){ try{localStorage.removeItem(k);}catch(e){} });
   shownMilestones = null;
   renderAll(); renderStatePension(); renderDebtDashboard(); renderBudgetTracker(); renderScenariosList();
   showToast('All data reset');
@@ -2480,8 +3033,8 @@ document.getElementById('epClose').addEventListener('click', closeEdit);
 document.getElementById('epSave').addEventListener('click', saveFromPanel);
 document.getElementById('epReset').addEventListener('click', resetToDefaults);
 document.getElementById('editOverlay').addEventListener('click', function(e){ if(e.target===this) closeEdit(); });
-document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeEdit(); });
-window.addEventListener('resize', function(){ const d=getData(),c=calc(d); drawCanvas(d,c); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeEdit(); closeChartModal(); closeAISettings(); } });
+window.addEventListener('resize', function(){ const d=getData(),c=calc(d); drawCanvas(d,c); if(window._mcLast) drawMonteCarlo(window._mcLast); });
 document.getElementById('aiSpeakBtn').addEventListener('click', function(){ speak(briefingText); });
 document.getElementById('aiStopBtn').addEventListener('click', stopSpeak);
 document.getElementById('aiAskBtn').addEventListener('click', function(){ const i=document.getElementById('aiAsk'); const q=i.value.trim(); if(q){ handleAsk(q); i.value=''; } });
@@ -2493,6 +3046,26 @@ document.getElementById('aisSaveBtn').addEventListener('click', saveApiKey);
 document.getElementById('aisClearKeyBtn').addEventListener('click', clearApiKey);
 document.getElementById('aisCloseBtn').addEventListener('click', closeAISettings);
 document.getElementById('aiSettingsOverlay').addEventListener('click', function(e){ if(e.target===this) closeAISettings(); });
+// Tabs
+initTabs();
+// Monte Carlo
+document.getElementById('mcRunBtn').addEventListener('click', runMonteCarlo);
+document.getElementById('mcReturn').addEventListener('change', runMonteCarlo);
+document.getElementById('mcVol').addEventListener('change', runMonteCarlo);
+// Tax calculator
+document.getElementById('taxCalcBtn').addEventListener('click', renderTax);
+['taxSalary','taxPensionPct'].forEach(function(id){ document.getElementById(id).addEventListener('input', renderTax); });
+document.getElementById('taxSalSac').addEventListener('change', renderTax);
+document.getElementById('taxStudentLoan').addEventListener('change', renderTax);
+document.querySelectorAll('.tax-region-btn').forEach(function(b){ b.addEventListener('click', function(){ taxRegion=this.dataset.region; document.querySelectorAll('.tax-region-btn').forEach(function(x){ x.classList.toggle('active', x===b); }); renderTax(); }); });
+// Chart expand modals
+document.getElementById('projChartSection').addEventListener('click', function(){ openChartModal('projection'); });
+document.getElementById('mcSection').addEventListener('click', function(e){ if(e.target.closest('.mc-controls')) return; openChartModal('montecarlo'); });
+document.getElementById('chartModalClose').addEventListener('click', closeChartModal);
+document.getElementById('chartModal').addEventListener('click', function(e){ if(e.target===this) closeChartModal(); });
+// Watchlist
+document.getElementById('watchlistAddBtn').addEventListener('click', addToWatchlist);
+document.getElementById('watchlistInput').addEventListener('keydown', function(e){ if(e.key==='Enter') addToWatchlist(); });
 // State pension
 document.getElementById('spCalcBtn').addEventListener('click', calcStatePension);
 document.getElementById('spNiYears').addEventListener('change', calcStatePension);
@@ -2525,11 +3098,15 @@ renderDebtDashboard();
 renderBudgetTracker();
 renderScenariosList();
 updateApiIndicator();
+(function(){ const d=getData(); const r=document.getElementById('mcReturn'); if(r) r.value=d.baseRet; })();
+runMonteCarlo();
+renderTax();
 initHeaderCanvas();
 initCalcs();
 initPWA();
 checkOnboarding();
 fetchLiveData();
+fetchWatchlist();
 fetchNews().then(renderNews);
 setInterval(function(){ fetchNews().then(function(i){ renderNews(i, true); }); }, 30 * 60 * 1000);
 setInterval(function(){ fetchLiveData(); }, 5 * 60 * 1000);
