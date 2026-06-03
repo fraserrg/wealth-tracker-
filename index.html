@@ -753,6 +753,47 @@ body.dark .tabnav { background: rgba(14,12,10,0.85); }
   .live-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 0 0 12px; }
   .sparkline-wrap { border-right: none; padding: 0; }
 }
+
+/* ── VIZ 1: WEALTH TIMELINE ──────────────────────────────────── */
+.timeline-wrap { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:28px; margin-bottom:48px; overflow:hidden; }
+.timeline-canvas-wrap { position:relative; }
+.timeline-tooltip { position:absolute; background:var(--ink); color:#fff; font-family:var(--mono); font-size:10px; padding:10px 14px; border-radius:8px; pointer-events:none; display:none; z-index:10; border:1px solid rgba(212,165,32,0.4); min-width:140px; line-height:1.6; }
+
+/* ── VIZ 2: MORTGAGE AMORTISATION ───────────────────────────── */
+.amort-wrap { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:28px; margin-bottom:48px; }
+.amort-controls { display:flex; gap:20px; flex-wrap:wrap; align-items:flex-end; margin-bottom:20px; }
+.amort-ctrl { display:flex; flex-direction:column; gap:5px; }
+.amort-ctrl label { font-family:var(--mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; }
+.amort-ctrl input { padding:7px 10px; border:1px solid var(--border); border-radius:6px; font-family:var(--mono); font-size:12px; background:var(--surface2); color:var(--ink); outline:none; width:110px; }
+.amort-ctrl input[type=range] { width:180px; accent-color:var(--teal); }
+.amort-stats { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:16px; }
+.amort-stat { background:var(--surface2); border-radius:8px; padding:12px 16px; }
+.amort-stat-val { font-family:var(--serif); font-size:20px; font-style:italic; color:var(--ink); }
+.amort-stat-lbl { font-family:var(--mono); font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-top:2px; }
+.amort-stat-val.positive { color:var(--teal); }
+
+/* ── VIZ 3: COMPOUND TREE ────────────────────────────────────── */
+.ctree-wrap { background:linear-gradient(160deg,#050810 0%,#0a1020 100%); border:1px solid rgba(0,180,216,0.15); border-radius:12px; padding:28px; margin-bottom:48px; }
+.ctree-controls { display:flex; gap:20px; align-items:center; flex-wrap:wrap; margin-bottom:16px; }
+.ctree-ctrl { display:flex; flex-direction:column; gap:4px; }
+.ctree-ctrl label { font-family:var(--mono); font-size:9px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.12em; }
+.ctree-ctrl strong { color:var(--cyan); }
+.ctree-ctrl input[type=range] { accent-color:var(--cyan); width:140px; }
+.ctree-stats-row { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:12px; }
+.ctree-stat { font-family:var(--mono); font-size:11px; color:rgba(255,255,255,0.6); }
+.ctree-stat strong { color:var(--gold-light); }
+
+/* ── VIZ 4: SPENDING VELOCITY GAUGE ─────────────────────────── */
+.budget-income-header { grid-template-columns: repeat(4,1fr) 168px !important; }
+
+/* ── VIZ 5: NET WORTH HEATMAP ────────────────────────────────── */
+.heatmap-wrap { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:24px; margin-bottom:32px; }
+.heatmap-title { font-family:var(--mono); font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:16px; }
+.heatmap-grid { display:flex; gap:3px; flex-wrap:wrap; }
+.heatmap-cell { width:18px; height:18px; border-radius:3px; cursor:pointer; transition:transform 0.1s; position:relative; }
+.heatmap-cell:hover { transform:scale(1.3); z-index:5; }
+.heatmap-legend { display:flex; gap:6px; align-items:center; margin-top:12px; font-family:var(--mono); font-size:9px; color:var(--muted); }
+.heatmap-empty { font-family:var(--mono); font-size:11px; color:var(--muted); padding:8px 0; }
 </style>
 </head>
 <body>
@@ -841,6 +882,24 @@ body.dark .tabnav { background: rgba(14,12,10,0.85); }
   <div class="contrib-section">
     <div class="contrib-title" id="contribTitle"></div>
     <div class="contrib-flows" id="contribFlows"></div>
+  </div>
+
+  <!-- NET WORTH HEATMAP -->
+  <div class="section-header" style="margin-top:32px;">
+    <div class="section-num">2B</div>
+    <div class="section-title">Net Worth History Heatmap</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="heatmap-wrap">
+    <div class="heatmap-title">Monthly net worth — colour intensity = growth rate</div>
+    <div class="heatmap-grid" id="heatmapGrid"></div>
+    <div class="heatmap-legend">
+      Less <div style="width:12px;height:12px;border-radius:2px;background:#c0392b;display:inline-block;"></div>
+      <div style="width:12px;height:12px;border-radius:2px;background:#e2ddd5;display:inline-block;"></div>
+      <div style="width:12px;height:12px;border-radius:2px;background:#3d9e91;display:inline-block;"></div>
+      <div style="width:12px;height:12px;border-radius:2px;background:#00b4d8;display:inline-block;"></div> More
+    </div>
+    <div id="heatmapEmpty" class="heatmap-empty" style="display:none;">No history yet — add snapshots by saving your data.</div>
   </div>
 
   </div><!-- /page home -->
@@ -967,6 +1026,22 @@ body.dark .tabnav { background: rgba(14,12,10,0.85); }
     <div id="historyStats" style="display:none; margin-top:16px; display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px;"></div>
   </div>
 
+  <!-- COMPOUND TREE -->
+  <div class="section-header">
+    <div class="section-num">9A</div>
+    <div class="section-title">Compound Growth Tree</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="ctree-wrap">
+    <div class="ctree-controls">
+      <div class="ctree-ctrl"><label>Return rate: <strong id="ctreeRateLabel">5%</strong></label><input type="range" id="ctreeRate" min="1" max="12" step="0.5" value="5"></div>
+      <div class="ctree-ctrl"><label>Years: <strong id="ctreeYearsLabel">27</strong></label><input type="range" id="ctreeYears" min="5" max="40" step="1" value="27"></div>
+      <div class="ctree-ctrl"><label>Monthly contrib: <strong id="ctreeContribLabel">£1,150</strong></label><input type="range" id="ctreeContrib" min="0" max="5000" step="50" value="1150"></div>
+    </div>
+    <div class="ctree-stats-row" id="ctreeStats"></div>
+    <canvas id="ctreeCanvas" height="340" style="width:100%;"></canvas>
+  </div>
+
   <!-- FIRE CALCULATOR -->
   <div class="section-header">
     <div class="section-num">9B</div>
@@ -987,6 +1062,19 @@ body.dark .tabnav { background: rgba(14,12,10,0.85); }
         <div class="fire-stat"><div class="fire-stat-val" id="fireYears">—</div><div class="fire-stat-lbl">Years to FI</div></div>
       </div>
       <div class="fire-insight" id="fireInsight"></div>
+    </div>
+  </div>
+
+  <!-- WEALTH TIMELINE -->
+  <div class="section-header">
+    <div class="section-num">9C</div>
+    <div class="section-title">Wealth Building Timeline</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="timeline-wrap">
+    <div class="timeline-canvas-wrap">
+      <canvas id="timelineCanvas" height="160" style="width:100%;cursor:pointer;"></canvas>
+      <div id="timelineTooltip" class="timeline-tooltip"></div>
     </div>
   </div>
 
@@ -1207,6 +1295,23 @@ body.dark .tabnav { background: rgba(14,12,10,0.85); }
   </div>
   <div class="debt-grid" id="debtGrid"></div>
 
+  <!-- MORTGAGE AMORTISATION VISUALISER -->
+  <div class="section-header">
+    <div class="section-num">10C</div>
+    <div class="section-title">Mortgage Amortisation Visualiser</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="amort-wrap">
+    <div class="amort-controls">
+      <div class="amort-ctrl"><label>Balance (£)</label><input type="number" id="amortBalance" value="340000" step="1000"></div>
+      <div class="amort-ctrl"><label>Rate (%)</label><input type="number" id="amortRate" value="4.5" step="0.05" min="0.1" max="15"></div>
+      <div class="amort-ctrl"><label>Monthly payment (£)</label><input type="number" id="amortPayment" value="1850" step="50"></div>
+      <div class="amort-ctrl"><label>Extra overpayment: <strong id="amortOverLabel">£0</strong>/mo</label><input type="range" id="amortOver" min="0" max="2000" step="50" value="0"></div>
+    </div>
+    <div class="amort-stats" id="amortStats"></div>
+    <canvas id="amortCanvas" height="180" style="width:100%;"></canvas>
+  </div>
+
   </div><!-- /page plan -->
 
   <div class="page" data-page="manage">
@@ -1267,12 +1372,12 @@ body.dark .tabnav { background: rgba(14,12,10,0.85); }
   <!-- BUDGET INCOME HEADER -->
   <div class="budget-income-header">
     <div class="budget-income-card">
-      <div class="bi-label">Fraser take-home</div>
+      <div class="bi-label">F take-home</div>
       <div class="bi-val"><span class="bi-sym">£</span><input type="number" id="incFraser" value="4232" min="0" step="100"></div>
       <div class="bi-sub">after tax &amp; pension</div>
     </div>
     <div class="budget-income-card">
-      <div class="bi-label">Kiera take-home</div>
+      <div class="bi-label">K take-home</div>
       <div class="bi-val"><span class="bi-sym">£</span><input type="number" id="incKiera" value="2700" min="0" step="100"></div>
       <div class="bi-sub">after tax &amp; pension</div>
     </div>
@@ -1285,6 +1390,11 @@ body.dark .tabnav { background: rgba(14,12,10,0.85); }
       <div class="bi-label">Monthly surplus</div>
       <div class="bi-total" id="biSurplus">—</div>
       <div class="bi-sub" id="biSurplusSub">after all outgoings</div>
+    </div>
+    <div class="budget-income-card" style="display:flex;flex-direction:column;align-items:center;padding:16px 20px;">
+      <div class="bi-label">Spending Velocity</div>
+      <canvas id="velocityGauge" width="140" height="90" style="width:140px;height:90px;"></canvas>
+      <div id="velocityLabel" style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px;text-align:center;">— of budget used</div>
     </div>
   </div>
 
@@ -1473,20 +1583,20 @@ const BUDGET_DEFAULTS = [
   { cat:'Food & Groceries',   plan:500,  section:'Joint Household' },
   { cat:'Gym',                plan:65,   section:'Joint Household' },
   { cat:'Life Insurance',     plan:54,   section:'Joint Household' },
-  { cat:'BMW & Service Plan', plan:386,  section:'Fraser Personal' },
-  { cat:'Audi',               plan:334,  section:'Fraser Personal' },
-  { cat:'Fuel (Fraser)',      plan:150,  section:'Fraser Personal' },
-  { cat:'Phone (Fraser)',     plan:43,   section:'Fraser Personal' },
-  { cat:'Car Insurance',      plan:60,   section:'Fraser Personal' },
-  { cat:'Spotify (Fraser)',   plan:12,   section:'Fraser Personal' },
-  { cat:'Claude AI',          plan:20,   section:'Fraser Personal' },
-  { cat:'Holiday Fund (F)',   plan:1000, section:'Fraser Personal' },
-  { cat:'Fuel (Kiera)',       plan:150,  section:'Kiera Personal' },
-  { cat:'Phone (Kiera)',      plan:55,   section:'Kiera Personal' },
-  { cat:'Spotify (Kiera)',    plan:12,   section:'Kiera Personal' },
-  { cat:'Subscriptions',      plan:72,   section:'Kiera Personal' },
-  { cat:'S&S ISA (Kiera)',    plan:100,  section:'Kiera Personal' },
-  { cat:'Holiday Fund (K)',   plan:200,  section:'Kiera Personal' },
+  { cat:'BMW & Service Plan', plan:386,  section:'F Personal' },
+  { cat:'Audi',               plan:334,  section:'F Personal' },
+  { cat:'Fuel (F)',      plan:150,  section:'F Personal' },
+  { cat:'Phone (F)',     plan:43,   section:'F Personal' },
+  { cat:'Car Insurance',      plan:60,   section:'F Personal' },
+  { cat:'Spotify (F)',   plan:12,   section:'F Personal' },
+  { cat:'Claude AI',          plan:20,   section:'F Personal' },
+  { cat:'Holiday Fund (F)',   plan:1000, section:'F Personal' },
+  { cat:'Fuel (K)',       plan:150,  section:'K Personal' },
+  { cat:'Phone (K)',      plan:55,   section:'K Personal' },
+  { cat:'Spotify (K)',    plan:12,   section:'K Personal' },
+  { cat:'Subscriptions',      plan:72,   section:'K Personal' },
+  { cat:'S&S ISA (K)',    plan:100,  section:'K Personal' },
+  { cat:'Holiday Fund (K)',   plan:200,  section:'K Personal' },
   { cat:'Joint Savings',      plan:100,  section:'Savings & Investments' }
 ];
 
@@ -2030,9 +2140,17 @@ function redrawVisible(page) {
     drawCanvas(d,c);
     if (window._mcLast) drawMonteCarlo(window._mcLast); else runMonteCarlo();
     renderFIRE();
+    drawCompoundTree();
+    renderWealthTimeline();
   }
-  if (page==='budget') {
+  if (page==='plan' || !page) {
+    renderAmortChart();
+  }
+  if (page==='budget' || !page) {
     renderBudgetTracker();
+  }
+  if (page==='home' || !page) {
+    renderHeatmap();
   }
 }
 function initTabs() {
@@ -2477,8 +2595,8 @@ function renderBudgetTracker() {
   // ── Group by section ───────────────────────────────────────
   const SECTION_COLORS = {
     'Joint Household':      '#2a7a6f',
-    'Fraser Personal':      '#2c5f8a',
-    'Kiera Personal':       '#b8860b',
+    'F Personal':      '#2c5f8a',
+    'K Personal':       '#b8860b',
     'Savings & Investments':'#00b4d8',
     'Other':                '#8a8278'
   };
@@ -2585,6 +2703,8 @@ function renderBudgetTracker() {
       }).join('');
     }
   }
+  // Velocity gauge
+  drawVelocityGauge();
 }
 
 // ── FIRE CALCULATOR ───────────────────────────────────────────
@@ -3890,7 +4010,7 @@ document.getElementById('budgetImportBtn').addEventListener('click', function(){
 document.getElementById('budgetImportFile').addEventListener('change', function(){ if(this.files[0]) importBudgetFile(this.files[0]); this.value=''; });
 document.getElementById('budgetAddCatBtn').addEventListener('click', function(){
   const name = prompt('Category name:'); if(!name) return;
-  const sec = prompt('Section (Joint Household / Fraser Personal / Kiera Personal / Savings & Investments):') || 'Other';
+  const sec = prompt('Section (Joint Household /  F Personal /  K Personal / Savings & Investments):') || 'Other';
   const arr = getBudget();
   arr.push({ cat: name, plan: 0, actual: 0, section: sec });
   saveBudget(arr);
@@ -3977,6 +4097,629 @@ function initAnimations() {
   });
 }
 
+// ── VIZ 1: WEALTH BUILDING TIMELINE ──────────────────────────
+function renderWealthTimeline() {
+  var cv = document.getElementById('timelineCanvas'); if (!cv) return;
+  var d = getData(), c = calc(d);
+  var dpr = window.devicePixelRatio || 1;
+  var W = cv.parentElement.clientWidth || 600;
+  var H = 160;
+  cv.width = W * dpr; cv.height = H * dpr;
+  cv.style.width = W + 'px'; cv.style.height = H + 'px';
+  var ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, W, H);
+
+  // Compute FIRE number from budget expenses
+  var budget = getBudget();
+  var annualExpenses = budget.reduce(function(s,b){ return s + (b.plan || 0); }, 0) * 12;
+  if (annualExpenses < 5000) annualExpenses = 30000;
+  var fireNum = annualExpenses / 0.04;
+
+  var milestones = [
+    { label: '£250k', target: 250000 },
+    { label: '£500k', target: 500000 },
+    { label: '£1M', target: 1000000 },
+    { label: 'FIRE', target: fireNum },
+    { label: 'Target', target: d.target }
+  ];
+
+  // Project base scenario for 40 years
+  var projArr = project(c.totalInvested, c.monthlyTotal, 40, (d.baseRet || 5) / 100);
+  // projArr[i] = value at end of year (i+1)
+  var currentYear = new Date().getFullYear();
+
+  milestones.forEach(function(m) {
+    m.hitYear = null; m.hitAge = null;
+    if (c.totalInvested >= m.target) { m.hitYear = currentYear; m.hitAge = d.age; return; }
+    for (var i = 0; i < projArr.length; i++) {
+      if (projArr[i] >= m.target) {
+        m.hitYear = currentYear + i + 1;
+        m.hitAge = d.age + i + 1;
+        break;
+      }
+    }
+  });
+
+  var padL = 60, padR = 40, lineY = H * 0.52;
+  var usableW = W - padL - padR;
+
+  // Draw gradient line
+  var grad = ctx.createLinearGradient(padL, 0, W - padR, 0);
+  grad.addColorStop(0, '#2a7a6f'); grad.addColorStop(1, '#00b4d8');
+  ctx.strokeStyle = grad; ctx.lineWidth = 3; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(padL, lineY); ctx.lineTo(W - padR, lineY); ctx.stroke();
+
+  // "Now" label
+  ctx.fillStyle = 'var(--muted)'; ctx.font = '9px IBM Plex Mono,monospace'; ctx.textAlign = 'center';
+  ctx.fillStyle = '#8a8278'; ctx.fillText('Now', padL, lineY - 14);
+  ctx.fillStyle = '#00b4d8';
+  ctx.beginPath(); ctx.arc(padL, lineY, 5, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#8a8278'; ctx.font = '8px IBM Plex Mono,monospace';
+  ctx.fillText(fmtS(c.totalInvested), padL, lineY + 20);
+
+  // Determine x positions for milestones
+  var hitMilestones = milestones.filter(function(m){ return m.hitYear !== null; });
+  // Spread hit milestones evenly across usable width, ordered by year
+  hitMilestones.sort(function(a, b){ return a.hitYear - b.hitYear; });
+  var maxYear = hitMilestones.length > 0 ? hitMilestones[hitMilestones.length - 1].hitYear : currentYear + 30;
+  var yearSpan = Math.max(maxYear - currentYear, 5);
+
+  window._timelineNodes = [];
+
+  hitMilestones.forEach(function(m, i) {
+    var xFrac = (m.hitYear - currentYear) / yearSpan;
+    var x = padL + xFrac * usableW;
+    if (x < padL + 30) x = padL + 30 + i * 20;
+    m._x = x; m._y = lineY;
+    window._timelineNodes.push({ x: x, y: lineY, milestone: m });
+  });
+
+  // Animate nodes
+  if (window._timelineAnim) { clearInterval(window._timelineAnim); window._timelineAnim = null; }
+  var nodesDone = 0;
+  var total = hitMilestones.length;
+  function drawNodes(upTo) {
+    ctx.clearRect(0, 0, W, H);
+    // Redraw line
+    var g2 = ctx.createLinearGradient(padL, 0, W - padR, 0);
+    g2.addColorStop(0, '#2a7a6f'); g2.addColorStop(1, '#00b4d8');
+    ctx.strokeStyle = g2; ctx.lineWidth = 3; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(padL, lineY); ctx.lineTo(W - padR, lineY); ctx.stroke();
+
+    // "Now"
+    ctx.fillStyle = '#8a8278'; ctx.font = '9px IBM Plex Mono,monospace'; ctx.textAlign = 'center';
+    ctx.fillText('Now', padL, lineY - 16);
+    ctx.fillStyle = '#00b4d8';
+    ctx.beginPath(); ctx.arc(padL, lineY, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#8a8278'; ctx.font = '8px IBM Plex Mono,monospace';
+    ctx.fillText(fmtS(c.totalInvested), padL, lineY + 20);
+
+    for (var j = 0; j < Math.min(upTo, hitMilestones.length); j++) {
+      var m = hitMilestones[j];
+      var x = m._x;
+      var isNow = m.hitYear === currentYear;
+
+      // Connector line
+      ctx.strokeStyle = '#e2ddd5'; ctx.lineWidth = 1;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath(); ctx.moveTo(x, lineY - 5); ctx.lineTo(x, lineY - 28); ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Node circle
+      ctx.beginPath(); ctx.arc(x, lineY, 7, 0, Math.PI * 2);
+      var isMilestone = m.target >= 1000000 || m.label === 'FIRE' || m.label === 'Target';
+      ctx.fillStyle = isMilestone ? '#d4a520' : '#3d9e91';
+      ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+
+      // Glow
+      ctx.beginPath(); ctx.arc(x, lineY, 11, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,180,216,0.12)'; ctx.fill();
+
+      // Label above
+      ctx.fillStyle = '#1a1714'; ctx.font = 'bold 10px IBM Plex Mono,monospace'; ctx.textAlign = 'center';
+      ctx.fillText(m.label, x, lineY - 33);
+
+      // Age + year below
+      ctx.fillStyle = '#8a8278'; ctx.font = '8px IBM Plex Mono,monospace';
+      if (isNow) {
+        ctx.fillText('Now · ' + currentYear, x, lineY + 22);
+      } else {
+        ctx.fillText('Age ' + m.hitAge + ' · ' + m.hitYear, x, lineY + 22);
+      }
+    }
+
+    // Unreachable milestones
+    milestones.forEach(function(m) {
+      if (m.hitYear === null) {
+        var x = W - padR - 20;
+        ctx.font = '9px IBM Plex Mono,monospace'; ctx.fillStyle = '#c0392b'; ctx.textAlign = 'right';
+        ctx.fillText(m.label + ': not reached in 40yrs', x, lineY - 10);
+      }
+    });
+  }
+
+  // Stagger animation
+  var step = 0;
+  window._timelineAnim = setInterval(function() {
+    step++;
+    drawNodes(step);
+    if (step >= hitMilestones.length) { clearInterval(window._timelineAnim); window._timelineAnim = null; }
+  }, 180);
+  drawNodes(0);
+
+  // Click handler
+  cv.onclick = function(e) {
+    var rect = cv.getBoundingClientRect();
+    var mx = (e.clientX - rect.left) * (W / rect.width);
+    var tip = document.getElementById('timelineTooltip');
+    if (!tip) return;
+    var nearest = null, minDist = 24;
+    (window._timelineNodes || []).forEach(function(n) {
+      var dist = Math.abs(n.x - mx);
+      if (dist < minDist) { minDist = dist; nearest = n; }
+    });
+    if (nearest) {
+      var m = nearest.milestone;
+      tip.innerHTML = '<strong style="color:var(--gold-light)">' + m.label + '</strong><br>Target: ' + fmtFull(m.target) + '<br>Age: ' + (m.hitAge || '—') + '<br>Year: ' + (m.hitYear || '—') + '<br>Yrs away: ' + (m.hitYear ? Math.max(0, m.hitYear - currentYear) : '—');
+      tip.style.display = 'block';
+      tip.style.left = Math.min(nearest.x + 12, W - 160) + 'px';
+      tip.style.top = (nearest.y - 80) + 'px';
+    } else {
+      tip.style.display = 'none';
+    }
+  };
+
+  // Mousemove
+  cv.onmousemove = function(e) {
+    var rect = cv.getBoundingClientRect();
+    var mx = (e.clientX - rect.left) * (W / rect.width);
+    var tip = document.getElementById('timelineTooltip');
+    if (!tip) return;
+    var nearest = null, minDist = 30;
+    (window._timelineNodes || []).forEach(function(n) {
+      var dist = Math.abs(n.x - mx);
+      if (dist < minDist) { minDist = dist; nearest = n; }
+    });
+    if (nearest) { cv.style.cursor = 'pointer'; } else { cv.style.cursor = 'default'; }
+  };
+}
+
+// ── VIZ 2: MORTGAGE AMORTISATION ─────────────────────────────
+function renderAmortChart() {
+  var balEl = document.getElementById('amortBalance');
+  var rateEl = document.getElementById('amortRate');
+  var payEl = document.getElementById('amortPayment');
+  var overEl = document.getElementById('amortOver');
+  if (!balEl) return;
+  var balance = parseFloat(balEl.value) || 340000;
+  var annualRate = parseFloat(rateEl.value) || 4.5;
+  var payment = parseFloat(payEl.value) || 1850;
+  var overpay = parseFloat(overEl.value) || 0;
+
+  var overLbl = document.getElementById('amortOverLabel');
+  if (overLbl) overLbl.textContent = '£' + overpay.toLocaleString();
+
+  var monthlyRate = annualRate / 12 / 100;
+
+  function buildSchedule(bal, pmt, over) {
+    var schedule = [];
+    var b = bal;
+    var maxM = 360;
+    while (b > 0 && schedule.length < maxM) {
+      var interest = b * monthlyRate;
+      var principal = Math.min(pmt + over - interest, b);
+      if (principal <= 0) { schedule.push({ interest: interest, principal: 0, balance: b }); break; }
+      b = Math.max(0, b - principal);
+      schedule.push({ interest: interest, principal: principal, balance: b });
+      if (b <= 0) break;
+    }
+    return schedule;
+  }
+
+  var sched = buildSchedule(balance, payment, overpay);
+  var baseline = buildSchedule(balance, payment, 0);
+
+  var totInt = sched.reduce(function(s, m){ return s + m.interest; }, 0);
+  var totIntBase = baseline.reduce(function(s, m){ return s + m.interest; }, 0);
+  var months = sched.length;
+  var monthsBase = baseline.length;
+  var monthsSaved = Math.max(0, monthsBase - months);
+  var intSaved = Math.max(0, totIntBase - totInt);
+
+  // Stats
+  var statsEl = document.getElementById('amortStats');
+  if (statsEl) {
+    function stat(label, val, cls) {
+      return '<div class="amort-stat"><div class="amort-stat-val' + (cls ? ' ' + cls : '') + '">' + val + '</div><div class="amort-stat-lbl">' + label + '</div></div>';
+    }
+    statsEl.innerHTML =
+      stat('Payoff', Math.floor(months / 12) + 'yr ' + (months % 12) + 'mo') +
+      stat('Total interest', fmtS(totInt)) +
+      (overpay > 0 ? stat('Months saved', monthsSaved, 'positive') : '') +
+      (overpay > 0 ? stat('Interest saved', fmtS(intSaved), 'positive') : '');
+  }
+
+  // Draw chart
+  var cv = document.getElementById('amortCanvas'); if (!cv) return;
+  var dpr = window.devicePixelRatio || 1;
+  var W = cv.parentElement.clientWidth || 600;
+  var H = 180;
+  cv.width = W * dpr; cv.height = H * dpr;
+  cv.style.width = W + 'px'; cv.style.height = H + 'px';
+  var ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, W, H);
+
+  var padL = 60, padR = 20, padT = 16, padB = 32;
+  var cW = W - padL - padR, cH = H - padT - padB;
+
+  // Aggregate every 6 months
+  var barPeriod = 6;
+  var bars = [];
+  for (var i = 0; i < sched.length; i += barPeriod) {
+    var chunk = sched.slice(i, i + barPeriod);
+    var prin = chunk.reduce(function(s, m){ return s + m.principal; }, 0);
+    var intr = chunk.reduce(function(s, m){ return s + m.interest; }, 0);
+    bars.push({ principal: prin, interest: intr, month: i });
+  }
+
+  var maxVal = 0;
+  bars.forEach(function(b) { maxVal = Math.max(maxVal, b.principal + b.interest); });
+  if (maxVal === 0) maxVal = 1;
+
+  var barW = cW / bars.length * 0.72;
+  var gap = cW / bars.length;
+  var isDark = document.body.classList.contains('dark');
+  var gridCol = isDark ? '#2a2520' : '#e2ddd5';
+  var txtCol = isDark ? '#6b6258' : '#8a8278';
+
+  // Grid lines
+  ctx.strokeStyle = gridCol; ctx.lineWidth = 1; ctx.fillStyle = txtCol;
+  ctx.font = '9px IBM Plex Mono,monospace'; ctx.textAlign = 'right';
+  [0, 0.25, 0.5, 0.75, 1].forEach(function(f) {
+    var y = padT + cH - f * cH;
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + cW, y); ctx.stroke();
+    var v = maxVal * f;
+    ctx.fillText(v >= 1000 ? '£' + Math.round(v / 1000) + 'k' : '£' + Math.round(v), padL - 4, y + 3);
+  });
+
+  // Animate bars
+  if (window._amortAnimId) cancelAnimationFrame(window._amortAnimId);
+  var animProg = 0;
+  function drawBars(progress) {
+    ctx.clearRect(padL, padT, cW, cH + 2);
+    // Re-draw grid
+    ctx.strokeStyle = gridCol; ctx.lineWidth = 1;
+    [0, 0.25, 0.5, 0.75, 1].forEach(function(f) {
+      var y = padT + cH - f * cH;
+      ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + cW, y); ctx.stroke();
+    });
+
+    bars.forEach(function(b, i) {
+      var x = padL + i * gap + (gap - barW) / 2;
+      var totalH = ((b.principal + b.interest) / maxVal) * cH * progress;
+      var prinH = (b.principal / (b.principal + b.interest)) * totalH;
+      var intrH = totalH - prinH;
+
+      // Interest (amber) - bottom
+      ctx.fillStyle = '#d4680a';
+      ctx.fillRect(x, padT + cH - intrH, barW, intrH);
+
+      // Principal (teal) - top
+      ctx.fillStyle = '#2a7a6f';
+      ctx.fillRect(x, padT + cH - intrH - prinH, barW, prinH);
+    });
+
+    // X-axis labels
+    ctx.fillStyle = txtCol; ctx.font = '8px IBM Plex Mono,monospace'; ctx.textAlign = 'center';
+    bars.forEach(function(b, i) {
+      if (i % Math.max(1, Math.floor(bars.length / 6)) === 0) {
+        var x = padL + i * gap + gap / 2;
+        ctx.fillText('Yr ' + Math.ceil((b.month + 1) / 12), x, H - padB + 16);
+      }
+    });
+
+    // Baseline end line (if overpayment)
+    if (overpay > 0 && monthsBase > 0) {
+      var baseX = padL + (monthsBase / barPeriod / bars.length) * cW;
+      ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]);
+      ctx.beginPath(); ctx.moveTo(baseX, padT); ctx.lineTo(baseX, padT + cH); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#c0392b'; ctx.font = '8px IBM Plex Mono,monospace'; ctx.textAlign = 'left';
+      ctx.fillText('No overpay ends', baseX + 3, padT + 12);
+    }
+  }
+
+  function animate() {
+    animProg = Math.min(animProg + 0.06, 1);
+    drawBars(animProg);
+    if (animProg < 1) { window._amortAnimId = requestAnimationFrame(animate); }
+    else { window._amortAnimId = null; }
+  }
+
+  // Legend
+  ctx.fillStyle = '#2a7a6f'; ctx.fillRect(padL, padT - 1, 10, 8);
+  ctx.fillStyle = txtCol; ctx.font = '8px IBM Plex Mono,monospace'; ctx.textAlign = 'left';
+  ctx.fillText('Principal', padL + 14, padT + 7);
+  ctx.fillStyle = '#d4680a'; ctx.fillRect(padL + 80, padT - 1, 10, 8);
+  ctx.fillStyle = txtCol; ctx.fillText('Interest', padL + 94, padT + 7);
+
+  animate();
+}
+
+// ── VIZ 3: COMPOUND GROWTH TREE ───────────────────────────────
+function drawCompoundTree() {
+  var cv = document.getElementById('ctreeCanvas'); if (!cv) return;
+  var d = getData(), c = calc(d);
+
+  var rateSlider = document.getElementById('ctreeRate');
+  var yearsSlider = document.getElementById('ctreeYears');
+  var contribSlider = document.getElementById('ctreeContrib');
+  var rate = rateSlider ? parseFloat(rateSlider.value) : (d.baseRet || 5);
+  var years = yearsSlider ? parseInt(yearsSlider.value) : c.years;
+  var monthly = contribSlider ? parseFloat(contribSlider.value) : c.monthlyTotal;
+
+  // Update labels
+  var rl = document.getElementById('ctreeRateLabel'); if (rl) rl.textContent = rate + '%';
+  var yl = document.getElementById('ctreeYearsLabel'); if (yl) yl.textContent = years;
+  var cl = document.getElementById('ctreeContribLabel'); if (cl) cl.textContent = '£' + monthly.toLocaleString();
+
+  var dpr = window.devicePixelRatio || 1;
+  var W = cv.parentElement.clientWidth || 600;
+  var H = 340;
+  cv.width = W * dpr; cv.height = H * dpr;
+  cv.style.width = W + 'px'; cv.style.height = H + 'px';
+
+  if (window._ctreeAnimFrame) { cancelAnimationFrame(window._ctreeAnimFrame); window._ctreeAnimFrame = null; }
+
+  var ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, W, H);
+
+  // Dark background
+  ctx.fillStyle = '#050810'; ctx.fillRect(0, 0, W, H);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(0,180,216,0.06)'; ctx.lineWidth = 1;
+  for (var gx = 0; gx < W; gx += 40) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
+  for (var gy = 0; gy < H; gy += 40) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
+
+  // Build growth values
+  var startVal = c.totalInvested;
+  var growthData = [startVal];
+  for (var i = 1; i <= years; i++) {
+    growthData.push(growthData[i-1] * (1 + rate/100) + monthly * 12);
+  }
+  var finalVal = growthData[years];
+  var bullVal = startVal;
+  for (var i = 1; i <= years; i++) bullVal = bullVal * (1 + (d.bullRet||8)/100) + monthly * 12;
+  var bearVal = startVal;
+  for (var i = 1; i <= years; i++) bearVal = bearVal * (1 + (d.bearRet||3)/100) + monthly * 12;
+
+  // Stats row
+  var statsEl = document.getElementById('ctreeStats');
+  if (statsEl) {
+    statsEl.innerHTML =
+      '<div class="ctree-stat">Base: <strong>' + fmtS(finalVal) + '</strong></div>' +
+      '<div class="ctree-stat">Bull: <strong>' + fmtS(bullVal) + '</strong></div>' +
+      '<div class="ctree-stat">Bear: <strong>' + fmtS(bearVal) + '</strong></div>' +
+      '<div class="ctree-stat">Start: <strong>' + fmtS(startVal) + '</strong></div>';
+  }
+
+  var maxDepth = Math.min(years, 9);
+  var trunkX = W / 2;
+  var trunkBaseY = H - 20;
+  var trunkLen = Math.min(H * 0.28, 90);
+
+  function treeBranch(ctx, x, y, angle, len, depth, maxDepth) {
+    if (depth > maxDepth || len < 3) return;
+    var x2 = x + Math.cos(angle) * len;
+    var y2 = y - Math.sin(angle) * len;
+    var t = depth / maxDepth;
+    var r2 = Math.round(120 - t * 80);
+    var g2 = Math.round(60 + t * 120);
+    var b2 = Math.round(20 + t * 60);
+    ctx.strokeStyle = depth === maxDepth ? '#d4a520' : 'rgb(' + r2 + ',' + g2 + ',' + b2 + ')';
+    ctx.lineWidth = Math.max(0.5, (maxDepth - depth + 1) * 1.4);
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x2, y2); ctx.stroke();
+    if (depth === maxDepth) {
+      ctx.beginPath(); ctx.arc(x2, y2, 3, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(212,165,32,0.85)'; ctx.fill();
+      // Glow
+      ctx.beginPath(); ctx.arc(x2, y2, 6, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(212,165,32,0.15)'; ctx.fill();
+    }
+    var spread = 0.32 + 0.04 * (12 - rate);
+    treeBranch(ctx, x2, y2, angle - spread, len * 0.72, depth + 1, maxDepth);
+    treeBranch(ctx, x2, y2, angle + spread, len * 0.68, depth + 1, maxDepth);
+  }
+
+  // Draw annually level by level with stagger
+  var currentLevel = 0;
+  function drawLevel() {
+    if (currentLevel > maxDepth) { window._ctreeAnimFrame = null; return; }
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#050810'; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(0,180,216,0.06)'; ctx.lineWidth = 1;
+    for (var gx = 0; gx < W; gx += 40) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
+    for (var gy = 0; gy < H; gy += 40) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
+
+    // Trunk
+    ctx.strokeStyle = 'rgb(100,55,15)'; ctx.lineWidth = 8;
+    ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(trunkX, trunkBaseY); ctx.lineTo(trunkX, trunkBaseY - trunkLen); ctx.stroke();
+
+    treeBranch(ctx, trunkX, trunkBaseY - trunkLen, Math.PI / 2, trunkLen * 0.72, 1, currentLevel);
+
+    // Value labels every 5 years
+    if (currentLevel >= 2) {
+      ctx.font = '8px IBM Plex Mono,monospace'; ctx.fillStyle = 'rgba(212,165,32,0.7)'; ctx.textAlign = 'left';
+      var labelY = trunkBaseY - trunkLen - 10;
+      [3, 6, 9].forEach(function(yr) {
+        if (yr <= currentLevel && growthData[yr]) {
+          var labelX = trunkX + 16 + (yr / maxDepth) * 30;
+          ctx.fillText(fmtS(growthData[yr]), Math.min(labelX, W - 80), labelY - yr * 10);
+        }
+      });
+    }
+
+    // Start value
+    ctx.fillStyle = 'rgba(0,180,216,0.7)'; ctx.font = '9px IBM Plex Mono,monospace'; ctx.textAlign = 'center';
+    ctx.fillText(fmtS(startVal), trunkX, trunkBaseY + 14);
+
+    currentLevel++;
+    window._ctreeAnimFrame = requestAnimationFrame(drawLevel);
+  }
+
+  window._ctreeAnimFrame = requestAnimationFrame(drawLevel);
+}
+
+// ── VIZ 4: SPENDING VELOCITY GAUGE ───────────────────────────
+function drawVelocityGauge() {
+  var cv = document.getElementById('velocityGauge'); if (!cv) return;
+  var budget = getBudget();
+  var totPlan = budget.reduce(function(s, b){ return s + (b.plan || 0); }, 0);
+  var totActual = budget.reduce(function(s, b){ return s + (b.actual != null ? b.actual : b.plan); }, 0);
+  var pct = totPlan > 0 ? (totActual / totPlan * 100) : 0;
+
+  var dpr = window.devicePixelRatio || 1;
+  var W = 140, H = 90;
+  cv.width = W * dpr; cv.height = H * dpr;
+  cv.style.width = W + 'px'; cv.style.height = H + 'px';
+  var ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, W, H);
+
+  var cx = W / 2, cy = H - 10, r = 62;
+
+  // Background arc
+  ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, 0);
+  ctx.strokeStyle = '#e2ddd5'; ctx.lineWidth = 12; ctx.lineCap = 'round'; ctx.stroke();
+
+  // Colour zones: green 0-70%, amber 70-90%, red 90%+
+  var zones = [
+    { start: 0, end: 0.70, col: '#2a7a6f' },
+    { start: 0.70, end: 0.90, col: '#d4680a' },
+    { start: 0.90, end: 1.0,  col: '#c0392b' }
+  ];
+  zones.forEach(function(z) {
+    var startA = Math.PI + z.start * Math.PI;
+    var endA   = Math.PI + z.end * Math.PI;
+    ctx.beginPath(); ctx.arc(cx, cy, r, startA, endA);
+    ctx.strokeStyle = z.col; ctx.lineWidth = 12; ctx.lineCap = 'butt'; ctx.stroke();
+  });
+
+  // Needle
+  var needlePct = Math.min(pct / 100, 1);
+  var needleAngle = Math.PI + needlePct * Math.PI;
+  var nx = cx + r * Math.cos(needleAngle);
+  var ny = cy + r * Math.sin(needleAngle);
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(nx, ny);
+  ctx.strokeStyle = '#1a1714'; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+  ctx.fillStyle = '#1a1714'; ctx.fill();
+  // Needle tip dot
+  ctx.beginPath(); ctx.arc(nx, ny, 3, 0, Math.PI * 2);
+  ctx.fillStyle = '#fff'; ctx.fill();
+  ctx.strokeStyle = '#1a1714'; ctx.lineWidth = 1; ctx.stroke();
+
+  // Center text
+  var isDark = document.body.classList.contains('dark');
+  ctx.fillStyle = isDark ? '#f0ece4' : '#1a1714';
+  ctx.font = 'bold 16px IBM Plex Mono,monospace'; ctx.textAlign = 'center';
+  ctx.fillText(pct.toFixed(0) + '%', cx, cy - 16);
+  ctx.fillStyle = '#8a8278'; ctx.font = '7px IBM Plex Mono,monospace';
+  ctx.fillText('of budget', cx, cy - 4);
+
+  // Label
+  var lbl = document.getElementById('velocityLabel');
+  if (lbl) {
+    var status = pct <= 70 ? 'on track' : pct <= 90 ? 'watch spend' : 'over budget';
+    lbl.textContent = pct.toFixed(0) + '% used — ' + status;
+    lbl.style.color = pct <= 70 ? 'var(--teal)' : pct <= 90 ? 'var(--amber)' : 'var(--red)';
+  }
+}
+
+// ── VIZ 5: NET WORTH HEATMAP ──────────────────────────────────
+function renderHeatmap() {
+  var HSK = 'wealth_history_v1';
+  var grid = document.getElementById('heatmapGrid');
+  var empty = document.getElementById('heatmapEmpty');
+  if (!grid) return;
+
+  var hist;
+  try { hist = JSON.parse(localStorage.getItem(HSK) || '[]'); } catch(e) { hist = []; }
+
+  if (hist.length < 2) {
+    grid.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  var MAX_CELLS = 36;
+  var data = hist.length > MAX_CELLS + 1 ? hist.slice(-(MAX_CELLS + 1)) : hist;
+  var showingNote = hist.length > MAX_CELLS + 1;
+
+  // Compute growth rates
+  var cells = [];
+  for (var i = 1; i < data.length; i++) {
+    var prev = data[i - 1], curr = data[i];
+    var growth = prev.nw > 0 ? (curr.nw - prev.nw) / prev.nw * 100 : 0;
+    cells.push({ date: curr.date, nw: curr.nw, growth: growth });
+  }
+
+  function growthColor(g) {
+    if (g < -2)   return '#c0392b';
+    if (g < -0.5) return '#e8736a';
+    if (g < 0.5)  return '#e2ddd5';
+    if (g < 2)    return '#3d9e91';
+    if (g < 5)    return '#2a7a6f';
+    return '#00b4d8';
+  }
+
+  var html = '';
+  if (showingNote) {
+    html += '<div style="width:100%;font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:8px;">Showing last ' + MAX_CELLS + ' months</div>';
+  }
+
+  cells.forEach(function(cell, i) {
+    var dateStr = new Date(cell.date).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+    var growthStr = (cell.growth >= 0 ? '+' : '') + cell.growth.toFixed(2) + '%';
+    var nwStr = fmtS(cell.nw);
+    var col = growthColor(cell.growth);
+    var title = dateStr + ' · NW: ' + nwStr + ' · Growth: ' + growthStr;
+    html += '<div class="heatmap-cell" style="background:' + col + ';opacity:0;transition:opacity 0.2s ' + (i * 0.03) + 's,transform 0.1s;" title="' + title + '" data-i="' + i + '"></div>';
+  });
+
+  grid.innerHTML = html;
+
+  // Stagger fade-in
+  requestAnimationFrame(function() {
+    grid.querySelectorAll('.heatmap-cell').forEach(function(el) {
+      el.style.opacity = '1';
+    });
+  });
+}
+
+// ── AMORT INPUT WIRING ────────────────────────────────────────
+(function() {
+  var amortIds = ['amortBalance','amortRate','amortPayment','amortOver'];
+  amortIds.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('input', renderAmortChart);
+  });
+})();
+
+// ── CTREE SLIDER WIRING ───────────────────────────────────────
+(function() {
+  ['ctreeRate','ctreeYears','ctreeContrib'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('input', drawCompoundTree);
+  });
+})();
+
 // ── BOOT ──────────────────────────────────────────────────────
 loadDarkMode();
 renderAll();
@@ -3998,6 +4741,8 @@ setTimeout(initAnimations, 200);
 fetchLiveData();
 fetchWatchlist();
 fetchNews().then(renderNews);
+// New visualisations boot
+setTimeout(function(){ drawCompoundTree(); renderWealthTimeline(); renderAmortChart(); renderHeatmap(); drawVelocityGauge(); }, 300);
 setInterval(function(){ fetchNews().then(function(i){ renderNews(i, true); }); }, 30 * 60 * 1000);
 setInterval(function(){ fetchLiveData(); }, 5 * 60 * 1000);
 
