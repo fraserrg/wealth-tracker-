@@ -705,7 +705,40 @@ body.dark .tabnav { background: rgba(14,12,10,0.85); }
 @media(max-width:900px){ .allowance-efund-grid { grid-template-columns:1fr; } }
 
 /* BUDGET TOOLBAR */
-.budget-toolbar { display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+.budget-toolbar { display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap; margin-top:16px; }
+
+/* BUDGET TAB */
+.budget-income-header { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:36px; }
+.budget-income-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:22px 20px; }
+.budget-income-card.highlight { background:var(--ink); border-color:var(--ink); }
+.budget-income-card.highlight2 { background:linear-gradient(135deg,rgba(42,122,111,0.12),rgba(0,180,216,0.08)); border-color:rgba(42,122,111,0.3); }
+.bi-label { font-family:var(--mono); font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+.budget-income-card.highlight .bi-label { color:rgba(255,255,255,0.4); }
+.bi-val { display:flex; align-items:baseline; gap:2px; }
+.bi-sym { font-family:var(--mono); font-size:16px; color:var(--muted); }
+.bi-val input { font-family:var(--serif); font-size:28px; font-style:italic; color:var(--ink); background:none; border:none; outline:none; width:120px; padding:0; }
+.bi-val input:focus { color:var(--teal); }
+.bi-total { font-family:var(--serif); font-size:28px; font-style:italic; color:var(--gold-light); line-height:1; }
+.budget-income-card.highlight2 .bi-total { color:var(--teal); }
+.bi-sub { font-family:var(--mono); font-size:9px; color:var(--muted); margin-top:5px; }
+.budget-income-card.highlight .bi-sub { color:rgba(255,255,255,0.3); }
+
+.budget-section-block { margin-bottom:32px; }
+.budget-section-hdr { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+.budget-section-name { font-family:var(--mono); font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); }
+.budget-section-total { font-family:var(--mono); font-size:11px; font-weight:500; color:var(--ink); margin-left:auto; }
+.budget-section-rule { flex:1; height:1px; background:var(--border); }
+.budget-section-color { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+
+.budget-chart-wrap { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:24px; margin-bottom:24px; }
+.budget-chart-title { font-family:var(--mono); font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:18px; }
+.budget-legend { display:flex; flex-direction:column; gap:10px; flex:1; }
+.budget-legend-item { display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:11px; }
+.budget-legend-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+.budget-legend-label { color:var(--ink); flex:1; }
+.budget-legend-val { color:var(--muted); }
+
+@media(max-width:900px){ .budget-income-header { grid-template-columns:1fr 1fr; } }
 
 @media (max-width: 900px) { .visual-grid { grid-template-columns: 1fr; } .calc-grid { grid-template-columns: 1fr; } .tax-grid { grid-template-columns: 1fr; } .tabnav { padding: 0 20px; } }
 @media (max-width: 700px) {
@@ -742,6 +775,7 @@ body.dark .tabnav { background: rgba(14,12,10,0.85); }
   <button class="tab-btn" data-page="growth"><span class="tab-icon">📈</span> Growth &amp; Projections</button>
   <button class="tab-btn" data-page="plan"><span class="tab-icon">🧮</span> Plan &amp; Tax</button>
   <button class="tab-btn" data-page="manage"><span class="tab-icon">⚙</span> Manage &amp; Markets</button>
+  <button class="tab-btn" data-page="budget"><span class="tab-icon">💰</span> Budget</button>
 </div>
 
 <div class="main">
@@ -1173,21 +1207,6 @@ body.dark .tabnav { background: rgba(14,12,10,0.85); }
   </div>
   <div class="debt-grid" id="debtGrid"></div>
 
-  <!-- BUDGET TRACKER -->
-  <div class="section-header">
-    <div class="section-num">14</div>
-    <div class="section-title">Monthly Budget — Plan vs Actual</div>
-    <div class="section-rule"></div>
-  </div>
-  <div class="budget-toolbar">
-    <button class="calc-btn" id="budgetImportBtn" style="margin-top:0;width:auto;padding:9px 16px;">📊 Import Excel / CSV</button>
-    <input type="file" id="budgetImportFile" accept=".xlsx,.xls,.csv" style="display:none">
-    <button class="calc-btn" id="budgetAddCatBtn" style="margin-top:0;width:auto;padding:9px 16px;background:var(--surface);color:var(--ink);border:1px solid var(--border);">+ Add Category</button>
-    <span style="font-family:var(--mono);font-size:10px;color:var(--muted);">Excel should have columns: Category, Budget, Actual</span>
-  </div>
-  <div class="budget-grid" id="budgetGrid"></div>
-  <div class="budget-summary-row" id="budgetSummary"></div>
-
   </div><!-- /page plan -->
 
   <div class="page" data-page="manage">
@@ -1242,6 +1261,58 @@ body.dark .tabnav { background: rgba(14,12,10,0.85); }
   </div>
 
   </div><!-- /page manage -->
+
+  <div class="page" data-page="budget">
+
+  <!-- BUDGET INCOME HEADER -->
+  <div class="budget-income-header">
+    <div class="budget-income-card">
+      <div class="bi-label">Fraser take-home</div>
+      <div class="bi-val"><span class="bi-sym">£</span><input type="number" id="incFraser" value="4232" min="0" step="100"></div>
+      <div class="bi-sub">after tax &amp; pension</div>
+    </div>
+    <div class="budget-income-card">
+      <div class="bi-label">Kiera take-home</div>
+      <div class="bi-val"><span class="bi-sym">£</span><input type="number" id="incKiera" value="2700" min="0" step="100"></div>
+      <div class="bi-sub">after tax &amp; pension</div>
+    </div>
+    <div class="budget-income-card highlight">
+      <div class="bi-label">Total household</div>
+      <div class="bi-total" id="biTotal">£6,932</div>
+      <div class="bi-sub">combined monthly</div>
+    </div>
+    <div class="budget-income-card highlight2">
+      <div class="bi-label">Monthly surplus</div>
+      <div class="bi-total" id="biSurplus">—</div>
+      <div class="bi-sub" id="biSurplusSub">after all outgoings</div>
+    </div>
+  </div>
+
+  <!-- BUDGET CONTENT -->
+  <div id="budgetSections"></div>
+
+  <!-- SUMMARY BAR -->
+  <div class="budget-summary-row" id="budgetSummary"></div>
+
+  <!-- SPENDING BREAKDOWN CHART -->
+  <div class="budget-chart-wrap">
+    <div class="budget-chart-title">Spending Breakdown by Section</div>
+    <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap;">
+      <canvas id="budgetDonut" width="200" height="200" style="max-width:200px;flex-shrink:0;"></canvas>
+      <div id="budgetLegend" class="budget-legend"></div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="budget-toolbar">
+    <button class="calc-btn" id="budgetImportBtn" style="margin-top:0;width:auto;padding:9px 16px;">📊 Import Excel / CSV</button>
+    <input type="file" id="budgetImportFile" accept=".xlsx,.xls,.csv" style="display:none">
+    <button class="calc-btn" id="budgetAddCatBtn" style="margin-top:0;width:auto;padding:9px 16px;background:var(--surface);color:var(--ink);border:1px solid var(--border);">+ Add Category</button>
+    <button class="calc-btn" id="budgetResetBtn" style="margin-top:0;width:auto;padding:9px 16px;background:var(--surface);color:var(--muted);border:1px solid var(--border);">↺ Reset to defaults</button>
+    <span style="font-family:var(--mono);font-size:10px;color:var(--muted);">Excel: columns Category, Budget, Actual</span>
+  </div>
+
+  </div><!-- /page budget -->
 
 </div>
 
@@ -1394,14 +1465,29 @@ const KEYK = 'wealth_claude_key';
 const OBK = 'wealth_onboarded_v1';
 
 const BUDGET_DEFAULTS = [
-  { cat:'Housing / Mortgage', plan:1400 },
-  { cat:'Pension & Investments', plan:1150 },
-  { cat:'Food & Groceries', plan:450 },
-  { cat:'Utilities & Bills', plan:300 },
-  { cat:'Transport', plan:250 },
-  { cat:'Leisure & Dining', plan:300 },
-  { cat:'Insurance', plan:120 },
-  { cat:'Other / Misc', plan:200 }
+  { cat:'Mortgage',           plan:1850, section:'Joint Household' },
+  { cat:'Gas & Electric',     plan:180,  section:'Joint Household' },
+  { cat:'Council Tax',        plan:324,  section:'Joint Household' },
+  { cat:'Home Insurance',     plan:25,   section:'Joint Household' },
+  { cat:'Internet',           plan:30,   section:'Joint Household' },
+  { cat:'Food & Groceries',   plan:500,  section:'Joint Household' },
+  { cat:'Gym',                plan:65,   section:'Joint Household' },
+  { cat:'Life Insurance',     plan:54,   section:'Joint Household' },
+  { cat:'BMW & Service Plan', plan:386,  section:'Fraser Personal' },
+  { cat:'Audi',               plan:334,  section:'Fraser Personal' },
+  { cat:'Fuel (Fraser)',      plan:150,  section:'Fraser Personal' },
+  { cat:'Phone (Fraser)',     plan:43,   section:'Fraser Personal' },
+  { cat:'Car Insurance',      plan:60,   section:'Fraser Personal' },
+  { cat:'Spotify (Fraser)',   plan:12,   section:'Fraser Personal' },
+  { cat:'Claude AI',          plan:20,   section:'Fraser Personal' },
+  { cat:'Holiday Fund (F)',   plan:1000, section:'Fraser Personal' },
+  { cat:'Fuel (Kiera)',       plan:150,  section:'Kiera Personal' },
+  { cat:'Phone (Kiera)',      plan:55,   section:'Kiera Personal' },
+  { cat:'Spotify (Kiera)',    plan:12,   section:'Kiera Personal' },
+  { cat:'Subscriptions',      plan:72,   section:'Kiera Personal' },
+  { cat:'S&S ISA (Kiera)',    plan:100,  section:'Kiera Personal' },
+  { cat:'Holiday Fund (K)',   plan:200,  section:'Kiera Personal' },
+  { cat:'Joint Savings',      plan:100,  section:'Savings & Investments' }
 ];
 
 function getData() {
@@ -1945,6 +2031,9 @@ function redrawVisible(page) {
     if (window._mcLast) drawMonteCarlo(window._mcLast); else runMonteCarlo();
     renderFIRE();
   }
+  if (page==='budget') {
+    renderBudgetTracker();
+  }
 }
 function initTabs() {
   document.querySelectorAll('.tab-btn').forEach(function(b){ b.addEventListener('click', function(){ switchPage(this.dataset.page); }); });
@@ -2351,42 +2440,97 @@ function getBudget() {
     if (s) {
       const saved = JSON.parse(s);
       // Merge with defaults — ensures actual is always defined even if saved data is partial
-      return BUDGET_DEFAULTS.map(function(def, i) {
+      // If saved is flat old format (no sections) use length match, else use full merge
+      const merged = BUDGET_DEFAULTS.map(function(def, i) {
         const item = (saved && saved[i]) ? saved[i] : {};
         const plan = item.plan != null ? item.plan : def.plan;
         const actual = item.actual != null ? item.actual : plan;
-        return { cat: item.cat || def.cat, plan: plan, actual: actual };
+        return { cat: item.cat || def.cat, plan: plan, actual: actual, section: item.section || def.section || 'Other' };
       });
+      // If saved has extra custom items beyond defaults, append them
+      if (saved.length > BUDGET_DEFAULTS.length) {
+        for (let i = BUDGET_DEFAULTS.length; i < saved.length; i++) {
+          const item = saved[i]; if (!item || !item.cat) continue;
+          merged.push({ cat: item.cat, plan: item.plan||0, actual: item.actual!=null?item.actual:item.plan||0, section: item.section||'Other' });
+        }
+      }
+      return merged;
     }
   } catch(e){}
-  return BUDGET_DEFAULTS.map(function(b){ return { cat:b.cat, plan:b.plan, actual:b.plan }; });
+  return BUDGET_DEFAULTS.map(function(b){ return { cat:b.cat, plan:b.plan, actual:b.plan, section:b.section||'Other' }; });
 }
 function saveBudget(arr) { try { localStorage.setItem(BGK, JSON.stringify(arr)); } catch(e){} }
+let budgetDonutInst = null;
 function renderBudgetTracker() {
-  const grid = document.getElementById('budgetGrid');
-  if (!grid) return;
+  const sectionsEl = document.getElementById('budgetSections');
+  if (!sectionsEl) return;
   const budget = getBudget();
-  grid.innerHTML = budget.map(function(b, i){
-    const actual = b.actual != null ? b.actual : b.plan;
-    const pct = b.plan > 0 ? Math.min(actual / b.plan * 100, 150) : 0;
-    const over = actual > b.plan;
-    const under = actual < b.plan * 0.9;
-    const col = over ? 'var(--red)' : pct > 90 ? 'var(--amber)' : 'var(--teal)';
-    const chipBg = over ? 'rgba(192,57,43,0.1)' : 'rgba(42,122,111,0.1)';
-    const chipCol = over ? 'var(--red)' : 'var(--teal)';
-    const chipTxt = over ? '+'+fmtS(actual-b.plan)+' over' : under ? '-'+fmtS(b.plan-actual)+' under' : '✓ on plan';
-    return '<div class="budget-item">'+
-      '<div class="budget-cat"><span>'+b.cat+'</span>'+
-      '<span class="budget-status-chip" style="background:'+chipBg+';color:'+chipCol+'">'+chipTxt+'</span></div>'+
-      '<div class="budget-inputs">'+
-        '<div class="budget-col"><div class="budget-input-lbl">Budget</div><input type="number" data-i="'+i+'" data-f="plan" value="'+b.plan+'" min="0" step="10"></div>'+
-        '<div class="budget-vs">vs</div>'+
-        '<div class="budget-col"><div class="budget-input-lbl">Actual</div><input type="number" data-i="'+i+'" data-f="actual" value="'+actual+'" min="0" step="10"></div>'+
-      '</div>'+
-      '<div class="budget-bar-wrap"><div class="budget-bar-fill" style="width:'+pct.toFixed(0)+'%;background:'+col+'"></div></div>'+
-    '</div>';
-  }).join('');
-  grid.querySelectorAll('input').forEach(function(inp){
+
+  // ── Income header ──────────────────────────────────────────
+  const fEl = document.getElementById('incFraser'), kEl = document.getElementById('incKiera');
+  const incF = fEl ? (parseFloat(fEl.value)||4232) : 4232;
+  const incK = kEl ? (parseFloat(kEl.value)||2700) : 2700;
+  const totalIncome = incF + incK;
+  const totalEl = document.getElementById('biTotal');
+  if (totalEl) totalEl.textContent = '£' + totalIncome.toLocaleString();
+
+  // ── Group by section ───────────────────────────────────────
+  const SECTION_COLORS = {
+    'Joint Household':      '#2a7a6f',
+    'Fraser Personal':      '#2c5f8a',
+    'Kiera Personal':       '#b8860b',
+    'Savings & Investments':'#00b4d8',
+    'Other':                '#8a8278'
+  };
+  const sections = {};
+  budget.forEach(function(b) {
+    const sec = b.section || 'Other';
+    if (!sections[sec]) sections[sec] = [];
+    sections[sec].push(b);
+  });
+
+  let html = '';
+  const sectionTotals = {};
+  Object.keys(sections).forEach(function(sec) {
+    const items = sections[sec];
+    const col = SECTION_COLORS[sec] || '#8a8278';
+    const secTotal = items.reduce(function(s,b){ return s+(b.actual!=null?b.actual:b.plan); },0);
+    const secPlan  = items.reduce(function(s,b){ return s+b.plan; },0);
+    sectionTotals[sec] = { total:secTotal, plan:secPlan, col:col };
+    html += '<div class="budget-section-block">';
+    html += '<div class="budget-section-hdr">';
+    html += '<div class="budget-section-color" style="background:'+col+'"></div>';
+    html += '<div class="budget-section-name">'+sec+'</div>';
+    html += '<div class="budget-section-rule"></div>';
+    html += '<div class="budget-section-total">£'+secTotal.toFixed(0)+' / mo'+(secTotal>secPlan?' <span style="color:var(--red);font-size:9px;">+£'+(secTotal-secPlan).toFixed(0)+'</span>':'')+'</div>';
+    html += '</div>';
+    html += '<div class="budget-grid">';
+    items.forEach(function(b, localI) {
+      const globalI = budget.indexOf(b);
+      const actual = b.actual != null ? b.actual : b.plan;
+      const pct = b.plan > 0 ? Math.min(actual / b.plan * 100, 150) : 0;
+      const over = actual > b.plan;
+      const under = actual < b.plan * 0.9;
+      const barCol = over ? 'var(--red)' : pct > 90 ? 'var(--amber)' : col;
+      const chipBg = over ? 'rgba(192,57,43,0.1)' : 'rgba(42,122,111,0.1)';
+      const chipCol = over ? 'var(--red)' : 'var(--teal)';
+      const chipTxt = over ? '+'+fmtS(actual-b.plan)+' over' : under ? '-'+fmtS(b.plan-actual)+' under' : '✓ on plan';
+      html += '<div class="budget-item">'+
+        '<div class="budget-cat"><span>'+b.cat+'</span>'+
+        '<span class="budget-status-chip" style="background:'+chipBg+';color:'+chipCol+'">'+chipTxt+'</span></div>'+
+        '<div class="budget-inputs">'+
+          '<div class="budget-col"><div class="budget-input-lbl">Budget</div><input type="number" data-i="'+globalI+'" data-f="plan" value="'+b.plan+'" min="0" step="10"></div>'+
+          '<div class="budget-vs">vs</div>'+
+          '<div class="budget-col"><div class="budget-input-lbl">Actual</div><input type="number" data-i="'+globalI+'" data-f="actual" value="'+actual+'" min="0" step="10"></div>'+
+        '</div>'+
+        '<div class="budget-bar-wrap"><div class="budget-bar-fill" style="width:'+pct.toFixed(0)+'%;background:'+barCol+'"></div></div>'+
+      '</div>';
+    });
+    html += '</div></div>';
+  });
+  sectionsEl.innerHTML = html;
+
+  sectionsEl.querySelectorAll('input').forEach(function(inp){
     inp.addEventListener('change', function(){
       const arr = getBudget();
       arr[parseInt(this.dataset.i)][this.dataset.f] = parseFloat(this.value) || 0;
@@ -2394,17 +2538,52 @@ function renderBudgetTracker() {
       renderBudgetTracker();
     });
   });
+
+  // ── Summary ────────────────────────────────────────────────
   const totPlan = budget.reduce(function(s,b){ return s+b.plan; },0);
-  const totAct = budget.reduce(function(s,b){ return s+(b.actual!=null?b.actual:b.plan); },0);
-  const d = getData();
-  const income = d.monthlyIncome || 4000;
+  const totAct  = budget.reduce(function(s,b){ return s+(b.actual!=null?b.actual:b.plan); },0);
+  const surplus = totalIncome - totAct;
+  const pctSaved = totalIncome > 0 ? (Math.max(0,surplus)/totalIncome*100).toFixed(0) : 0;
+  const surplusEl = document.getElementById('biSurplus');
+  const surplusSubEl = document.getElementById('biSurplusSub');
+  if (surplusEl) { surplusEl.textContent = (surplus>=0?'+':'')+fmtS(surplus); surplusEl.style.color = surplus>=0?'var(--teal)':'var(--red)'; }
+  if (surplusSubEl) surplusSubEl.textContent = 'savings rate: '+pctSaved+'%';
   const sumEl = document.getElementById('budgetSummary');
   if (sumEl) {
-    const surplus = income - totAct;
-    const pctSaved = income > 0 ? (Math.max(0, surplus) / income * 100).toFixed(0) : 0;
-    sumEl.innerHTML =
-      '<span style="font-family:var(--mono);font-size:11px;">Income: <strong>'+fmtFull(income)+'</strong> · Planned out: <strong>'+fmtFull(totPlan)+'</strong> · Actual out: <strong>'+fmtFull(totAct)+'</strong> · Savings rate: <strong>'+pctSaved+'%</strong></span>'+
+    sumEl.innerHTML = '<span style="font-family:var(--mono);font-size:11px;">Income: <strong>'+fmtFull(totalIncome)+'</strong> · Budgeted: <strong>'+fmtFull(totPlan)+'</strong> · Actual: <strong>'+fmtFull(totAct)+'</strong> · Savings rate: <strong>'+pctSaved+'%</strong></span>'+
       '<span style="font-family:var(--mono);font-size:11px;color:'+(surplus>=0?'var(--teal)':'var(--red)')+'">'+(surplus>=0?'Surplus: +':'Overspend: ')+fmtFull(Math.abs(surplus))+'/mo</span>';
+  }
+
+  // ── Spending donut ─────────────────────────────────────────
+  const donutCV = document.getElementById('budgetDonut');
+  if (donutCV) {
+    const dpr = window.devicePixelRatio||1;
+    donutCV.width=200*dpr; donutCV.height=200*dpr;
+    donutCV.style.width='200px'; donutCV.style.height='200px';
+    const dCtx = donutCV.getContext('2d'); dCtx.scale(dpr,dpr);
+    dCtx.clearRect(0,0,200,200);
+    const cx=100,cy=100,outerR=90,innerR=58;
+    const secKeys = Object.keys(sectionTotals);
+    let startA = -Math.PI/2;
+    secKeys.forEach(function(sec) {
+      const slice = sectionTotals[sec].total / totAct;
+      if (slice<=0) return;
+      const endA = startA + slice*Math.PI*2;
+      dCtx.beginPath(); dCtx.moveTo(cx,cy); dCtx.arc(cx,cy,outerR,startA,endA); dCtx.closePath();
+      dCtx.fillStyle=sectionTotals[sec].col; dCtx.fill();
+      startA=endA;
+    });
+    dCtx.beginPath(); dCtx.arc(cx,cy,innerR,0,Math.PI*2); dCtx.fillStyle=document.body.classList.contains('dark')?'#161310':'#fff'; dCtx.fill();
+    dCtx.fillStyle='#1a1714'; dCtx.font='bold 20px "IBM Plex Mono"'; dCtx.textAlign='center'; dCtx.fillText('£'+Math.round(totAct/1000)+'k',cx,cy+4);
+    dCtx.fillStyle='#8a8278'; dCtx.font='9px "IBM Plex Mono"'; dCtx.fillText('/month',cx,cy+18);
+    // Legend
+    const legendEl = document.getElementById('budgetLegend');
+    if (legendEl) {
+      legendEl.innerHTML = secKeys.map(function(sec) {
+        const t=sectionTotals[sec]; const pct2 = totAct>0?(t.total/totAct*100).toFixed(0):0;
+        return '<div class="budget-legend-item"><div class="budget-legend-dot" style="background:'+t.col+'"></div><span class="budget-legend-label">'+sec+'</span><span class="budget-legend-val">£'+Math.round(t.total).toLocaleString()+' ('+pct2+'%)</span></div>';
+      }).join('');
+    }
   }
 }
 
@@ -2450,27 +2629,28 @@ function renderFIRE() {
 
 function drawFireGauge(pct) {
   const cv = document.getElementById('fireGaugeCanvas'); if(!cv) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = 220, H = 130;
+  cv.width = W * dpr; cv.height = H * dpr;
+  cv.style.width = W + 'px'; cv.style.height = H + 'px';
   const ctx = cv.getContext('2d');
-  const W = cv.width, H = cv.height;
+  ctx.scale(dpr, dpr);
   ctx.clearRect(0,0,W,H);
-  const cx = W/2, cy = H - 20, r = 90;
+  const cx = W/2, cy = H - 18, r = 86;
 
-  // Background arc
-  ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, 0); ctx.strokeStyle='#e2ddd5'; ctx.lineWidth=16; ctx.lineCap='round'; ctx.stroke();
-
-  // Colored fill arc
+  ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI,0); ctx.strokeStyle='#e2ddd5'; ctx.lineWidth=16; ctx.lineCap='round'; ctx.stroke();
   const prog = Math.PI + (pct/100) * Math.PI;
-  const grad = ctx.createLinearGradient(cx-r, 0, cx+r, 0);
-  grad.addColorStop(0, '#c0392b'); grad.addColorStop(0.4, '#d4680a'); grad.addColorStop(0.75, '#2a7a6f'); grad.addColorStop(1, '#00b4d8');
-  ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, prog); ctx.strokeStyle=grad; ctx.lineWidth=16; ctx.lineCap='round'; ctx.stroke();
-
-  // Center text
-  ctx.fillStyle='#1a1714'; ctx.font='bold 28px "IBM Plex Mono"'; ctx.textAlign='center'; ctx.fillText(pct.toFixed(0)+'%', cx, cy - 18);
-  ctx.fillStyle='#8a8278'; ctx.font='10px "IBM Plex Mono"'; ctx.fillText('of FIRE number', cx, cy - 3);
-
-  // Labels
-  ctx.fillStyle='#8a8278'; ctx.font='9px "IBM Plex Mono"'; ctx.textAlign='left'; ctx.fillText('0%', cx-r-8, cy+14);
-  ctx.textAlign='right'; ctx.fillText('100%', cx+r+8, cy+14);
+  const grad = ctx.createLinearGradient(cx-r,0,cx+r,0);
+  grad.addColorStop(0,'#c0392b'); grad.addColorStop(0.4,'#d4680a'); grad.addColorStop(0.75,'#2a7a6f'); grad.addColorStop(1,'#00b4d8');
+  ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI,prog); ctx.strokeStyle=grad; ctx.lineWidth=16; ctx.lineCap='round'; ctx.stroke();
+  // Needle dot
+  const needleX = cx + r * Math.cos(Math.PI + (pct/100)*Math.PI);
+  const needleY = cy + r * Math.sin(Math.PI + (pct/100)*Math.PI);
+  ctx.beginPath(); ctx.arc(needleX,needleY,5,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill(); ctx.strokeStyle='#1a1714'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.fillStyle='#1a1714'; ctx.font='bold 26px "IBM Plex Mono"'; ctx.textAlign='center'; ctx.fillText(pct.toFixed(0)+'%',cx,cy-16);
+  ctx.fillStyle='#8a8278'; ctx.font='9px "IBM Plex Mono"'; ctx.fillText('of FIRE number',cx,cy-2);
+  ctx.fillStyle='#8a8278'; ctx.font='9px "IBM Plex Mono"'; ctx.textAlign='left'; ctx.fillText('0%',cx-r-6,cy+14);
+  ctx.textAlign='right'; ctx.fillText('100%',cx+r+6,cy+14);
 }
 
 // ── ALLOWANCE + EMERGENCY FUND ────────────────────────────────
@@ -2531,8 +2711,12 @@ function renderAllowanceTracker() {
 
 function drawEfundGauge(months) {
   const cv = document.getElementById('efundGauge'); if(!cv) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = 180, H = 110;
+  cv.width = W*dpr; cv.height = H*dpr;
+  cv.style.width = W+'px'; cv.style.height = H+'px';
   const ctx = cv.getContext('2d');
-  const W = cv.width, H = cv.height;
+  ctx.scale(dpr, dpr);
   ctx.clearRect(0,0,W,H);
   const cx = W/2, cy = H - 10, r = 78;
 
@@ -2601,11 +2785,13 @@ function importBudgetFile(file) {
         }
         return null;
       };
+      const secKeys = ['section','group','category_group','type'];
       const imported = rows.map(function(row) {
         const cat = getVal(row, catKeys);
         const plan = parseFloat(getVal(row, planKeys)) || 0;
         const actual = parseFloat(getVal(row, actualKeys)) || plan;
-        return cat ? { cat: String(cat).trim(), plan, actual } : null;
+        const sec = getVal(row, secKeys) || 'Other';
+        return cat ? { cat: String(cat).trim(), plan, actual, section: String(sec).trim() } : null;
       }).filter(Boolean);
 
       if (!imported.length) { showToast('No rows found — check columns: Category, Budget, Actual'); return; }
@@ -3697,15 +3883,24 @@ document.getElementById('fireStatePension').addEventListener('change', renderFIR
 // Allowance tracker
 document.getElementById('isaUsed').addEventListener('change', function(){ this._touched=true; localStorage.setItem('wealth_isa_used', this.value); renderAllowanceTracker(); });
 document.getElementById('pensionUsed').addEventListener('change', function(){ this._touched=true; localStorage.setItem('wealth_pen_used', this.value); renderAllowanceTracker(); });
-// Budget import / add category
+// Budget income inputs
+['incFraser','incKiera'].forEach(function(id){ const el=document.getElementById(id); if(el) el.addEventListener('input', renderBudgetTracker); });
+// Budget import / add category / reset
 document.getElementById('budgetImportBtn').addEventListener('click', function(){ document.getElementById('budgetImportFile').click(); });
 document.getElementById('budgetImportFile').addEventListener('change', function(){ if(this.files[0]) importBudgetFile(this.files[0]); this.value=''; });
 document.getElementById('budgetAddCatBtn').addEventListener('click', function(){
   const name = prompt('Category name:'); if(!name) return;
+  const sec = prompt('Section (Joint Household / Fraser Personal / Kiera Personal / Savings & Investments):') || 'Other';
   const arr = getBudget();
-  arr.push({ cat: name, plan: 0, actual: 0 });
+  arr.push({ cat: name, plan: 0, actual: 0, section: sec });
   saveBudget(arr);
   renderBudgetTracker();
+});
+document.getElementById('budgetResetBtn').addEventListener('click', function(){
+  if (!confirm('Reset budget to Excel defaults? This cannot be undone.')) return;
+  localStorage.removeItem(BGK);
+  renderBudgetTracker();
+  showToast('Budget reset to defaults ✓');
 });
 // Debt
 document.getElementById('debtAddBtn').addEventListener('click', addDebt);
