@@ -794,6 +794,33 @@ body.dark .tabnav { background: rgba(14,12,10,0.85); }
 .heatmap-cell:hover { transform:scale(1.3); z-index:5; }
 .heatmap-legend { display:flex; gap:6px; align-items:center; margin-top:12px; font-family:var(--mono); font-size:9px; color:var(--muted); }
 .heatmap-empty { font-family:var(--mono); font-size:11px; color:var(--muted); padding:8px 0; }
+
+/* WEALTH PERCENTILE */
+.wealth-percentile-wrap { background:linear-gradient(160deg,#050810 0%,#0c1428 100%); border:1px solid rgba(0,180,216,0.15); border-radius:12px; padding:28px; margin-bottom:48px; }
+.wp-toggle-row { display:flex; gap:8px; margin-bottom:20px; }
+.wp-toggle { font-family:var(--mono); font-size:11px; padding:7px 16px; border-radius:20px; cursor:pointer; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.5); transition:all 0.2s; }
+.wp-toggle.active { background:var(--gold); color:#000; border-color:var(--gold); font-weight:600; }
+.wp-toggle:hover:not(.active) { border-color:var(--cyan); color:rgba(255,255,255,0.8); }
+.wp-stats { display:flex; gap:16px; flex-wrap:wrap; margin-top:16px; }
+.wp-stat { font-family:var(--mono); font-size:11px; color:rgba(255,255,255,0.5); }
+.wp-stat strong { color:var(--gold-light); }
+
+/* LIFE EVENTS */
+.life-events-wrap { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:28px; margin-bottom:48px; position:relative; }
+.le-add-form { margin-bottom:16px; }
+.le-type-chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+.le-chip { font-family:var(--mono); font-size:10px; padding:6px 12px; border-radius:20px; cursor:pointer; border:1px solid var(--border); background:var(--surface2); color:var(--muted); transition:all 0.15s; display:flex; align-items:center; gap:5px; }
+.le-chip:hover { border-color:var(--gold); color:var(--ink); }
+.le-chip.selected { border-color:var(--gold); background:rgba(184,134,11,0.1); color:var(--ink); }
+.le-inputs { display:flex; flex-direction:column; gap:10px; background:var(--surface2); border-radius:10px; padding:16px; }
+.le-inputs input[type=text], .le-inputs input[type=number] { padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-family:var(--mono); font-size:12px; background:var(--surface); color:var(--ink); outline:none; }
+.le-inp-row { display:flex; gap:12px; flex-wrap:wrap; }
+.le-inp-row > div { display:flex; flex-direction:column; gap:5px; }
+.le-inp-row label { font-family:var(--mono); font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; }
+.le-btn-row { display:flex; align-items:center; gap:8px; }
+.le-event-tag { display:flex; align-items:center; gap:7px; font-family:var(--mono); font-size:10px; padding:7px 12px; border-radius:20px; background:var(--surface2); border:1px solid var(--border); }
+.le-event-tag .le-del { background:none; border:none; color:var(--muted); cursor:pointer; font-size:12px; padding:0 2px; }
+.le-event-tag .le-del:hover { color:var(--red); }
 </style>
 </head>
 <body>
@@ -900,6 +927,20 @@ body.dark .tabnav { background: rgba(14,12,10,0.85); }
       <div style="width:12px;height:12px;border-radius:2px;background:#00b4d8;display:inline-block;"></div> More
     </div>
     <div id="heatmapEmpty" class="heatmap-empty" style="display:none;">No history yet — add snapshots by saving your data.</div>
+  </div>
+
+  <div class="section-header" style="margin-top:32px;">
+    <div class="section-num">2C</div>
+    <div class="section-title">Global Wealth Percentile</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="wealth-percentile-wrap">
+    <div class="wp-toggle-row">
+      <button class="wp-toggle active" data-scope="global">🌍 Global</button>
+      <button class="wp-toggle" data-scope="uk">🇬🇧 UK</button>
+    </div>
+    <canvas id="wpCanvas" height="320" style="width:100%;cursor:crosshair;"></canvas>
+    <div id="wpStats" class="wp-stats"></div>
   </div>
 
   </div><!-- /page home -->
@@ -1076,6 +1117,35 @@ body.dark .tabnav { background: rgba(14,12,10,0.85); }
       <canvas id="timelineCanvas" height="160" style="width:100%;cursor:pointer;"></canvas>
       <div id="timelineTooltip" class="timeline-tooltip"></div>
     </div>
+  </div>
+
+  <div class="section-header">
+    <div class="section-num">9D</div>
+    <div class="section-title">Life Events — Impact on Your Wealth Journey</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="life-events-wrap">
+    <!-- Add event form -->
+    <div class="le-add-form">
+      <div class="le-type-chips" id="leTypeChips"></div>
+      <div class="le-inputs" id="leInputs" style="display:none;">
+        <input type="text" id="leLabel" placeholder="Event name…">
+        <div class="le-inp-row">
+          <div><label>At age</label><input type="number" id="leAge" min="18" max="80" step="1" value="32"></div>
+          <div><label id="leImpactLabel">Financial impact (£)</label><input type="number" id="leImpact" step="100"></div>
+        </div>
+        <div class="le-btn-row">
+          <button class="calc-btn" id="leAddBtn" style="width:auto;margin:0;padding:9px 20px;">Add Event</button>
+          <button id="leCancelBtn" style="background:none;border:none;font-family:var(--mono);font-size:11px;color:var(--muted);cursor:pointer;padding:9px 12px;">Cancel</button>
+        </div>
+      </div>
+    </div>
+    <!-- Timeline canvas -->
+    <canvas id="lifeEventsCanvas" height="200" style="width:100%;margin:20px 0;cursor:pointer;"></canvas>
+    <div id="lifeEventsTooltip" style="position:absolute;display:none;background:var(--ink);color:#fff;font-family:var(--mono);font-size:10px;padding:10px 14px;border-radius:8px;pointer-events:none;z-index:20;border:1px solid rgba(212,165,32,0.4);min-width:160px;line-height:1.7;"></div>
+    <!-- Event list -->
+    <div id="lifeEventsList" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;"></div>
+    <div id="lifeEventsEmpty" style="font-family:var(--mono);font-size:11px;color:var(--muted);padding:12px 0;display:none;">No life events added yet. Add a salary increase, major purchase, or milestone to see how it shifts your wealth trajectory.</div>
   </div>
 
   </div><!-- /page growth -->
@@ -2142,6 +2212,8 @@ function redrawVisible(page) {
     renderFIRE();
     drawCompoundTree();
     renderWealthTimeline();
+    renderLifeEventsUI();
+    renderLifeEventsCanvas();
   }
   if (page==='plan' || !page) {
     renderAmortChart();
@@ -2151,6 +2223,7 @@ function redrawVisible(page) {
   }
   if (page==='home' || !page) {
     renderHeatmap();
+    renderWealthPercentile();
   }
 }
 function initTabs() {
@@ -4720,6 +4793,645 @@ function renderHeatmap() {
   });
 })();
 
+// ── FEATURE 1: LIFE EVENTS TIMELINE ──────────────────────────
+
+var EVENT_TYPES = [
+  { type:'salary',     label:'Salary Increase',   icon:'📈', color:'#2a7a6f', impactType:'monthly',  defaultImpact: 500 },
+  { type:'career',     label:'Career Change',      icon:'💼', color:'#2c5f8a', impactType:'monthly',  defaultImpact:-200 },
+  { type:'children',   label:'Children',           icon:'👶', color:'#d4680a', impactType:'monthly',  defaultImpact:-600 },
+  { type:'property',   label:'Property Purchase',  icon:'🏠', color:'#b8860b', impactType:'oneoff',   defaultImpact:-25000 },
+  { type:'car',        label:'Car Purchase',        icon:'🚗', color:'#8a8278', impactType:'oneoff',   defaultImpact:-20000 },
+  { type:'wedding',    label:'Wedding',             icon:'💍', color:'#c0392b', impactType:'oneoff',   defaultImpact:-15000 },
+  { type:'inheritance',label:'Inheritance',         icon:'🎁', color:'#00b4d8', impactType:'oneoff',   defaultImpact:50000 },
+  { type:'sabbatical', label:'Sabbatical',          icon:'✈️', color:'#6b5b95', impactType:'monthly',  defaultImpact:-2000 },
+  { type:'business',   label:'Business Start',      icon:'🚀', color:'#d4a520', impactType:'monthly',  defaultImpact:-500 },
+  { type:'renovation', label:'Renovation',          icon:'🔨', color:'#8a8278', impactType:'oneoff',   defaultImpact:-30000 }
+];
+
+function getLifeEvents() {
+  try { return JSON.parse(localStorage.getItem('wealth_life_events_v1') || '[]'); } catch(e) { return []; }
+}
+function saveLifeEvents(arr) {
+  try { localStorage.setItem('wealth_life_events_v1', JSON.stringify(arr)); } catch(e) {}
+}
+
+function renderLifeEventsUI() {
+  var chipsEl = document.getElementById('leTypeChips');
+  var listEl = document.getElementById('lifeEventsList');
+  var emptyEl = document.getElementById('lifeEventsEmpty');
+  if (!chipsEl) return;
+
+  // Build chips
+  chipsEl.innerHTML = '';
+  EVENT_TYPES.forEach(function(t) {
+    var chip = document.createElement('div');
+    chip.className = 'le-chip';
+    chip.dataset.type = t.type;
+    chip.innerHTML = '<span>' + t.icon + '</span><span>' + t.label + '</span>';
+    chip.addEventListener('click', function() {
+      // Toggle selection
+      var wasSelected = chip.classList.contains('selected');
+      document.querySelectorAll('.le-chip').forEach(function(c) { c.classList.remove('selected'); });
+      var inputsEl = document.getElementById('leInputs');
+      if (wasSelected) {
+        inputsEl.style.display = 'none';
+        window._leSelectedType = null;
+        return;
+      }
+      chip.classList.add('selected');
+      window._leSelectedType = t;
+      inputsEl.style.display = 'flex';
+      var labelEl = document.getElementById('leLabel');
+      var impactEl = document.getElementById('leImpact');
+      var impactLabelEl = document.getElementById('leImpactLabel');
+      var ageEl = document.getElementById('leAge');
+      if (labelEl) labelEl.value = t.label;
+      if (impactEl) impactEl.value = t.defaultImpact;
+      if (impactLabelEl) impactLabelEl.textContent = t.impactType === 'monthly' ? 'Monthly change (£/mo)' : 'One-off cost/gain (£)';
+      if (ageEl) {
+        var d = getData();
+        ageEl.value = Math.min(d.retAge - 1, Math.max(d.age + 1, d.age + 3));
+      }
+    });
+    chipsEl.appendChild(chip);
+  });
+
+  // Render event list
+  var events = getLifeEvents();
+  if (listEl) {
+    listEl.innerHTML = '';
+    events.forEach(function(ev) {
+      var tag = document.createElement('div');
+      tag.className = 'le-event-tag';
+      tag.style.borderColor = ev.color;
+      var impactStr = ev.impactType === 'monthly'
+        ? (ev.impact >= 0 ? '+' : '') + '£' + Math.abs(ev.impact) + '/mo'
+        : (ev.impact >= 0 ? '+' : '-') + '£' + Math.abs(ev.impact).toLocaleString('en-GB');
+      tag.innerHTML = '<span>' + ev.icon + '</span><span style="color:var(--ink)">' + ev.label + '</span><span style="color:var(--muted)">age ' + ev.age + '</span><span style="color:' + (ev.impact >= 0 ? 'var(--teal)' : 'var(--red)') + '">' + impactStr + '</span><button class="le-del" data-id="' + ev.id + '">×</button>';
+      listEl.appendChild(tag);
+    });
+  }
+
+  if (emptyEl) emptyEl.style.display = events.length === 0 ? 'block' : 'none';
+}
+
+function computeProjectionWithEvents(d, c, events) {
+  var portfolio = c.totalInvested;
+  var monthly = c.monthlyTotal;
+  var results = [];
+  var sortedEvents = events.slice().sort(function(a, b) { return a.age - b.age; });
+
+  for (var yr = 0; yr <= c.years; yr++) {
+    var currentAge = d.age + yr;
+    // Apply events at this age
+    sortedEvents.forEach(function(ev) {
+      if (Math.round(ev.age) === currentAge) {
+        if (ev.impactType === 'oneoff') {
+          portfolio += ev.impact;
+        } else {
+          monthly += ev.impact;
+        }
+      }
+    });
+    if (yr > 0) {
+      portfolio = portfolio * (1 + (d.baseRet || 5) / 100) + monthly * 12;
+    }
+    results.push([currentAge, Math.max(0, portfolio)]);
+  }
+  return results;
+}
+
+var _leAnimFrame = null;
+
+function renderLifeEventsCanvas() {
+  var cv = document.getElementById('lifeEventsCanvas');
+  if (!cv) return;
+  var d = getData(), c = calc(d);
+  var events = getLifeEvents().slice().sort(function(a, b) { return a.age - b.age; });
+
+  var dpr = window.devicePixelRatio || 1;
+  var W = Math.max((cv.parentElement ? cv.parentElement.clientWidth : 600) - 40, 300);
+  var H = 260;
+  cv.width = W * dpr; cv.height = H * dpr;
+  cv.style.width = W + 'px'; cv.style.height = H + 'px';
+  var ctx = cv.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  var padL = 20, padR = 20, padT = 60, padB = 40;
+  var usableW = W - padL - padR;
+  var usableH = H - padT - padB;
+  var timelineY = padT + usableH * 0.55;
+
+  var ageRange = (c.years > 0) ? c.years : 1;
+  function ageToX(age) {
+    return padL + (age - d.age) / ageRange * usableW;
+  }
+
+  // Compute base projection (no events)
+  var baseProjRaw = project(c.totalInvested, c.monthlyTotal, c.years, (d.baseRet || 5) / 100);
+  var baseProj = baseProjRaw.map(function(v, i) { return [d.age + i + 1, v]; });
+  baseProj.unshift([d.age, c.totalInvested]);
+
+  // Compute adjusted projection (with events)
+  var adjProj = computeProjectionWithEvents(d, c, events);
+
+  var maxVal = 0;
+  baseProj.forEach(function(p) { if (p[1] > maxVal) maxVal = p[1]; });
+  adjProj.forEach(function(p) { if (p[1] > maxVal) maxVal = p[1]; });
+  if (maxVal < 1) maxVal = 1;
+
+  // Projection area height: from timelineY+8 down to H-padB (below line)
+  // and from timelineY-8 up to padT (above line)
+  var projAreaTop = padT + 4;
+  var projAreaBot = timelineY - 8;
+  var projH = projAreaBot - projAreaTop;
+
+  function valToY_above(val) {
+    return projAreaBot - (val / maxVal) * projH;
+  }
+
+  if (_leAnimFrame) cancelAnimationFrame(_leAnimFrame);
+  var startTs = null;
+  var ANIM_DUR = 1200;
+
+  function drawFrame(ts) {
+    if (!startTs) startTs = ts;
+    var progress = Math.min((ts - startTs) / ANIM_DUR, 1);
+    var ease = 1 - Math.pow(1 - progress, 3);
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Background
+    ctx.fillStyle = '#0a0d17';
+    ctx.fillRect(0, 0, W, H);
+
+    // Draw projection lines (animated up to ease * length)
+    var animSteps = Math.max(1, Math.floor(ease * (c.years)));
+
+    // Draw base projection (faint white/grey)
+    ctx.beginPath();
+    for (var i = 0; i <= animSteps && i < baseProj.length; i++) {
+      var bx = ageToX(baseProj[i][0]);
+      var by = valToY_above(baseProj[i][1]);
+      if (i === 0) ctx.moveTo(bx, by); else ctx.lineTo(bx, by);
+    }
+    ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Draw adjusted projection (gold)
+    if (events.length > 0) {
+      // Fill between base and adj
+      ctx.beginPath();
+      for (var i2 = 0; i2 <= animSteps && i2 < adjProj.length; i2++) {
+        var ax2 = ageToX(adjProj[i2][0]);
+        var ay2 = valToY_above(adjProj[i2][1]);
+        if (i2 === 0) ctx.moveTo(ax2, ay2); else ctx.lineTo(ax2, ay2);
+      }
+      for (var i3 = Math.min(animSteps, adjProj.length - 1); i3 >= 0; i3--) {
+        var ax3 = ageToX(baseProj[i3][0]);
+        var ay3 = valToY_above(baseProj[i3][1]);
+        ctx.lineTo(ax3, ay3);
+      }
+      ctx.closePath();
+      // Check if adj is above base at end
+      var adjEnd = adjProj[Math.min(animSteps, adjProj.length - 1)][1];
+      var baseEnd = baseProj[Math.min(animSteps, baseProj.length - 1)][1];
+      ctx.fillStyle = adjEnd >= baseEnd ? 'rgba(42,122,111,0.15)' : 'rgba(192,57,43,0.12)';
+      ctx.fill();
+
+      ctx.beginPath();
+      for (var i4 = 0; i4 <= animSteps && i4 < adjProj.length; i4++) {
+        var ax4 = ageToX(adjProj[i4][0]);
+        var ay4 = valToY_above(adjProj[i4][1]);
+        if (i4 === 0) ctx.moveTo(ax4, ay4); else ctx.lineTo(ax4, ay4);
+      }
+      ctx.strokeStyle = '#d4a520';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    // Draw horizontal timeline line
+    var tlGrad = ctx.createLinearGradient(padL, 0, W - padR, 0);
+    tlGrad.addColorStop(0, '#2a7a6f');
+    tlGrad.addColorStop(1, '#00b4d8');
+    ctx.strokeStyle = tlGrad;
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(padL, timelineY);
+    ctx.lineTo(W - padR, timelineY);
+    ctx.stroke();
+
+    // Now marker
+    var nowX = ageToX(d.age);
+    ctx.beginPath();
+    ctx.arc(nowX, timelineY, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#00b4d8';
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.font = '9px IBM Plex Mono,monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('Age ' + d.age, nowX, timelineY - 10);
+
+    // Retirement marker
+    var retX = ageToX(d.retAge);
+    ctx.beginPath();
+    ctx.arc(retX, timelineY, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#d4a520';
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.textAlign = 'center';
+    ctx.fillText('Retire ' + d.retAge, retX, timelineY - 10);
+
+    // Draw event markers
+    events.forEach(function(ev) {
+      if (ev.age < d.age || ev.age > d.retAge) return;
+      var ex = ageToX(ev.age);
+      var isPositive = ev.impact >= 0;
+      var stemLen = Math.min(40 + Math.abs(ev.impact) / 2000, 70);
+
+      // Vertical stem going up
+      ctx.strokeStyle = ev.color;
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath();
+      ctx.moveTo(ex, timelineY - 5);
+      ctx.lineTo(ex, timelineY - stemLen);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Circle at timeline
+      ctx.beginPath();
+      ctx.arc(ex, timelineY, 6, 0, Math.PI * 2);
+      ctx.fillStyle = ev.color;
+      ctx.fill();
+      ctx.strokeStyle = '#0a0d17';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Icon
+      ctx.font = '14px serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(ev.icon, ex, timelineY - stemLen - 4);
+
+      // Label
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      ctx.font = '8px IBM Plex Mono,monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(ev.label, ex, timelineY - stemLen - 18);
+    });
+
+    // Value labels at end of projection lines
+    if (ease > 0.8 && c.years > 0) {
+      var endBaseVal = baseProj[baseProj.length - 1][1];
+      var endAdjVal = events.length > 0 ? adjProj[adjProj.length - 1][1] : null;
+      var endX = ageToX(d.retAge);
+
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.font = '9px IBM Plex Mono,monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(fmtS(endBaseVal), Math.min(endX + 4, W - 60), valToY_above(endBaseVal) - 3);
+
+      if (endAdjVal !== null) {
+        ctx.fillStyle = '#d4a520';
+        ctx.fillText(fmtS(endAdjVal), Math.min(endX + 4, W - 60), valToY_above(endAdjVal) - 3);
+      }
+    }
+
+    // Axis labels
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.font = '8px IBM Plex Mono,monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText('Portfolio value ↑', padL, padT - 4);
+    ctx.textAlign = 'right';
+    ctx.fillText('Age →', W - padR, H - 6);
+
+    if (progress < 1) _leAnimFrame = requestAnimationFrame(drawFrame);
+  }
+
+  _leAnimFrame = requestAnimationFrame(drawFrame);
+
+  // Tooltip logic
+  var tooltip = document.getElementById('lifeEventsTooltip');
+  cv.onmousemove = function(e) {
+    if (!events.length || !tooltip) return;
+    var rect = cv.getBoundingClientRect();
+    var mx = e.clientX - rect.left;
+    var closest = null, closestDist = Infinity;
+    events.forEach(function(ev) {
+      if (ev.age < d.age || ev.age > d.retAge) return;
+      var ex = ageToX(ev.age);
+      var dist = Math.abs(mx - ex);
+      if (dist < closestDist) { closestDist = dist; closest = ev; }
+    });
+    if (closest && closestDist < 30) {
+      var adjEnd = adjProj[adjProj.length - 1][1];
+      var baseEnd = baseProj[baseProj.length - 1][1];
+      var diff = adjEnd - baseEnd;
+      var diffStr = (diff >= 0 ? '+' : '') + fmtFull(diff);
+      tooltip.style.display = 'block';
+      tooltip.style.left = (rect.left + ageToX(closest.age) - 80) + 'px';
+      tooltip.style.top = (rect.top + timelineY - 100 + window.scrollY) + 'px';
+      tooltip.innerHTML = '<strong>' + closest.icon + ' ' + closest.label + '</strong><br>Age: ' + closest.age + '<br>Impact: ' + (closest.impact >= 0 ? '+' : '') + '£' + Math.abs(closest.impact).toLocaleString('en-GB') + (closest.impactType === 'monthly' ? '/mo' : '') + '<br>Portfolio shift at ret: ' + diffStr;
+    } else {
+      tooltip.style.display = 'none';
+    }
+  };
+  cv.onmouseleave = function() { if (tooltip) tooltip.style.display = 'none'; };
+}
+
+// Life Events event listeners
+(function() {
+  var addBtn = document.getElementById('leAddBtn');
+  var cancelBtn = document.getElementById('leCancelBtn');
+  var listEl = document.getElementById('lifeEventsList');
+
+  if (addBtn) {
+    addBtn.addEventListener('click', function() {
+      var t = window._leSelectedType;
+      if (!t) { showToast('Select an event type first'); return; }
+      var label = (document.getElementById('leLabel').value || '').trim() || t.label;
+      var age = parseInt(document.getElementById('leAge').value) || 30;
+      var impact = parseFloat(document.getElementById('leImpact').value) || t.defaultImpact;
+      var ev = {
+        id: String(Date.now()),
+        type: t.type,
+        label: label,
+        age: age,
+        impact: impact,
+        impactType: t.impactType,
+        color: t.color,
+        icon: t.icon
+      };
+      var arr = getLifeEvents();
+      arr.push(ev);
+      saveLifeEvents(arr);
+      // Reset form
+      document.getElementById('leInputs').style.display = 'none';
+      document.querySelectorAll('.le-chip').forEach(function(c) { c.classList.remove('selected'); });
+      window._leSelectedType = null;
+      renderLifeEventsUI();
+      renderLifeEventsCanvas();
+      showToast('Life event added ✓');
+    });
+  }
+
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', function() {
+      document.getElementById('leInputs').style.display = 'none';
+      document.querySelectorAll('.le-chip').forEach(function(c) { c.classList.remove('selected'); });
+      window._leSelectedType = null;
+    });
+  }
+
+  if (listEl) {
+    listEl.addEventListener('click', function(e) {
+      var btn = e.target.closest('.le-del');
+      if (!btn) return;
+      var id = btn.dataset.id;
+      var arr = getLifeEvents().filter(function(ev) { return ev.id !== id; });
+      saveLifeEvents(arr);
+      renderLifeEventsUI();
+      renderLifeEventsCanvas();
+      showToast('Event removed');
+    });
+  }
+})();
+
+// ── FEATURE 2: WEALTH PERCENTILE ANIMATION ───────────────────
+
+var WP_GLOBAL_TIERS = [
+  { label:'< £8k',      min:0,       max:8000,    pct:53.2, color:'rgba(192,57,43,0.7)' },
+  { label:'£8k–£80k',   min:8000,    max:80000,   pct:34.4, color:'rgba(212,104,10,0.7)' },
+  { label:'£80k–£800k', min:80000,   max:800000,  pct:11.3, color:'rgba(42,122,111,0.7)' },
+  { label:'> £800k',    min:800000,  max:Infinity,pct:1.1,  color:'rgba(0,180,216,0.8)' }
+];
+var WP_UK_TIERS = [
+  { label:'< £30k',     min:0,       max:30000,   pct:20,   color:'rgba(192,57,43,0.7)' },
+  { label:'£30k–£150k', min:30000,   max:150000,  pct:25,   color:'rgba(212,104,10,0.7)' },
+  { label:'£150k–£500k',min:150000,  max:500000,  pct:30,   color:'rgba(42,122,111,0.7)' },
+  { label:'£500k–£1.5M',min:500000,  max:1500000, pct:20,   color:'rgba(0,180,216,0.7)' },
+  { label:'> £1.5M',    min:1500000, max:Infinity,pct:5,    color:'rgba(212,165,32,0.8)' }
+];
+var UK_PERCENTILES = { p10:12000, p25:80000, p50:172000, p75:432000, p90:842000, p95:1400000, p99:3200000 };
+var GLOBAL_PERCENTILES = { p50:8000, p75:40000, p90:120000, p95:280000, p99:800000 };
+
+var _wpScope = 'global';
+var _wpAnimFrame = null;
+
+function renderWealthPercentile(scope) {
+  scope = scope || _wpScope;
+  _wpScope = scope;
+
+  var cv = document.getElementById('wpCanvas');
+  if (!cv) return;
+  var dpr = window.devicePixelRatio || 1;
+  var W = Math.max((cv.parentElement ? cv.parentElement.clientWidth - 56 : 300), 300);
+  var H = 320;
+  cv.width = W * dpr; cv.height = H * dpr;
+  cv.style.width = W + 'px'; cv.style.height = H + 'px';
+  var ctx = cv.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  var d = getData(), c = calc(d);
+  var nw = c.totalNW;
+  var tiers = scope === 'uk' ? WP_UK_TIERS : WP_GLOBAL_TIERS;
+  var pctiles = scope === 'uk' ? UK_PERCENTILES : GLOBAL_PERCENTILES;
+
+  // Calculate user's percentile
+  var userPct = 0;
+  if (scope === 'uk') {
+    if (nw < pctiles.p10) userPct = nw / pctiles.p10 * 10;
+    else if (nw < pctiles.p25) userPct = 10 + (nw - pctiles.p10) / (pctiles.p25 - pctiles.p10) * 15;
+    else if (nw < pctiles.p50) userPct = 25 + (nw - pctiles.p25) / (pctiles.p50 - pctiles.p25) * 25;
+    else if (nw < pctiles.p75) userPct = 50 + (nw - pctiles.p50) / (pctiles.p75 - pctiles.p50) * 25;
+    else if (nw < pctiles.p90) userPct = 75 + (nw - pctiles.p75) / (pctiles.p90 - pctiles.p75) * 15;
+    else if (nw < pctiles.p95) userPct = 90 + (nw - pctiles.p90) / (pctiles.p95 - pctiles.p90) * 5;
+    else if (nw < pctiles.p99) userPct = 95 + (nw - pctiles.p95) / (pctiles.p99 - pctiles.p95) * 4;
+    else userPct = 99 + Math.min(nw / pctiles.p99 - 1, 1);
+    userPct = Math.min(99.9, Math.max(0, userPct));
+  } else {
+    if (nw < pctiles.p50) userPct = nw / pctiles.p50 * 50;
+    else if (nw < pctiles.p75) userPct = 50 + (nw - pctiles.p50) / (pctiles.p75 - pctiles.p50) * 25;
+    else if (nw < pctiles.p90) userPct = 75 + (nw - pctiles.p75) / (pctiles.p90 - pctiles.p75) * 15;
+    else if (nw < pctiles.p95) userPct = 90 + (nw - pctiles.p90) / (pctiles.p95 - pctiles.p90) * 5;
+    else if (nw < pctiles.p99) userPct = 95 + (nw - pctiles.p95) / (pctiles.p99 - pctiles.p95) * 4;
+    else userPct = 99 + Math.min(nw / pctiles.p99 - 1, 1);
+    userPct = Math.min(99.9, Math.max(0, userPct));
+  }
+
+  // Deterministic pseudo-random for stable dot layout
+  var _rngSeed = 42;
+  function rand() {
+    _rngSeed = (_rngSeed * 1103515245 + 12345) & 0x7fffffff;
+    return _rngSeed / 0x7fffffff;
+  }
+  _rngSeed = 42; // reset
+
+  // Generate dots
+  var dots = [];
+  var cumPct = 0;
+  tiers.forEach(function(tier) {
+    var count = Math.round(800 * tier.pct / 100);
+    var xStart = cumPct / 100;
+    var xEnd = xStart + tier.pct / 100;
+    cumPct += tier.pct;
+    for (var i = 0; i < count; i++) {
+      var tx = xStart + rand() * (xEnd - xStart);
+      var ty = 0.1 + rand() * 0.75;
+      var sx = rand();
+      var sy = rand();
+      var delay = rand() * 0.4;
+      dots.push({
+        targetX: tx, targetY: ty,
+        startX: sx, startY: sy,
+        r: 2.5 + rand() * 1.5,
+        col: tier.color,
+        delay: delay
+      });
+    }
+  });
+
+  if (_wpAnimFrame) cancelAnimationFrame(_wpAnimFrame);
+  var startTime = null;
+  var DURATION = 1800;
+
+  function drawFrame(ts) {
+    if (!startTime) startTime = ts;
+    var progress = Math.min((ts - startTime) / DURATION, 1);
+    var ease = 1 - Math.pow(1 - progress, 3);
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Background
+    ctx.fillStyle = '#050810';
+    ctx.fillRect(0, 0, W, H);
+
+    // Vertical grid lines
+    ctx.strokeStyle = 'rgba(0,180,216,0.04)';
+    ctx.lineWidth = 1;
+    for (var gx = 0; gx <= 10; gx++) {
+      ctx.beginPath();
+      ctx.moveTo(gx / 10 * W, 0);
+      ctx.lineTo(gx / 10 * W, H);
+      ctx.stroke();
+    }
+
+    // Tier background bands
+    var cx2 = 0;
+    tiers.forEach(function(tier) {
+      var bw = tier.pct / 100 * W;
+      var bandCol = tier.color.replace(/[\d.]+\)$/, '0.04)');
+      ctx.fillStyle = bandCol;
+      ctx.fillRect(cx2, 0, bw, H - 40);
+      // Tier label
+      ctx.fillStyle = 'rgba(255,255,255,0.25)';
+      ctx.font = '9px IBM Plex Mono,monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(tier.label, cx2 + bw / 2, H - 20);
+      cx2 += bw;
+    });
+
+    // Draw dots
+    dots.forEach(function(dot) {
+      var dotProgress = dot.delay >= 1 ? ease : Math.max(0, Math.min((ease - dot.delay) / (1 - dot.delay + 0.001), 1));
+      var x = (dot.startX + (dot.targetX - dot.startX) * dotProgress) * W;
+      var y = (dot.startY + (dot.targetY - dot.startY) * dotProgress) * (H - 60) + 20;
+      var alpha = 0.3 + dotProgress * 0.5;
+      ctx.beginPath();
+      ctx.arc(x, y, dot.r, 0, Math.PI * 2);
+      ctx.fillStyle = dot.col.replace(/[\d.]+\)$/, alpha + ')');
+      ctx.fill();
+    });
+
+    // User position (appears after dots settle, ~60% through)
+    if (ease > 0.5) {
+      var userProgress = Math.min((ease - 0.5) / 0.5, 1);
+      var userX = (userPct / 100) * W * userProgress;
+
+      // Glow dashed line
+      var grd = ctx.createLinearGradient(userX, 0, userX, H - 40);
+      grd.addColorStop(0, 'rgba(212,165,32,0)');
+      grd.addColorStop(0.3, 'rgba(212,165,32,0.6)');
+      grd.addColorStop(0.7, 'rgba(212,165,32,0.6)');
+      grd.addColorStop(1, 'rgba(212,165,32,0)');
+      ctx.strokeStyle = grd;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(userX, 20);
+      ctx.lineTo(userX, H - 50);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // User dot glowing gold
+      var uy = (H - 60) * 0.55 + 20;
+      ctx.shadowColor = '#d4a520';
+      ctx.shadowBlur = 16;
+      ctx.beginPath();
+      ctx.arc(userX, uy, 7, 0, Math.PI * 2);
+      ctx.fillStyle = '#d4a520';
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(userX, uy, 7, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Label
+      if (userProgress > 0.8) {
+        var labelAlpha = (userProgress - 0.8) / 0.2;
+        ctx.font = 'bold 11px IBM Plex Mono,monospace';
+        ctx.fillStyle = 'rgba(212,165,32,' + labelAlpha + ')';
+        ctx.textAlign = 'center';
+        ctx.fillText('You · Top ' + (100 - userPct).toFixed(1) + '%', userX, uy - 18);
+        ctx.font = '9px IBM Plex Mono,monospace';
+        ctx.fillStyle = 'rgba(255,255,255,' + (labelAlpha * 0.5) + ')';
+        ctx.fillText(fmtFull(nw), userX, uy - 6);
+      }
+    }
+
+    // Axis labels
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    ctx.font = '9px IBM Plex Mono,monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText('← Less wealthy', 8, H - 6);
+    ctx.textAlign = 'right';
+    ctx.fillText('More wealthy →', W - 8, H - 6);
+
+    if (progress < 1) {
+      _wpAnimFrame = requestAnimationFrame(drawFrame);
+    } else {
+      // Update stats panel
+      var statsEl = document.getElementById('wpStats');
+      if (statsEl) {
+        statsEl.innerHTML = [
+          '<div class="wp-stat">Net worth: <strong>' + fmtFull(nw) + '</strong></div>',
+          '<div class="wp-stat">' + (scope === 'uk' ? 'UK' : 'Global') + ' percentile: <strong>Top ' + (100 - userPct).toFixed(1) + '%</strong></div>',
+          '<div class="wp-stat">Richer than: <strong>' + userPct.toFixed(1) + '% of ' + (scope === 'uk' ? 'UK adults' : 'global adults') + '</strong></div>'
+        ].join('');
+      }
+    }
+  }
+
+  _wpAnimFrame = requestAnimationFrame(drawFrame);
+}
+
+// Wire up wealth percentile toggles
+(function() {
+  document.querySelectorAll('.wp-toggle').forEach(function(b) {
+    b.addEventListener('click', function() {
+      document.querySelectorAll('.wp-toggle').forEach(function(x) { x.classList.remove('active'); });
+      this.classList.add('active');
+      renderWealthPercentile(this.dataset.scope);
+    });
+  });
+})();
+
 // ── BOOT ──────────────────────────────────────────────────────
 loadDarkMode();
 renderAll();
@@ -4742,7 +5454,8 @@ fetchLiveData();
 fetchWatchlist();
 fetchNews().then(renderNews);
 // New visualisations boot
-setTimeout(function(){ drawCompoundTree(); renderWealthTimeline(); renderAmortChart(); renderHeatmap(); drawVelocityGauge(); }, 300);
+setTimeout(function(){ drawCompoundTree(); renderWealthTimeline(); renderAmortChart(); renderHeatmap(); drawVelocityGauge(); renderLifeEventsUI(); renderLifeEventsCanvas(); }, 300);
+setTimeout(renderWealthPercentile, 400);
 setInterval(function(){ fetchNews().then(function(i){ renderNews(i, true); }); }, 30 * 60 * 1000);
 setInterval(function(){ fetchLiveData(); }, 5 * 60 * 1000);
 
