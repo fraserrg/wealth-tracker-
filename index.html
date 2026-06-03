@@ -305,6 +305,80 @@ canvas { width: 100%; display: block; }
 /* CONFETTI */
 @keyframes confettiFall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
 .confetti-particle { position: fixed; top: -20px; pointer-events: none; z-index: 9999; animation: confettiFall linear forwards; border-radius: 2px; }
+
+/* ── ANIMATIONS THROUGHOUT ─────────────────────────────────── */
+@keyframes fadeInUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeInLeft { from { opacity:0; transform:translateX(-12px); } to { opacity:1; transform:translateX(0); } }
+@keyframes scaleIn { from { opacity:0; transform:scale(0.94); } to { opacity:1; transform:scale(1); } }
+@keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+@keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+@keyframes glowPulse { 0%,100%{box-shadow:0 0 0 0 rgba(0,180,216,0.15)} 50%{box-shadow:0 0 16px 4px rgba(0,180,216,0.25)} }
+@keyframes barFill { from{width:0} }
+@keyframes countUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+@keyframes spinOnce { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes borderGlow { 0%,100%{border-color:rgba(0,180,216,0.2)} 50%{border-color:rgba(0,180,216,0.55)} }
+
+/* Animate-in class toggled by IntersectionObserver */
+.anim-ready { opacity:0; transform:translateY(16px); transition:opacity 0.5s ease, transform 0.5s ease; }
+.anim-ready.anim-visible { opacity:1; transform:translateY(0); }
+
+/* Snap cards hover lift */
+.snap-card { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
+.snap-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,0.08); border-color:var(--gold); }
+.snap-card.highlight:hover { box-shadow:0 8px 28px rgba(212,165,32,0.2); }
+
+/* Insight cards float */
+.insight-card { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+.insight-card:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.1); }
+
+/* Live market items pulse border */
+.live-item { transition: background 0.2s; }
+.live-item:hover { background:rgba(0,180,216,0.06); }
+
+/* News cards animate in */
+.news-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.news-card:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.1); }
+
+/* Debt cards */
+.debt-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.debt-card:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(192,57,43,0.1); }
+
+/* Budget items */
+.budget-item { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.budget-item:hover { transform:translateY(-2px); box-shadow:0 4px 16px rgba(0,0,0,0.06); }
+
+/* Progress bar animated fill */
+.progress-bar-fill { transition: width 1.4s cubic-bezier(0.34,1.56,0.64,1); }
+
+/* hstat number countup glow */
+.hstat-val.counting { animation: countUp 0.4s ease; }
+
+/* Chart cards hover */
+.chart-card { transition: box-shadow 0.2s ease; }
+.chart-card:hover { box-shadow:0 4px 20px rgba(0,0,0,0.07); }
+
+/* Budget progress bars animate */
+.budget-bar-fill { animation: barFill 1s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+/* Section headings slide in from left */
+.section-header { animation: fadeInLeft 0.45s ease both; }
+
+/* Perc cards */
+.perc-card { transition: transform 0.2s, border-color 0.2s; }
+.perc-card:hover { transform:translateY(-2px); border-color:var(--cyan); }
+
+/* Live dot enhanced */
+.live-dot { animation: pulse 2s infinite, glowPulse 3s infinite; }
+
+/* AI section glow border animation */
+.ai-section { animation: borderGlow 4s ease infinite; border:1px solid rgba(0,180,216,0.2); }
+
+/* Tab active indicator animated underline */
+.tab-btn.active::after { animation: scaleIn 0.25s ease; }
+
+/* Watchlist row hover */
+.wl-row { transition: background 0.15s; }
+.wl-row:hover { background: rgba(0,180,216,0.04); }
 /* MILESTONE TOAST */
 .milestone-toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px); z-index: 8000; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 13px; padding: 14px 24px; border-radius: 100px; border: 1px solid var(--gold); box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 20px rgba(212,165,32,0.2); opacity: 0; transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none; white-space: nowrap; }
 .milestone-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -717,7 +791,7 @@ body.dark .tabnav { background: rgba(14,12,10,0.85); }
     <div class="chart-card">
       <div class="chart-card-title">Asset Allocation — Portfolio Split</div>
       <div class="chart-card-inner">
-        <canvas id="allocChart"></canvas>
+        <canvas id="allocChart" style="max-height:240px;width:100%;"></canvas>
         <div class="donut-center"><div class="donut-center-val" id="donutTotal"></div><div class="donut-center-label">Total Net Worth</div></div>
       </div>
     </div>
@@ -908,7 +982,7 @@ body.dark .tabnav { background: rgba(14,12,10,0.85); }
         <div class="tax-row"><label>Gross annual salary (£)</label><input type="number" id="taxSalary" value="60000" min="0" step="1000"></div>
         <div class="tax-row toggle-row">
           <label>Salary sacrifice pension</label>
-          <span class="tax-switch"><input type="checkbox" id="taxSalSac"><span class="tax-slider"></span></span>
+          <label class="tax-switch"><input type="checkbox" id="taxSalSac"><span class="tax-slider"></span></label>
         </div>
         <div class="tax-row"><label>Pension contribution (%)</label><input type="number" id="taxPensionPct" value="10" min="0" max="100" step="1"></div>
         <div class="tax-row"><label>Student loan plan</label>
@@ -1328,7 +1402,7 @@ function renderAllocChart(d, c) {
       datasets:[{ data:[d.sipp,d.workPension,d.isa,Math.max(0,c.equity),d.cash],
         backgroundColor:['rgba(42,122,111,0.85)','rgba(42,122,111,0.5)','rgba(44,95,138,0.75)','rgba(184,134,11,0.75)','rgba(138,130,120,0.6)'],
         borderColor:'#fff', borderWidth:2, hoverOffset:8 }] },
-    options:{ cutout:'68%', plugins:{
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'68%', plugins:{
       legend:{ position:'bottom', labels:{ font:{family:'IBM Plex Mono',size:10}, color:'#8a8278', boxWidth:10, padding:12 } },
       tooltip:{ callbacks:{ label:function(i){ return ' '+fmtFull(i.raw)+' ('+(i.raw/c.totalNW*100).toFixed(1)+'%)'; } }, titleFont:{family:'IBM Plex Mono'}, bodyFont:{family:'IBM Plex Mono'} }
     }, animation:{ animateRotate:true, duration:700 } }
@@ -2380,48 +2454,246 @@ function exportPDF() {
     const d = getData(), c = calc(d);
     const doc = new jsPDF({ unit:'pt', format:'a4' });
     const W = doc.internal.pageSize.getWidth();
-    let y = 56;
-    doc.setFillColor(5,8,16); doc.rect(0,0,W,90,'F');
-    doc.setTextColor(212,165,32); doc.setFont('helvetica','bold'); doc.setFontSize(22);
-    doc.text('Wealth Report', 40, 50);
-    doc.setTextColor(170,170,170); doc.setFont('helvetica','normal'); doc.setFontSize(10);
-    doc.text('Generated ' + todayStr() + '  ·  Age ' + d.age + ' → ' + d.retAge, 40, 70);
-    y = 130;
-    function heading(t){ doc.setTextColor(26,23,20); doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text(t, 40, y); y+=20; doc.setDrawColor(220,215,205); doc.line(40,y-8,W-40,y-8); }
-    function row(l,v){ doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(90,85,78); doc.text(l, 48, y); doc.setTextColor(26,23,20); doc.setFont('helvetica','bold'); doc.text(v, W-40, y, {align:'right'}); y+=18; }
-    heading('Net Worth Summary');
-    row('Total net worth', fmtFull(c.totalNW));
-    row('Total invested (pensions + ISA)', fmtFull(c.totalInvested));
-    row('Property equity', fmtFull(c.equity));
-    row('Cash savings', fmtFull(d.cash));
-    y += 12;
-    heading('Holdings');
-    row('Personal SIPP', fmtFull(d.sipp));
-    row('Workplace pension', fmtFull(d.workPension));
-    row('Stocks & Shares ISA', fmtFull(d.isa));
-    row('Property value', fmtFull(d.propVal));
-    row('Mortgage outstanding', fmtFull(d.mortgage));
-    y += 12;
-    heading('Monthly Contributions');
-    row('Work pension', fmtFull(d.wpMonthly));
-    row('Personal SIPP', fmtFull(d.sippMonthly));
-    row('Stocks & Shares ISA', fmtFull(d.isaMonthly));
-    row('Total per month', fmtFull(c.monthlyTotal));
-    y += 12;
-    heading('Projection to Age ' + d.retAge + ' (' + c.years + ' years)');
-    row('Bull case (' + d.bullRet + '% real)', fmtFull(c.bullAt));
-    row('Base case (' + d.baseRet + '% real)', fmtFull(c.baseAt));
-    row('Bear case (' + d.bearRet + '% real)', fmtFull(c.bearAt));
-    row('Target', fmtFull(d.target));
-    row('Minimum real return needed', c.minRet.toFixed(1) + '%');
-    if (c.millionAge) row('£1M reached around age', String(c.millionAge));
-    y += 20;
-    doc.setFontSize(8); doc.setTextColor(140,135,128); doc.setFont('helvetica','italic');
-    const disc = doc.splitTextToSize('Illustrative projections only, not regulated financial advice. Real returns shown (after inflation). Seek advice from an FCA-authorised IFA before making investment decisions.', W-80);
-    doc.text(disc, 40, y);
+    const H = doc.internal.pageSize.getHeight();
+    const MARGIN = 48;
+    const GOLD = [184,134,11]; const DARK = [5,8,16]; const WHITE = [255,255,255];
+    const INK = [26,23,20]; const MUTED = [120,114,108]; const TEAL = [42,122,111];
+    const SURFACE = [248,245,240]; const RED = [192,57,43]; const BLUE = [44,95,138];
+    let y = 0; let pageNum = 1;
+
+    function newPage() {
+      doc.addPage();
+      pageNum++;
+      drawPageFooter();
+      y = 80;
+    }
+    function checkPageBreak(needed) { if (y + needed > H - 80) newPage(); }
+
+    function drawPageFooter() {
+      const pn = pageNum;
+      doc.setFillColor(5,8,16); doc.rect(0, H-40, W, 40, 'F');
+      doc.setFont('helvetica','normal'); doc.setFontSize(7);
+      doc.setTextColor(100,95,88);
+      doc.text('CONFIDENTIAL — Wealth Tracker Personal Report', MARGIN, H-14);
+      doc.text('Page ' + pn, W-MARGIN, H-14, {align:'right'});
+      doc.setDrawColor(...GOLD); doc.setLineWidth(0.5); doc.line(0, H-40, W, H-40);
+    }
+
+    // ── PAGE 1 HEADER ──────────────────────────────────────────
+    // Full-width dark hero
+    doc.setFillColor(...DARK); doc.rect(0, 0, W, 120, 'F');
+    // Gold left accent bar
+    doc.setFillColor(...GOLD); doc.rect(0, 0, 6, 120, 'F');
+    // Subtle grid lines in header
+    doc.setDrawColor(0,180,216); doc.setLineWidth(0.3); doc.setGState(doc.GState({opacity:0.1}));
+    for (let gx = 60; gx < W; gx += 60) { doc.line(gx, 0, gx, 120); }
+    doc.setGState(doc.GState({opacity:1}));
+    // Eyebrow
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(0,180,216);
+    doc.text('PERSONAL WEALTH REPORT  ·  CONFIDENTIAL', MARGIN+10, 32);
+    // Title
+    doc.setFont('helvetica','bold'); doc.setFontSize(28); doc.setTextColor(...WHITE);
+    doc.text('Wealth Report', MARGIN+10, 62);
+    // Subtitle line
+    doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(180,175,165);
+    doc.text('Generated ' + todayStr() + '   ·   Age ' + d.age + ' → ' + d.retAge + '   ·   Target £' + (d.target/1e6).toFixed(2) + 'M', MARGIN+10, 82);
+    // Gold rule under header
+    doc.setDrawColor(...GOLD); doc.setLineWidth(1.5); doc.line(0, 120, W, 120);
+
+    drawPageFooter();
+    y = 148;
+
+    // ── HEADLINE METRIC BOXES ──────────────────────────────────
+    const boxes = [
+      { label:'Total Net Worth', value:fmtFull(c.totalNW), col:TEAL },
+      { label:'Total Invested', value:fmtFull(c.totalInvested), col:BLUE },
+      { label:'Property Equity', value:fmtFull(c.equity), col:[184,134,11] },
+      { label:'Monthly Contribution', value:fmtFull(c.monthlyTotal), col:[160,90,20] }
+    ];
+    const bw = (W - MARGIN*2 - 12) / 4;
+    boxes.forEach(function(b, i) {
+      const bx = MARGIN + i*(bw+4);
+      doc.setFillColor(...b.col); doc.roundedRect(bx, y, bw, 56, 4, 4, 'F');
+      doc.setFillColor(0,0,0); doc.setGState(doc.GState({opacity:0.2})); doc.roundedRect(bx, y+28, bw, 28, 4, 4, 'F');
+      doc.setGState(doc.GState({opacity:1}));
+      doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(255,255,255);
+      doc.text(b.label.toUpperCase(), bx+10, y+14);
+      doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(255,255,255);
+      doc.text(b.value, bx+10, y+42);
+    });
+    y += 72;
+
+    // ── SECTION HEADING HELPER ─────────────────────────────────
+    function sectionHeading(title, icon) {
+      checkPageBreak(40);
+      doc.setFillColor(...SURFACE); doc.rect(MARGIN, y, W-MARGIN*2, 24, 'F');
+      doc.setFillColor(...GOLD); doc.rect(MARGIN, y, 3, 24, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(...INK);
+      doc.text((icon||'') + '  ' + title, MARGIN+12, y+16);
+      y += 34;
+    }
+
+    // ── DATA ROW HELPERS ───────────────────────────────────────
+    let rowEven = false;
+    function dataRow(label, value, valueColor) {
+      checkPageBreak(22);
+      if (rowEven) { doc.setFillColor(245,242,238); doc.rect(MARGIN, y-10, W-MARGIN*2, 20, 'F'); }
+      rowEven = !rowEven;
+      doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(...MUTED);
+      doc.text(label, MARGIN+8, y+2);
+      doc.setFont('helvetica','bold'); doc.setFontSize(10);
+      if (valueColor) doc.setTextColor(...valueColor); else doc.setTextColor(...INK);
+      doc.text(value, W-MARGIN-8, y+2, {align:'right'});
+      y += 20;
+    }
+    function divider() { doc.setDrawColor(220,215,205); doc.setLineWidth(0.4); doc.line(MARGIN, y, W-MARGIN, y); y += 8; }
+
+    // ── SECTION 1: PORTFOLIO ───────────────────────────────────
+    sectionHeading('Portfolio Holdings', '▣');
+    rowEven = false;
+    dataRow('Personal SIPP', fmtFull(d.sipp), TEAL);
+    dataRow('Workplace Pension', fmtFull(d.workPension), TEAL);
+    dataRow('Stocks & Shares ISA', fmtFull(d.isa), BLUE);
+    dataRow('Property Value', fmtFull(d.propVal));
+    dataRow('Mortgage Outstanding', '–' + fmtFull(d.mortgage), RED);
+    dataRow('Property Equity', fmtFull(c.equity), [184,134,11]);
+    dataRow('Cash & Emergency Fund', fmtFull(d.cash));
+    divider();
+    rowEven = false;
+    dataRow('TOTAL NET WORTH', fmtFull(c.totalNW), TEAL);
+    y += 14;
+
+    // ── SECTION 2: MONTHLY CONTRIBUTIONS ──────────────────────
+    sectionHeading('Monthly Contributions & Savings Rate', '↑');
+    rowEven = false;
+    dataRow('Workplace pension', fmtFull(d.wpMonthly) + '/mo');
+    dataRow('Personal SIPP top-up', fmtFull(d.sippMonthly) + '/mo');
+    dataRow('Stocks & Shares ISA', fmtFull(d.isaMonthly) + '/mo');
+    divider();
+    rowEven = false;
+    dataRow('Total invested per month', fmtFull(c.monthlyTotal) + '/mo', TEAL);
+    if (d.monthlyIncome > 0) {
+      const savingsRate = ((c.monthlyTotal / d.monthlyIncome) * 100).toFixed(1);
+      dataRow('Savings rate (of income)', savingsRate + '%', savingsRate >= 20 ? TEAL : [184,134,11]);
+    }
+    y += 14;
+
+    // ── SECTION 3: PROJECTIONS ─────────────────────────────────
+    sectionHeading('Retirement Projections — Age ' + d.retAge + ' (' + c.years + ' yrs)', '◈');
+    rowEven = false;
+    dataRow('Bull case (' + d.bullRet + '% real)', fmtFull(c.bullAt), TEAL);
+    dataRow('Base case (' + d.baseRet + '% real)', fmtFull(c.baseAt), BLUE);
+    dataRow('Bear case (' + d.bearRet + '% real)', fmtFull(c.bearAt), RED);
+    divider();
+    rowEven = false;
+    dataRow('Retirement target', fmtFull(d.target));
+    dataRow('Min. return needed to hit target', c.minRet.toFixed(2) + '% real p.a.');
+    if (c.millionAge) dataRow('£1M milestone (base case)', 'Age ' + c.millionAge);
+    const onTrack = c.baseAt >= d.target;
+    dataRow('On track (base case)', onTrack ? '✓ YES' : '✗ Shortfall of ' + fmtFull(d.target - c.baseAt), onTrack ? TEAL : RED);
+    y += 14;
+
+    // ── SECTION 4: PROJECTION CHART SNAPSHOT ──────────────────
+    const projCanvas = document.getElementById('projChart');
+    if (projCanvas) {
+      try {
+        checkPageBreak(200);
+        sectionHeading('Growth Trajectory Chart', '∿');
+        const imgData = projCanvas.toDataURL('image/png');
+        const imgH = 160;
+        const imgW = W - MARGIN*2;
+        doc.addImage(imgData, 'PNG', MARGIN, y, imgW, imgH);
+        y += imgH + 16;
+      } catch(e) {}
+    }
+
+    // ── PAGE 2 ─────────────────────────────────────────────────
+    newPage();
+
+    // ── SECTION 5: MONTE CARLO ─────────────────────────────────
+    if (window._mcLast) {
+      sectionHeading('Monte Carlo Simulation (2,000 paths)', '⚡');
+      rowEven = false;
+      const mc = window._mcLast;
+      const total = mc.results.length;
+      const successes = mc.results.filter(function(r){ return r[r.length-1] >= d.target; }).length;
+      const pSuccess = (successes/total*100).toFixed(1);
+      dataRow('Simulation paths run', total.toLocaleString());
+      dataRow('Probability of hitting target', pSuccess + '%', parseFloat(pSuccess) >= 70 ? TEAL : parseFloat(pSuccess) >= 50 ? [184,134,11] : RED);
+      dataRow('Median outcome (50th percentile)', fmtFull(mc.p50[mc.p50.length-1]), BLUE);
+      dataRow('Optimistic outcome (90th pct)', fmtFull(mc.p90[mc.p90.length-1]), TEAL);
+      dataRow('Pessimistic outcome (10th pct)', fmtFull(mc.p10[mc.p10.length-1]), RED);
+      y += 14;
+      const mcCanvas = document.getElementById('mcCanvas');
+      if (mcCanvas) {
+        try {
+          checkPageBreak(180);
+          const imgData = mcCanvas.toDataURL('image/png');
+          doc.addImage(imgData, 'PNG', MARGIN, y, W-MARGIN*2, 160);
+          y += 176;
+        } catch(e) {}
+      }
+    }
+
+    // ── SECTION 6: ASSET ALLOCATION ───────────────────────────
+    sectionHeading('Asset Allocation', '◉');
+    const totalNW = c.totalNW;
+    const allocs = [
+      { name:'Personal SIPP', val:d.sipp, col:TEAL },
+      { name:'Workplace Pension', val:d.workPension, col:[42,122,111] },
+      { name:'ISA', val:d.isa, col:BLUE },
+      { name:'Property Equity', val:Math.max(0,c.equity), col:[184,134,11] },
+      { name:'Cash', val:d.cash, col:[120,114,108] }
+    ];
+    const barW = W - MARGIN*2 - 100;
+    y += 4;
+    allocs.forEach(function(a) {
+      if (a.val <= 0) return;
+      checkPageBreak(22);
+      const pct = (a.val / totalNW * 100);
+      doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(...MUTED);
+      doc.text(a.name, MARGIN+8, y+2);
+      doc.setTextColor(...INK); doc.setFont('helvetica','bold'); doc.setFontSize(9);
+      doc.text(pct.toFixed(1) + '%', W-MARGIN-8, y+2, {align:'right'});
+      const fillW = Math.max(2, barW * pct / 100);
+      doc.setFillColor(235,232,228); doc.roundedRect(MARGIN+8, y+6, barW, 6, 2, 2, 'F');
+      doc.setFillColor(...a.col); doc.roundedRect(MARGIN+8, y+6, fillW, 6, 2, 2, 'F');
+      y += 22;
+    });
+    y += 14;
+
+    // ── SECTION 7: BUDGET SNAPSHOT ─────────────────────────────
+    const budget = getBudget();
+    if (budget && budget.length) {
+      sectionHeading('Monthly Budget Overview', '£');
+      rowEven = false;
+      let totalPlan = 0, totalActual = 0;
+      budget.forEach(function(b) {
+        const actual = b.actual || 0;
+        const over = actual > b.plan;
+        dataRow(b.cat, fmtFull(b.plan) + ' planned' + (actual > 0 ? ' / ' + fmtFull(actual) + ' actual' : ''), over ? RED : (actual > 0 ? TEAL : null));
+        totalPlan += b.plan; totalActual += actual;
+      });
+      divider();
+      rowEven = false;
+      dataRow('Total planned spend', fmtFull(totalPlan) + '/mo');
+      if (totalActual > 0) dataRow('Total actual spend', fmtFull(totalActual) + '/mo', totalActual > totalPlan ? RED : TEAL);
+      y += 14;
+    }
+
+    // ── DISCLAIMER PAGE FOOTER ─────────────────────────────────
+    checkPageBreak(80);
+    y += 10;
+    doc.setFillColor(...SURFACE); doc.rect(MARGIN, y, W-MARGIN*2, 60, 'F');
+    doc.setFillColor(...GOLD); doc.rect(MARGIN, y, 3, 60, 'F');
+    doc.setFont('helvetica','italic'); doc.setFontSize(7.5); doc.setTextColor(...MUTED);
+    const disc = 'This report is for personal planning purposes only and does not constitute regulated financial advice. All projections are illustrative and based on assumed real returns after inflation. Past performance is not indicative of future results. For regulated advice please consult an FCA-authorised Independent Financial Adviser. Prepared using Wealth Tracker — a personal finance planning tool.';
+    const lines = doc.splitTextToSize(disc, W-MARGIN*2-24);
+    lines.forEach(function(line, i) { doc.text(line, MARGIN+10, y+14+(i*10)); });
+
     doc.save('wealth-report-' + new Date().toISOString().slice(0,10) + '.pdf');
-    showToast('PDF downloaded ✓');
-  } catch(e) { showToast('PDF export failed'); }
+    showToast('Professional PDF downloaded ✓');
+  } catch(e) { console.error(e); showToast('PDF export failed: ' + e.message); }
 }
 
 // ── DATA PORTABILITY ──────────────────────────────────────────
@@ -2881,9 +3153,13 @@ function drawSparkline(closes) {
 // ── NEWS (robust multi-source) ───────────────────────────────
 const FEEDS = [
   { url:'https://feeds.bbci.co.uk/news/business/rss.xml', name:'BBC Business', direct:true },
-  { url:'https://feeds.skynews.com/feeds/rss/business.xml', name:'Sky News', direct:false },
+  { url:'https://feeds.bloomberg.com/markets/news.rss', name:'Bloomberg Markets', direct:false },
+  { url:'https://feeds.reuters.com/reuters/businessNews', name:'Reuters Business', direct:false },
   { url:'https://www.theguardian.com/uk/business/rss', name:'The Guardian', direct:true },
-  { url:'https://www.ft.com/rss/home/uk', name:'Financial Times', direct:false }
+  { url:'https://feeds.marketwatch.com/marketwatch/topstories/', name:'MarketWatch', direct:false },
+  { url:'https://feeds.skynews.com/feeds/rss/business.xml', name:'Sky News', direct:false },
+  { url:'https://www.ft.com/rss/home/uk', name:'Financial Times', direct:false },
+  { url:'https://www.investing.com/rss/news_25.rss', name:'Investing.com', direct:false }
 ];
 
 function parseRSS(xmlText, sourceName) {
@@ -2923,7 +3199,7 @@ async function fetchNews() {
       if (res.ok) { const xml = await res.text(); addItems(parseRSS(xml, feed.name)); }
     } catch(e) {}
   }
-  if (allItems.length >= 4) return allItems.slice(0, 6);
+  if (allItems.length >= 6) return allItems.slice(0, 10);
 
   // Strategy 2: allorigins.win returns JSON wrapper { contents: "<xml>..." }
   for (const feed of FEEDS) {
@@ -2936,9 +3212,9 @@ async function fetchNews() {
         if (data && data.contents) addItems(parseRSS(data.contents, feed.name));
       }
     } catch(e) {}
-    if (allItems.length >= 6) break;
+    if (allItems.length >= 10) break;
   }
-  if (allItems.length >= 3) return allItems.slice(0, 6);
+  if (allItems.length >= 4) return allItems.slice(0, 10);
 
   // Strategy 3: corsproxy.io raw fetch
   for (const feed of FEEDS) {
@@ -2948,9 +3224,9 @@ async function fetchNews() {
       const res = await fetch(pUrl, { signal: AbortSignal.timeout(7000) });
       if (res.ok) { const xml = await res.text(); addItems(parseRSS(xml, feed.name)); }
     } catch(e) {}
-    if (allItems.length >= 6) break;
+    if (allItems.length >= 10) break;
   }
-  if (allItems.length >= 2) return allItems.slice(0, 6);
+  if (allItems.length >= 3) return allItems.slice(0, 10);
 
   // Strategy 4: rss2json as last resort (rate-limited but sometimes works)
   for (const feed of FEEDS) {
@@ -2965,10 +3241,10 @@ async function fetchNews() {
         }
       }
     } catch(e) {}
-    if (allItems.length >= 6) break;
+    if (allItems.length >= 10) break;
   }
 
-  return allItems.length ? allItems.slice(0, 6) : null;
+  return allItems.length ? allItems.slice(0, 10) : null;
 }
 
 function renderNews(items, silent) {
@@ -2988,7 +3264,7 @@ function renderNews(items, silent) {
   }
   if (ts) ts.textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
   const clean = function(s){ return (s||'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#0?39;|&apos;/g,"'").replace(/&quot;/g,'"').replace(/<!\[CDATA\[|\]\]>/g,''); };
-  grid.innerHTML = items.slice(0,6).map(function(item) {
+  grid.innerHTML = items.slice(0,10).map(function(item) {
     const dt = new Date(item.pubDate);
     const dateStr = isNaN(dt.getTime()) ? '' : dt.toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
     const fullDesc = clean(item.description || '');
@@ -3090,6 +3366,60 @@ if ('speechSynthesis' in window) {
   window.speechSynthesis.onvoiceschanged = function(){ window.speechSynthesis.getVoices(); };
 }
 
+// ── ANIMATIONS ────────────────────────────────────────────────
+function animateCountUp(el, target, duration, prefix, suffix) {
+  if (!el) return;
+  const start = 0, startTime = performance.now();
+  prefix = prefix || ''; suffix = suffix || '';
+  function step(now) {
+    const p = Math.min((now - startTime) / duration, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    const val = start + (target - start) * ease;
+    if (target >= 1e6) el.textContent = prefix + '£' + (val/1e6).toFixed(2) + 'M' + suffix;
+    else if (target >= 1e3) el.textContent = prefix + '£' + Math.round(val/1e3) + 'k' + suffix;
+    else el.textContent = prefix + Math.round(val).toLocaleString() + suffix;
+    if (p < 1) requestAnimationFrame(step);
+    else el.textContent = el.dataset.finalText || el.textContent;
+  }
+  requestAnimationFrame(step);
+}
+
+function initAnimations() {
+  // IntersectionObserver for fade-in-up on sections
+  const io = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('anim-visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.snap-card,.contrib-section,.chart-card,.insight-card,.perc-card,.debt-card,.news-card,.budget-item,.mc-section,.tax-grid,.chart-section,.wl-section').forEach(function(el, i) {
+    el.classList.add('anim-ready');
+    el.style.transitionDelay = Math.min(i * 0.06, 0.4) + 's';
+    io.observe(el);
+  });
+
+  // Stagger header stat bars on load
+  setTimeout(function() {
+    document.querySelectorAll('.hstat-bar-fill').forEach(function(bar) {
+      const w = bar.style.width; bar.style.width = '0';
+      setTimeout(function(){ bar.style.width = w; }, 100);
+    });
+  }, 300);
+
+  // Animate hstat numbers countup
+  document.querySelectorAll('.hstat-val').forEach(function(el) {
+    const text = el.textContent.trim();
+    const match = text.match(/£([\d,.]+)([kKmM]?)/);
+    if (!match) return;
+    let num = parseFloat(match[1].replace(/,/g,''));
+    if (match[2].toLowerCase() === 'm') num *= 1e6;
+    if (match[2].toLowerCase() === 'k') num *= 1e3;
+    if (num > 0) {
+      el.dataset.finalText = text;
+      animateCountUp(el, num, 1400);
+    }
+  });
+}
+
 // ── BOOT ──────────────────────────────────────────────────────
 loadDarkMode();
 renderAll();
@@ -3105,6 +3435,7 @@ initHeaderCanvas();
 initCalcs();
 initPWA();
 checkOnboarding();
+setTimeout(initAnimations, 200);
 fetchLiveData();
 fetchWatchlist();
 fetchNews().then(renderNews);
