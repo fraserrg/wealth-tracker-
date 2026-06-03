@@ -11,6 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 <style>
 :root {
   --bg: #f5f2ec; --surface: #ffffff; --surface2: #f0ece4;
@@ -668,6 +669,44 @@ body.dark .tabnav { background: rgba(14,12,10,0.85); }
   .main { padding: 20px; }
 }
 
+/* FIRE */
+.fire-wrap { display:grid; grid-template-columns:1fr 1fr; gap:24px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:28px; margin-bottom:48px; }
+.fire-inputs-col { display:flex; flex-direction:column; gap:18px; }
+.fire-row { display:flex; flex-direction:column; gap:6px; }
+.fire-row label { font-family:var(--mono); font-size:11px; color:var(--muted); }
+.fire-row strong { color:var(--ink); }
+.fire-row input[type=number] { width:140px; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-family:var(--mono); font-size:12px; background:var(--surface2); color:var(--ink); outline:none; }
+.fire-row input[type=range] { width:100%; accent-color:var(--teal); }
+.fire-results-col { display:flex; flex-direction:column; align-items:center; gap:12px; }
+.fire-stats-row { display:flex; gap:20px; width:100%; justify-content:center; flex-wrap:wrap; }
+.fire-stat { text-align:center; }
+.fire-stat-val { font-family:var(--serif); font-size:22px; font-style:italic; color:var(--ink); }
+.fire-stat-lbl { font-family:var(--mono); font-size:9px; text-transform:uppercase; letter-spacing:0.12em; color:var(--muted); margin-top:3px; }
+.fire-insight { font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.7; text-align:center; padding:10px 16px; background:var(--surface2); border-radius:8px; width:100%; }
+@media(max-width:900px){ .fire-wrap { grid-template-columns:1fr; } }
+
+/* ALLOWANCES + EMERGENCY FUND */
+.allowance-efund-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:48px; }
+.allowance-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:22px; }
+.allowance-title { font-family:var(--mono); font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+.allowance-limit { font-family:var(--mono); font-size:11px; color:var(--ink); margin-bottom:14px; }
+.allowance-limit strong { color:var(--teal); }
+.allowance-input-row { margin-bottom:12px; }
+.allowance-input-row label { display:block; font-family:var(--mono); font-size:10px; color:var(--muted); margin-bottom:5px; }
+.allowance-input-row input { width:100%; padding:7px 10px; border:1px solid var(--border); border-radius:6px; font-family:var(--mono); font-size:12px; background:var(--surface2); color:var(--ink); outline:none; box-sizing:border-box; }
+.allowance-bar-wrap { height:8px; background:var(--border); border-radius:4px; overflow:hidden; margin-bottom:10px; }
+.allowance-bar-fill { height:100%; border-radius:4px; transition:width 0.8s cubic-bezier(0.34,1.56,0.64,1); }
+.allowance-stats { display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px; }
+.allowance-remaining { font-family:var(--mono); font-size:11px; font-weight:500; color:var(--ink); }
+.allowance-deadline { font-family:var(--mono); font-size:9px; color:var(--muted); }
+.efund-card { display:flex; flex-direction:column; align-items:center; }
+.efund-labels { display:flex; flex-direction:column; align-items:center; margin-top:-8px; }
+.efund-legend { font-family:var(--mono); font-size:9px; color:var(--muted); margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+@media(max-width:900px){ .allowance-efund-grid { grid-template-columns:1fr; } }
+
+/* BUDGET TOOLBAR */
+.budget-toolbar { display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+
 @media (max-width: 900px) { .visual-grid { grid-template-columns: 1fr; } .calc-grid { grid-template-columns: 1fr; } .tax-grid { grid-template-columns: 1fr; } .tabnav { padding: 0 20px; } }
 @media (max-width: 700px) {
   .header, .main { padding: 28px 20px; }
@@ -891,11 +930,83 @@ body.dark .tabnav { background: rgba(14,12,10,0.85); }
   <div class="history-section">
     <div id="historyChart" style="height:200px;position:relative;"></div>
     <div id="historyEmpty" class="history-empty" style="display:none;">No history yet — your net worth will be tracked each time you save updated figures. Check back after your first update.</div>
+    <div id="historyStats" style="display:none; margin-top:16px; display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px;"></div>
+  </div>
+
+  <!-- FIRE CALCULATOR -->
+  <div class="section-header">
+    <div class="section-num">9B</div>
+    <div class="section-title">FIRE — Financial Independence Calculator</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="fire-wrap">
+    <div class="fire-inputs-col">
+      <div class="fire-row"><label>Annual living expenses (£)</label><input type="number" id="fireExpenses" value="30000" min="0" step="1000"></div>
+      <div class="fire-row"><label>Safe withdrawal rate: <strong id="fireSWRLabel">4.0%</strong></label><input type="range" id="fireSWR" min="2.5" max="5" step="0.1" value="4"></div>
+      <div class="fire-row"><label>Subtract state pension (est.)</label><label class="tax-switch"><input type="checkbox" id="fireStatePension" checked><span class="tax-slider"></span></label></div>
+    </div>
+    <div class="fire-results-col">
+      <canvas id="fireGaugeCanvas" width="220" height="130"></canvas>
+      <div class="fire-stats-row">
+        <div class="fire-stat"><div class="fire-stat-val" id="fireNumber">—</div><div class="fire-stat-lbl">FIRE Number</div></div>
+        <div class="fire-stat"><div class="fire-stat-val" id="firePct">—</div><div class="fire-stat-lbl">FI Progress</div></div>
+        <div class="fire-stat"><div class="fire-stat-val" id="fireYears">—</div><div class="fire-stat-lbl">Years to FI</div></div>
+      </div>
+      <div class="fire-insight" id="fireInsight"></div>
+    </div>
   </div>
 
   </div><!-- /page growth -->
 
   <div class="page" data-page="plan">
+
+  <!-- ALLOWANCES + EMERGENCY FUND -->
+  <div class="allowance-efund-grid">
+    <!-- ISA Allowance -->
+    <div class="allowance-card">
+      <div class="allowance-title">ISA Allowance 2024/25</div>
+      <div class="allowance-limit">Annual limit: <strong>£20,000</strong></div>
+      <div class="allowance-input-row">
+        <label>Contributed this tax year (£)</label>
+        <input type="number" id="isaUsed" value="0" min="0" max="20000" step="100">
+      </div>
+      <div class="allowance-bar-wrap"><div class="allowance-bar-fill" id="isaBarFill" style="width:0%;background:var(--teal)"></div></div>
+      <div class="allowance-stats">
+        <span id="isaRemaining" class="allowance-remaining"></span>
+        <span id="isaDeadline" class="allowance-deadline"></span>
+      </div>
+    </div>
+    <!-- Pension Allowance -->
+    <div class="allowance-card">
+      <div class="allowance-title">Pension Annual Allowance</div>
+      <div class="allowance-limit">Annual limit: <strong>£60,000</strong></div>
+      <div class="allowance-input-row">
+        <label>Total pension contributions this year (£)</label>
+        <input type="number" id="pensionUsed" value="0" min="0" max="60000" step="500">
+      </div>
+      <div class="allowance-bar-wrap"><div class="allowance-bar-fill" id="pensionBarFill" style="width:0%;background:var(--blue)"></div></div>
+      <div class="allowance-stats">
+        <span id="pensionRemaining" class="allowance-remaining"></span>
+        <span id="pensionCarryFwd" class="allowance-deadline"></span>
+      </div>
+    </div>
+    <!-- Emergency Fund Gauge -->
+    <div class="allowance-card efund-card">
+      <div class="allowance-title">Emergency Fund</div>
+      <canvas id="efundGauge" width="180" height="110"></canvas>
+      <div class="efund-labels">
+        <span id="efundMonths" style="font-family:var(--serif);font-size:22px;font-style:italic;color:var(--ink);">—</span>
+        <span style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);">months covered</span>
+      </div>
+      <div class="efund-legend">
+        <span style="color:var(--red)">■</span> &lt;1mo
+        <span style="color:var(--amber)">■</span> 1–3mo
+        <span style="color:var(--teal)">■</span> 3–6mo
+        <span style="color:var(--cyan)">■</span> 6mo+
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);text-align:center;margin-top:6px;" id="efundNote"></div>
+    </div>
+  </div>
 
   <!-- SMART CALCULATORS -->
   <div class="section-header">
@@ -1067,6 +1178,12 @@ body.dark .tabnav { background: rgba(14,12,10,0.85); }
     <div class="section-num">14</div>
     <div class="section-title">Monthly Budget — Plan vs Actual</div>
     <div class="section-rule"></div>
+  </div>
+  <div class="budget-toolbar">
+    <button class="calc-btn" id="budgetImportBtn" style="margin-top:0;width:auto;padding:9px 16px;">📊 Import Excel / CSV</button>
+    <input type="file" id="budgetImportFile" accept=".xlsx,.xls,.csv" style="display:none">
+    <button class="calc-btn" id="budgetAddCatBtn" style="margin-top:0;width:auto;padding:9px 16px;background:var(--surface);color:var(--ink);border:1px solid var(--border);">+ Add Category</button>
+    <span style="font-family:var(--mono);font-size:10px;color:var(--muted);">Excel should have columns: Category, Budget, Actual</span>
   </div>
   <div class="budget-grid" id="budgetGrid"></div>
   <div class="budget-summary-row" id="budgetSummary"></div>
@@ -1571,6 +1688,26 @@ function renderHistory() {
       ]},
       options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{font:{family:'IBM Plex Mono',size:10},color:'#8a8278'} }, tooltip:{ callbacks:{ label:function(i){ return ' '+fmtFull(i.raw); }}, titleFont:{family:'IBM Plex Mono'}, bodyFont:{family:'IBM Plex Mono'} } }, scales:{ x:{ ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8a8278'}, grid:{color:'#e2ddd5'} }, y:{ ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8a8278',callback:function(v){return v>=1e6?'£'+(v/1e6).toFixed(1)+'M':'£'+(v/1000)+'K';}}, grid:{color:'#e2ddd5'} } } }
     });
+    // Compute stats
+    if (hist.length >= 2) {
+      const first = hist[0], last = hist[hist.length-1];
+      const totalGrowth = last.nw - first.nw;
+      const totalPct = first.nw > 0 ? (totalGrowth / first.nw * 100) : 0;
+      const daysDiff = (new Date(last.date) - new Date(first.date)) / 86400000;
+      const years = daysDiff / 365.25;
+      const cagr = years > 0.1 ? (Math.pow(last.nw / Math.max(first.nw,1), 1/years) - 1) * 100 : 0;
+      const statsEl = document.getElementById('historyStats');
+      if (statsEl) {
+        statsEl.style.display = 'grid';
+        const stat = function(l,v,col){ return '<div style="background:var(--surface2);border-radius:8px;padding:12px 14px;"><div style="font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:6px;">'+l+'</div><div style="font-family:var(--serif);font-size:20px;font-style:italic;color:'+(col||'var(--ink)')+'">'+v+'</div></div>'; };
+        statsEl.innerHTML =
+          stat('First recorded', fmtS(first.nw) + ' ('+first.date.slice(0,7)+')') +
+          stat('Latest snapshot', fmtS(last.nw), 'var(--teal)') +
+          stat('Total growth', (totalGrowth>=0?'+':'')+fmtS(totalGrowth)+' ('+totalPct.toFixed(0)+'%)', totalGrowth>=0?'var(--teal)':'var(--red)') +
+          stat('CAGR', years >= 0.1 ? (cagr>=0?'+':'')+cagr.toFixed(1)+'%/yr' : 'N/A (< 1yr)', cagr>=0?'var(--teal)':'var(--red)') +
+          stat('Snapshots', hist.length + ' records');
+      }
+    }
   } catch(e) {}
 }
 
@@ -1806,6 +1943,7 @@ function redrawVisible(page) {
   if (page==='growth' || !page) {
     drawCanvas(d,c);
     if (window._mcLast) drawMonteCarlo(window._mcLast); else runMonteCarlo();
+    renderFIRE();
   }
 }
 function initTabs() {
@@ -2270,6 +2408,216 @@ function renderBudgetTracker() {
   }
 }
 
+// ── FIRE CALCULATOR ───────────────────────────────────────────
+function renderFIRE() {
+  const d = getData(), c = calc(d);
+  const expenses = parseFloat(document.getElementById('fireExpenses').value) || 30000;
+  const swr = parseFloat(document.getElementById('fireSWR').value) / 100;
+  const inclSP = document.getElementById('fireStatePension').checked;
+  // State pension estimate ~£11500/year (full new SP 2024/25)
+  const spAnnual = inclSP ? 11500 : 0;
+  const adjustedExpenses = Math.max(0, expenses - spAnnual);
+  const fireNum = adjustedExpenses / swr;
+  const portfolio = c.totalInvested; // investable assets only (not property)
+  const pct = fireNum > 0 ? Math.min((portfolio / fireNum) * 100, 100) : 0;
+
+  // Years to FI — iterate monthly
+  let port = portfolio;
+  const annualContrib = c.monthlyTotal * 12;
+  const r = (d.baseRet || 5) / 100;
+  let yrs = 0;
+  while (port < fireNum && yrs < 60) {
+    port = port * (1 + r) + annualContrib;
+    yrs++;
+    if (port >= fireNum) break;
+  }
+  const fiAge = d.age + yrs;
+
+  // Update labels
+  document.getElementById('fireSWRLabel').textContent = (swr*100).toFixed(1) + '%';
+  document.getElementById('fireNumber').textContent = fmtS(fireNum);
+  document.getElementById('firePct').textContent = pct.toFixed(1) + '%';
+  document.getElementById('fireYears').textContent = portfolio >= fireNum ? 'Now!' : yrs + ' yrs';
+
+  const insight = portfolio >= fireNum
+    ? '🎉 You have already reached Financial Independence on a ' + (swr*100).toFixed(1) + '% SWR! Your portfolio can sustain £' + Math.round(adjustedExpenses/12).toLocaleString() + '/mo indefinitely.'
+    : 'At ' + (d.baseRet||5) + '% real returns, you reach FI at age ' + fiAge + '. Your FIRE number is ' + fmtFull(Math.round(fireNum)) + ' — you\'re ' + pct.toFixed(1) + '% there. Increasing contributions or reducing expenses accelerates this.';
+  document.getElementById('fireInsight').innerHTML = insight;
+
+  // Draw gauge
+  drawFireGauge(pct);
+}
+
+function drawFireGauge(pct) {
+  const cv = document.getElementById('fireGaugeCanvas'); if(!cv) return;
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  ctx.clearRect(0,0,W,H);
+  const cx = W/2, cy = H - 20, r = 90;
+
+  // Background arc
+  ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, 0); ctx.strokeStyle='#e2ddd5'; ctx.lineWidth=16; ctx.lineCap='round'; ctx.stroke();
+
+  // Colored fill arc
+  const prog = Math.PI + (pct/100) * Math.PI;
+  const grad = ctx.createLinearGradient(cx-r, 0, cx+r, 0);
+  grad.addColorStop(0, '#c0392b'); grad.addColorStop(0.4, '#d4680a'); grad.addColorStop(0.75, '#2a7a6f'); grad.addColorStop(1, '#00b4d8');
+  ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, prog); ctx.strokeStyle=grad; ctx.lineWidth=16; ctx.lineCap='round'; ctx.stroke();
+
+  // Center text
+  ctx.fillStyle='#1a1714'; ctx.font='bold 28px "IBM Plex Mono"'; ctx.textAlign='center'; ctx.fillText(pct.toFixed(0)+'%', cx, cy - 18);
+  ctx.fillStyle='#8a8278'; ctx.font='10px "IBM Plex Mono"'; ctx.fillText('of FIRE number', cx, cy - 3);
+
+  // Labels
+  ctx.fillStyle='#8a8278'; ctx.font='9px "IBM Plex Mono"'; ctx.textAlign='left'; ctx.fillText('0%', cx-r-8, cy+14);
+  ctx.textAlign='right'; ctx.fillText('100%', cx+r+8, cy+14);
+}
+
+// ── ALLOWANCE + EMERGENCY FUND ────────────────────────────────
+function renderAllowanceTracker() {
+  // --- ISA ---
+  const isaLimit = 20000;
+  const savedIsa = parseFloat(localStorage.getItem('wealth_isa_used') || '0');
+  const isaUsedEl = document.getElementById('isaUsed');
+  if (isaUsedEl && !isaUsedEl._touched) isaUsedEl.value = savedIsa;
+  const isaUsed = parseFloat((isaUsedEl && isaUsedEl.value) || savedIsa);
+  const isaRem = Math.max(0, isaLimit - isaUsed);
+  const isaPct = Math.min(isaUsed / isaLimit * 100, 100);
+  const isaBar = document.getElementById('isaBarFill');
+  if (isaBar) { isaBar.style.width = isaPct.toFixed(1)+'%'; isaBar.style.background = isaPct > 90 ? 'var(--red)' : isaPct > 70 ? 'var(--amber)' : 'var(--teal)'; }
+  const isaRem_el = document.getElementById('isaRemaining');
+  if (isaRem_el) isaRem_el.textContent = '£' + isaRem.toLocaleString() + ' remaining (' + isaPct.toFixed(0) + '% used)';
+
+  // Days until 5 April
+  const now = new Date();
+  const yr = now.getMonth() < 3 || (now.getMonth() === 3 && now.getDate() <= 5) ? now.getFullYear() : now.getFullYear() + 1;
+  const taxEnd = new Date(yr, 3, 5); // April 5
+  const days = Math.ceil((taxEnd - now) / 86400000);
+  const deadlineEl = document.getElementById('isaDeadline');
+  if (deadlineEl) deadlineEl.textContent = days + ' days until 5 April reset';
+
+  // --- PENSION ---
+  const penLimit = 60000;
+  const savedPen = parseFloat(localStorage.getItem('wealth_pen_used') || '0');
+  const penUsedEl = document.getElementById('pensionUsed');
+  if (penUsedEl && !penUsedEl._touched) penUsedEl.value = savedPen;
+  const penUsed = parseFloat((penUsedEl && penUsedEl.value) || savedPen);
+  const penRem = Math.max(0, penLimit - penUsed);
+  const penPct = Math.min(penUsed / penLimit * 100, 100);
+  const penBar = document.getElementById('pensionBarFill');
+  if (penBar) { penBar.style.width = penPct.toFixed(1)+'%'; penBar.style.background = penPct > 90 ? 'var(--red)' : penPct > 70 ? 'var(--amber)' : 'var(--blue)'; }
+  const penRem_el = document.getElementById('pensionRemaining');
+  if (penRem_el) penRem_el.textContent = '£' + penRem.toLocaleString() + ' remaining (' + penPct.toFixed(0) + '% used)';
+  const penCF = document.getElementById('pensionCarryFwd');
+  if (penCF) penCF.textContent = 'Can carry forward unused allowance up to 3 tax years';
+
+  // --- EMERGENCY FUND GAUGE ---
+  const d = getData();
+  const cash = d.cash || 0;
+  const budget = getBudget();
+  const monthlySpend = budget.reduce(function(s,b){ return s + (b.actual||b.plan); }, 0) || (d.monthlyIncome * 0.7) || 2500;
+  const months = monthlySpend > 0 ? cash / monthlySpend : 0;
+  const efEl = document.getElementById('efundMonths');
+  if (efEl) efEl.textContent = months.toFixed(1);
+  const efNote = document.getElementById('efundNote');
+  if (efNote) {
+    if (months < 1) efNote.textContent = '⚠ Below 1 month — build emergency fund urgently';
+    else if (months < 3) efNote.textContent = 'Aim for 3–6 months. Need £' + Math.round((3 - months) * monthlySpend).toLocaleString() + ' more.';
+    else if (months < 6) efNote.textContent = '✓ Good. Consider topping to 6 months for full security.';
+    else efNote.textContent = '✓ Excellent emergency buffer — ' + months.toFixed(1) + ' months secured.';
+  }
+  drawEfundGauge(months);
+}
+
+function drawEfundGauge(months) {
+  const cv = document.getElementById('efundGauge'); if(!cv) return;
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  ctx.clearRect(0,0,W,H);
+  const cx = W/2, cy = H - 10, r = 78;
+
+  // Background arc
+  ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI,0); ctx.strokeStyle='#e2ddd5'; ctx.lineWidth=14; ctx.lineCap='round'; ctx.stroke();
+
+  // Color zones (0–1 red, 1–3 amber, 3–6 teal, 6+ cyan)
+  const zones = [{end:1/12,col:'#c0392b'},{end:3/12,col:'#d4680a'},{end:6/12,col:'#2a7a6f'},{end:1,col:'#00b4d8'}];
+  let prevA = Math.PI;
+  zones.forEach(function(z) {
+    const endA = Math.PI + z.end * Math.PI;
+    ctx.beginPath(); ctx.arc(cx,cy,r,prevA,endA); ctx.strokeStyle=z.col; ctx.lineWidth=14; ctx.lineCap='butt'; ctx.stroke();
+    prevA = endA;
+  });
+
+  // Needle / progress overlay (white wipe then redraw up to current)
+  ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI,0); ctx.strokeStyle='#e2ddd5'; ctx.lineWidth=14; ctx.lineCap='round'; ctx.stroke();
+  const maxMonths = 12;
+  const progress = Math.min(months / maxMonths, 1);
+  const progA = Math.PI + progress * Math.PI;
+  const col = months < 1 ? '#c0392b' : months < 3 ? '#d4680a' : months < 6 ? '#2a7a6f' : '#00b4d8';
+  ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI,progA); ctx.strokeStyle=col; ctx.lineWidth=14; ctx.lineCap='round'; ctx.stroke();
+
+  // Center text
+  ctx.fillStyle='#1a1714'; ctx.font='bold 22px "IBM Plex Mono"'; ctx.textAlign='center'; ctx.fillText(months.toFixed(1), cx, cy-16);
+  ctx.fillStyle='#8a8278'; ctx.font='9px "IBM Plex Mono"'; ctx.fillText('months', cx, cy-3);
+}
+
+// ── BUDGET IMPORT ─────────────────────────────────────────────
+function importBudgetFile(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      let rows = [];
+      if (file.name.endsWith('.csv')) {
+        // Parse CSV manually
+        const lines = e.target.result.split(/\r?\n/).filter(function(l){ return l.trim(); });
+        const header = lines[0].split(',').map(function(h){ return h.trim().toLowerCase().replace(/[^a-z]/g,''); });
+        rows = lines.slice(1).map(function(line) {
+          const cols = line.split(',');
+          const obj = {};
+          header.forEach(function(h,i){ obj[h] = (cols[i]||'').trim().replace(/[£,"]/g,''); });
+          return obj;
+        });
+      } else {
+        // SheetJS for xlsx/xls
+        const XLSX = window.XLSX;
+        if (!XLSX) { showToast('SheetJS not loaded — try CSV instead'); return; }
+        const wb = XLSX.read(e.target.result, { type:'binary' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const raw = XLSX.utils.sheet_to_json(ws, { defval:'' });
+        rows = raw.map(function(r) {
+          const obj = {};
+          Object.keys(r).forEach(function(k){ obj[k.toLowerCase().replace(/[^a-z]/g,'')] = String(r[k]); });
+          return obj;
+        });
+      }
+      // Map columns — try common header names
+      const catKeys = ['category','cat','name','description','item'];
+      const planKeys = ['budget','planned','plan','amount','monthly'];
+      const actualKeys = ['actual','spent','spend','actuals'];
+      const getVal = function(row, keys) {
+        for (const k of keys) {
+          const v = row[k] || row[k.charAt(0).toUpperCase()+k.slice(1)];
+          if (v !== undefined && v !== '') return v;
+        }
+        return null;
+      };
+      const imported = rows.map(function(row) {
+        const cat = getVal(row, catKeys);
+        const plan = parseFloat(getVal(row, planKeys)) || 0;
+        const actual = parseFloat(getVal(row, actualKeys)) || plan;
+        return cat ? { cat: String(cat).trim(), plan, actual } : null;
+      }).filter(Boolean);
+
+      if (!imported.length) { showToast('No rows found — check columns: Category, Budget, Actual'); return; }
+      saveBudget(imported);
+      renderBudgetTracker();
+      showToast('Imported ' + imported.length + ' budget categories ✓');
+    } catch(err) { console.error(err); showToast('Import failed: ' + err.message); }
+  };
+  if (file.name.endsWith('.csv')) reader.readAsText(file);
+  else reader.readAsBinaryString(file);
+}
+
 // ── SCENARIOS ─────────────────────────────────────────────────
 function getScenarios() { try { return JSON.parse(localStorage.getItem(SCK) || '[]'); } catch(e){ return []; } }
 function saveScenarios(arr) { try { localStorage.setItem(SCK, JSON.stringify(arr)); } catch(e){} }
@@ -2484,10 +2832,6 @@ function exportPDF() {
     doc.setFillColor(...DARK); doc.rect(0, 0, W, 120, 'F');
     // Gold left accent bar
     doc.setFillColor(...GOLD); doc.rect(0, 0, 6, 120, 'F');
-    // Subtle grid lines in header
-    doc.setDrawColor(0,180,216); doc.setLineWidth(0.3); doc.setGState(doc.GState({opacity:0.1}));
-    for (let gx = 60; gx < W; gx += 60) { doc.line(gx, 0, gx, 120); }
-    doc.setGState(doc.GState({opacity:1}));
     // Eyebrow
     doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(0,180,216);
     doc.text('PERSONAL WEALTH REPORT  ·  CONFIDENTIAL', MARGIN+10, 32);
@@ -2514,8 +2858,9 @@ function exportPDF() {
     boxes.forEach(function(b, i) {
       const bx = MARGIN + i*(bw+4);
       doc.setFillColor(...b.col); doc.roundedRect(bx, y, bw, 56, 4, 4, 'F');
-      doc.setFillColor(0,0,0); doc.setGState(doc.GState({opacity:0.2})); doc.roundedRect(bx, y+28, bw, 28, 4, 4, 'F');
-      doc.setGState(doc.GState({opacity:1}));
+      // Bottom half slightly darker — achieved by second rect with dark fill at low RGB
+      const dc = b.col.map(function(v){ return Math.max(0, v-30); });
+      doc.setFillColor(dc[0],dc[1],dc[2]); doc.roundedRect(bx, y+28, bw, 28, 4, 4, 'F');
       doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(255,255,255);
       doc.text(b.label.toUpperCase(), bx+10, y+14);
       doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(255,255,255);
@@ -3345,6 +3690,23 @@ document.getElementById('watchlistInput').addEventListener('keydown', function(e
 // State pension
 document.getElementById('spCalcBtn').addEventListener('click', calcStatePension);
 document.getElementById('spNiYears').addEventListener('change', calcStatePension);
+// FIRE calculator
+document.getElementById('fireExpenses').addEventListener('input', renderFIRE);
+document.getElementById('fireSWR').addEventListener('input', renderFIRE);
+document.getElementById('fireStatePension').addEventListener('change', renderFIRE);
+// Allowance tracker
+document.getElementById('isaUsed').addEventListener('change', function(){ this._touched=true; localStorage.setItem('wealth_isa_used', this.value); renderAllowanceTracker(); });
+document.getElementById('pensionUsed').addEventListener('change', function(){ this._touched=true; localStorage.setItem('wealth_pen_used', this.value); renderAllowanceTracker(); });
+// Budget import / add category
+document.getElementById('budgetImportBtn').addEventListener('click', function(){ document.getElementById('budgetImportFile').click(); });
+document.getElementById('budgetImportFile').addEventListener('change', function(){ if(this.files[0]) importBudgetFile(this.files[0]); this.value=''; });
+document.getElementById('budgetAddCatBtn').addEventListener('click', function(){
+  const name = prompt('Category name:'); if(!name) return;
+  const arr = getBudget();
+  arr.push({ cat: name, plan: 0, actual: 0 });
+  saveBudget(arr);
+  renderBudgetTracker();
+});
 // Debt
 document.getElementById('debtAddBtn').addEventListener('click', addDebt);
 // Scenarios
@@ -3431,6 +3793,8 @@ updateApiIndicator();
 (function(){ const d=getData(); const r=document.getElementById('mcReturn'); if(r) r.value=d.baseRet; })();
 runMonteCarlo();
 renderTax();
+renderFIRE();
+renderAllowanceTracker();
 initHeaderCanvas();
 initCalcs();
 initPWA();
